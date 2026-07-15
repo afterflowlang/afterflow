@@ -3,9 +3,7 @@
 - Arrays
 - Structures
 - Refinement types
-- File I/O support
-- External imports
-- Unicode strings
+- External/FFI imports
 - Hashmap
 - Threads/coroutines
 - Benchmarks

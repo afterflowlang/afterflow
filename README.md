@@ -14,12 +14,13 @@ The grammar file lives in: [grammar.peg](./grammar.peg)
 - **Punctuation-driven syntax**: A minimal surface language that stays readable while keeping the parser and backend fast.
 - **No keywords**: There are no built-ins like `let`, `fn`, `if`, or `struct`, every semantic construct arises from punctuation and continuation form.
 - **First-class functions**: Every value is passed explicitly, closures are automatically curried and lowered to environment structures.
-- **Unicode-aware frontend**: UTF-8 literals and identifiers work as expected while the grammar stays ASCII-friendly.
+- **Unicode-aware strings**: UTF-8 string literals work as expected; identifiers use an intentionally ASCII-only grammar.
 - **Direct compile-to-assembly backend**: Deterministic performance, tiny runtime footprint, full control over calling conventions and memory layout.
 
 # Example
 ```
 str: @str
+
 name: "Alice"
 printf: (fmt: str!, args: ..., ok:()) {
    (s: str) = @sprintf(fmt, args)
@@ -29,6 +30,11 @@ hello: (){
    printf("hello %s", name, @exit(0))
 }
 ```
+
+`@name` addresses the compiler-provided types and operations that every Rgo
+implementation must support. It is separate from user labels; keyword-like
+types are usually given short aliases. Source packages use explicit namespace
+bindings such as `math: /math`.
 
 ## Execution Model & Core Semantics
 
@@ -45,6 +51,7 @@ There are no expressions, operators or return values, all computation is a seque
 A definition introduces a name for a value inside the current scope:
 ```
 str: @str
+
 name: "Bob"
 printf: (fmt: str!, args: ..., ok:()) {
    (s: str) = @sprintf(fmt, args)
@@ -59,6 +66,7 @@ foo: (ok:()){
 
 ```
 str: @str
+
 name: "Bob"
 printf: (fmt: str!, args: ..., ok:()) {
    (s: str) = @sprintf(fmt, args)
@@ -177,16 +185,16 @@ make run hello
 git clone https://github.com/rgolang/rgo.git
 cd rgo
 docker build -t rgo-compiler .
-docker run --rm -i rgo-compiler code/hello.rgo main
+docker run --rm -i rgo-compiler code/main.rgo hello
 ```
 
-This compiles and runs the `main` target in `code/hello.rgo`.
+This compiles and runs the `hello` target in `code/main.rgo`.
 
 This is what happens inside the container (or on your linux machine)
 ```sh
 apt-get install -y nasm gcc make
-cargo run -- code/hello.rgo main code/hello.asm
-nasm -felf64 code/hello.asm -o bin/hello.o
+cargo run -- code/main.rgo hello hello.asm
+nasm -felf64 hello.asm -o bin/hello.o
 ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc bin/hello.o -o bin/hello
 ./bin/hello
 ```
@@ -212,9 +220,20 @@ ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc bin/hello.o -o bin/hello
 - `src/`: Rust implementation of the lexer, parser, HIR, and back-end code generator.
 - `code/`: sample Rgo workspace files (`main.rgo` contains target functions such as `hello` for Makefile shortcuts).
 - `tests/`: integration and golden snapshot tests; `golden_test.rs` is the automated snapshot generator.
-- [SEMANTICS.md](SEMANTICS.md) describes source-language rules, user-visible behavior, and runtime behavior.
+- [SEMANTICS.md](SEMANTICS.md) describes source-language rules and
+  user-visible behavior.
+- [SPEC.md](SPEC.md) describes v1 runtime representation, lowering, and
+  heap details.
 
 ## Compilation
+
+For v1, the input file locates the project root: its containing folder is the
+root package, and every `.rgo` file directly in that folder is compiled into
+the same package. A source binding such as `lib: /lib` loads every direct
+`.rgo` file from the `lib` folder beneath that project root.
+The root package itself cannot be imported; declarations shared with imported
+packages belong in a named package that each consumer imports.
+
 The compilation process flows as follows:
 1. `Lexer`: Transforms source text into a stream of `Token`s.
 2. `Parser`: Consumes tokens to produce an Abstract Syntax Tree (AST).
@@ -230,14 +249,14 @@ This language is still in an early experimental phase, and several subsystems ar
 
 - No optimizations  
 The backend currently emits straightforward CPS-lowered NASM without peephole passes, register allocation strategies, inlining, or dead-code elimination. Output is correct but not optimized.
-- No floating-point support  
-The type system and backend only handle integers and pointers today. Floating-point literals, arithmetic, and ABI conventions remain unimplemented.
+- Limited floating-point support
+`f64` literals and the `@add_f64`, `@mul_f64`, and `@div_f64` builtins are available. Broader numeric facilities and platform math-library bindings are not yet implemented.
 - No math library  
 Functions such as sin, cos, sqrt, and friends are not yet exposed. Interfacing to libm and defining a typed surface for it are planned but currently absent.
 - No arrays or slices  
 Aggregate data structures are not yet supported. There is no syntax or type-level encoding for contiguous memory layouts, indexing, or bounds semantics.
 - Minimal runtime surface  
-At present, the only “standard library” consists of @write, @sprintf, and arbitrary native NASM instructions.
+The compiler-provided runtime surface consists of the builtins documented in [SEMANTICS.md](SEMANTICS.md), including `@write`, `@readfile`, and `@sprintf`.
 
 Despite that, functionality is slowly expanding, and the compiler architecture is structured so these features can be added piece by piece while keeping the language’s core goals (simplicity, explicitness, and predictability) intact.
 

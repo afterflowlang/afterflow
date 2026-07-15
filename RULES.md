@@ -21,8 +21,10 @@ Referenced outer values must be captured into nested executable values.
 
 ## Builtin labels must not share the user label namespace
 
-Builtin labels must not share the user label namespace. 
-A builtin can participate in the user label namespace only when user code gives it a user-space label.
+Builtin labels must not share the user label namespace.
+Builtin package namespaces must be compile-time-only. A builtin can participate
+in the user label namespace when user code gives it a user-space alias.
+
 
 ## Computation must be application
 

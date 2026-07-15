@@ -1,6 +1,11 @@
 
 # Lambda-calculus
 
+This document follows the evolution from lambda calculus into Rgo. Each step
+keeps the preceding computational model while making it more explicit and
+practical. The final step describes the current v1 language. For the complete,
+normative rules, see [SEMANTICS.md](SEMANTICS.md).
+
 https://en.wikipedia.org/wiki/Lambda_calculus
 
 >Lambda calculus (also written as λ-calculus) is a formal system in mathematical logic for expressing computation based on function abstraction and application using variable binding and substitution. It is a universal model of computation that can be used to simulate any Turing machine. It was introduced by the mathematician Alonzo Church in the 1930s as part of his research into the foundations of mathematics.
@@ -163,3 +168,47 @@ calculate: (f: (int), v: int){
 run: calculate(printdouble)
 run(0)
 ```
+
+## Rgo v1: current step
+
+The current v1 language is the next step in this progression:
+
+- compiler-provided types and operations use the separate `@name` label space;
+  they no longer need to be imported into the user label space
+- ordinary definitions can give builtin types or operations shorter local
+  labels, such as `int: @int`
+- every executable function uses continuation-passing style and does not
+  return
+- application in a value position curries an executable value, while the
+  outermost application in executable position transfers control
+- scope capture with `=` rewrites the remainder of a block into a continuation,
+  keeping sequential CPS code flat
+- adjacent executable phrases form right-associated continuation sentences
+- source packages use explicit compile-time namespace bindings such as
+  `math: /math`
+
+The final example from the previous step becomes valid v1 Rgo as follows:
+
+```rgo
+int: @int
+str: @str
+
+printdouble: (z: int){
+    (d: int) = @mul(2, z)
+    (s: str) = @sprintf("%d\n", d)
+    @write(s, @exit(0))
+}
+
+calculate: (f: (int)){
+    (a: int) = @add(2, 3)
+    @add(a, 3, f)
+}
+
+main: (){
+    calculate(printdouble)
+}
+```
+
+The program still represents the same reduction: add `2` and `3`, add `3`
+again, multiply the result by `2`, then print `16`. The difference is that v1
+makes the continuation flow, types, bindings, and final side effect explicit.

@@ -29,14 +29,19 @@ Source-file flow:
   - require the target invocation to be complete
 - execute by tail-transferring between executable values
 
-Blocks are non-empty. `;` and newlines separate block items.
+Blocks are non-empty. `;` and newlines separate block items. Newlines between
+adjacent executable phrases form one right-associated continuation sentence.
+When another kind of block item interrupts that sentence, the preceding
+execution captures the remaining block as a unit continuation.
 
 ## Lexical Rules
 
 Identifiers start with an ASCII letter or `_`, followed by ASCII letters,
 digits, or `_`.
 
-Line comments start with `//` and continue to the end of the line.
+Line comments start with `//` and continue to the end of the line. Block
+comments start with `/*` and continue until the next `*/`; they may span
+lines and are treated as whitespace. Block comments are not nested.
 
 String literals have two forms:
 
@@ -53,6 +58,7 @@ A definition introduces a name for a value inside the current scope:
 
 ```rgo
 str: @str
+
 printf: (fmt: str!, args: ..., ok:()) {
     (s: str) = @sprintf(fmt, args)
     @write(s, ok)
@@ -105,9 +111,10 @@ x: 1
 }()
 ```
 
-Type aliases obey the same declaration-before-use rule as values. Builtin
-types and functions are available as `@name` references and can be aliased or
-used inside ordinary source definitions, such as `int: @int` or a `@write`.
+Type aliases obey the same declaration-before-use rule as values. Builtins are
+referenced directly with `@name`. Keyword-like types are normally given short
+aliases such as `int: @int`, while functions normally retain their direct
+names, such as `@write(...)`.
 
 ## Invocation and Currying
 
@@ -121,10 +128,11 @@ Application flow:
     - bind the supplied arguments
     - produce an executable value
     - do not transfer control yet
-  - if it appears as a standalone block item
+  - if it is the outermost application of an executable block continuation
+    sentence
     - bind the supplied arguments
     - transfer control to the executable value
-    - do not return to the current block item
+    - do not return to the current block
 
 When application appears on the right-hand side of a definition or as an
 argument, it applies arguments to an executable value without running it. The
@@ -138,20 +146,19 @@ foo(end)
 In `end: exit(0)`, `exit(0)` is a curried executable value. It does not execute
 at definition time.
 
-When application appears as a standalone block item, it transfers control to
-that executable value and does not return to the current location:
+The outermost application of an executable block continuation sentence
+transfers control to that executable value and does not return to the current
+location:
 
 ```rgo
 foo(end)
 ```
 
-Block item identifiers and lambdas are invocations even when they have no
+Outermost identifiers and lambdas are invocations even when they have no
 explicit argument list:
 
 ```rgo
-write: @write
-
-mywrite: write("hello", (){})
+mywrite: @write("hello", (){})
 mywrite
 ```
 
@@ -160,16 +167,14 @@ The final `mywrite` invokes the executable value and writes `hello`.
 Likewise, a lambda block item executes:
 
 ```rgo
-write: @write
-
 (){
-    write("hello", (){})
+    @write("hello", (){})
 }
 ```
 
-A standalone invocation must supply enough arguments to run. A partial
-application can be stored or passed, but it cannot be the final action of a
-block item by itself.
+The outermost invocation must supply enough arguments to run. A partial
+application can be stored, passed, or used as an inner phrase of a continuation
+sentence, but it cannot be the outermost action by itself.
 
 Literal values cannot be standalone invocations.
 
@@ -180,6 +185,144 @@ foo(a)(b)
 ```
 
 is equivalent to currying `foo` with `a`, then currying that result with `b`.
+
+Inside a definition value, one argument of an application, or an executable
+block continuation sentence, whitespace between adjacent values applies to the
+right:
+
+```rgo
+chain: a b c
+foo(a b c)
+```
+
+Both value positions mean `a(b(c))`. Parentheses still supply the immediate
+arguments of one phrase, so:
+
+```rgo
+chain: a(x) b(y) c(z)
+```
+
+means:
+
+```rgo
+chain: a(x, b(y, c(z)))
+```
+
+A definition's continuation sentence may span lines when its following phrases
+are indented beyond its label:
+
+```rgo
+chain:
+    a(x)
+    b(y)
+    c(z)
+```
+
+## Block Continuation Sentences
+
+Newlines and spaces have the same right-associative application meaning between
+adjacent executable phrases. Only the outermost phrase transfers control; every
+phrase nested inside it is a curried value.
+
+```text
+after an executable phrase
+    next item is another executable phrase
+        right-fold it directly as a continuation value
+    next item is a definition or other block structure
+        capture the remaining block as a unit continuation
+    no next item
+        transfer through the executable as written
+```
+
+For example:
+
+```rgo
+foo: (){
+    bar(x)
+    baz(y)
+    exit(0)
+}
+```
+
+means:
+
+```rgo
+foo: (){
+    bar(x, baz(y, exit(0)))
+}
+```
+
+The unit continuation is not special. A right-hand phrase may instead remain
+partially applied with the payload shape expected by the phrase on its left:
+
+```rgo
+int: @int
+str: @str
+
+produce: (value: int, ok: (int)){
+    ok(value)
+}
+
+consume: (prefix: str, value: int){
+    (message: str) = @sprintf("%s %d\n", prefix, value)
+    @write(message, @exit(0))
+}
+
+main: (){
+    produce(42)
+    consume("value")
+}
+```
+
+The body of `main` means `produce(42, consume("value"))`.
+`consume("value")` has the residual signature `(int)`, so it matches
+`produce`'s `ok` parameter. When `produce` invokes `ok(42)`, control transfers
+to `consume("value", 42)`. The compiler does not introduce a result variable or
+a separate feed operation.
+
+A definition cannot itself be passed as a continuation value. When it follows
+a bare execution, the entire remaining block is therefore captured as `()`:
+
+```rgo
+main: (){
+    foo
+    value: something
+    bar(value)
+}
+```
+
+means:
+
+```rgo
+main: (){
+    foo((){
+        value: something
+        bar(value)
+    })
+}
+```
+
+The implicit unit capture extends through the end of the current block. The
+definition and final invocation remain inside that continuation's scope.
+
+This is the unnamed, eta-reduced form of explicit scope capture:
+
+```rgo
+main: (){
+    (result: int) = produce(42)
+    consume("value", result)
+}
+```
+
+Explicit scope capture remains necessary when the received values need names,
+must be used more than once, or feed a continuation that cannot be represented
+by the residual signature of one applied value. An implicit capture always has
+the unit signature `()`; use explicit scope capture when the preceding execution
+passes payload values into the remaining block.
+
+Right-associative application does not invent a terminal continuation. The
+complete outer invocation must still transfer to a continuation supplied by the
+source when the flow does not end in the invoked function.
 
 ## Argument Matching
 
@@ -224,17 +367,16 @@ For example:
 
 ```rgo
 int: @int
-add: @add
 str: @str
+
 printf: (fmt: str!, args: ..., ok:()) {
     (s: str) = @sprintf(fmt, args)
     @write(s, ok)
 }
-exit: @exit
 
 hello: (){
-    (sum: int) = add(2, 3)
-    printf("sum: %d\n", sum, exit(0))
+    (sum: int) = @add(2, 3)
+    printf("sum: %d\n", sum, @exit(0))
 }
 ```
 
@@ -247,19 +389,16 @@ declared functions and are not captured from other root-level functions.
 
 ## Types
 
-Builtin type names can be used directly with `@`:
-
-```rgo
-foo: (x: @int, text: @str, ratio: @f64){
-}
-```
-
-They can also be given local aliases with ordinary definitions:
+Builtin type names can be aliased into local type labels:
 
 ```rgo
 int: @int
 str: @str
+byte: @byte
 f64: @f64
+
+foo: (x: int, text: str, ratio: f64){
+}
 ```
 
 The primitive type rules are:
@@ -270,8 +409,21 @@ The primitive type rules are:
 - `int` must be an integer.
 - `int!` must be a compile-time available integer. The argument must be an
   integer literal or another `int!` value.
+- `uint` must be a non-negative integer in the machine-preferred unsigned
+  integer layout for the target architecture.
+- `uint!` must be a compile-time available non-negative integer. The argument
+  must be an integer literal or another compile-time integer value.
+- `byte` must be a compile-time available integer from `0` through `255`.
+  Integer literals supplied where `byte` is required are checked against this
+  range.
 - `f64` must be a floating-point value. An integer literal may satisfy an
   `f64` parameter because it is compile-time available.
+
+At runtime, a `str` carries a data pointer and a byte length. The data storage
+also has a trailing NUL byte for C interoperability, but that terminator is not
+part of the Rgo string length. Rgo operations such as `@write` preserve
+embedded `\0` bytes. A libc API that accepts only a C `char*`, including `%s`
+formatting, stops at the first embedded NUL.
 
 Function types are written with parameter lists:
 
@@ -369,6 +521,8 @@ Variadic argument flow:
 Formatted printing is ordinary source code:
 
 ```rgo
+str: @str
+
 printf: (fmt: str!, args: ..., ok:()) {
     (s: str) = @sprintf(fmt, args)
     @write(s, ok)
@@ -386,108 +540,186 @@ incompatible mutations of the same logical closure state.
 
 Rules:
 
-1. If a closure value has exactly one remaining use, currying may reuse the
-   same logical closure value.
-2. If a closure value has more than one remaining use, currying must preserve
-   the other uses as if they had independent closure state.
+1. Currying a closure must produce independent logical closure state. The v1
+   implementation does this by deep-cloning the source closure even when the
+   curry is its sole use.
+2. If a closure value has more than one remaining use, storing it as a curried
+   argument must preserve the other uses as if they had independent closure
+   state.
 3. If the same closure value is used in multiple places, such as `k(x, x)`,
    all uses must behave as independent values where later currying could
    otherwise interfere.
 4. Pure renaming without duplication does not create a new semantic use.
 
-These are semantic rules.
+These are semantic rules. The single-pointer runtime representation and cloning
+details are documented in [SPEC.md](SPEC.md).
 
 ## Builtins and Imports
 
-Bare `@name` references compiler-provided builtin types and functions. Builtins
-can be used directly at the use site:
+Compiler-provided builtins are addressed directly with `@name`. They are the
+types and operations that require backend support and are guaranteed by the
+Rgo language contract. Higher-level facilities belong in ordinary source
+packages.
 
-```rgo
-hello: (){
-    (s: @str) = @sprintf("hello\n")
-    @write(s, @exit(0))
-}
-```
-
-They can also be aliased with ordinary definitions:
+`@name` is a compiler-owned label space, not a namespace value or an import.
+It is available wherever a label or type is valid and never occupies the user
+label namespace unless code deliberately aliases it:
 
 ```rgo
 int: @int
 write: @write
 ```
 
+Builtin names are flat and must match a builtin known by the compiler.
+`@anything` never selects or renames a package; an unknown name is an error.
+Builtin references contain exactly one name, so `@std.write` is invalid.
+
 The builtin name must match a builtin known by the compiler. Current builtin
 entries are:
 
-```rgo
-@str // owner: backend/runtime ABI; string literal storage and pointer/length passing
+```text
+@str // owner: backend/runtime ABI; strings carry a data pointer and byte length; C calls receive a NUL-terminated data pointer
 @int // owner: backend/ABI; machine preferred integer layout for the target architecture
+@uint // owner: backend/ABI; machine preferred unsigned integer layout for the target architecture
+@byte // owner: backend/ABI; unsigned byte value constrained to the range 0 through 255
 @f64 // owner: CPU/backend/ABI; floating-point layout and register passing
+@b8 // owner: backend/ABI; uninterpreted 8-bit value
+@i8 // owner: backend/ABI; signed 8-bit integer
+@u8 // owner: backend/ABI; unsigned 8-bit integer
+@b32 // owner: backend/ABI; uninterpreted 32-bit value
+@i32 // owner: backend/ABI; signed 32-bit integer
+@u32 // owner: backend/ABI; unsigned 32-bit integer
+@b64 // owner: backend/ABI; uninterpreted 64-bit value
+@i64 // owner: backend/ABI; signed 64-bit integer
+@u64 // owner: backend/ABI; unsigned 64-bit integer
+@b128 // owner: backend/ABI; uninterpreted 128-bit value
+@i128 // owner: backend/ABI; signed 128-bit integer
+@u128 // owner: backend/ABI; unsigned 128-bit integer
 @add // owner: CPU/backend; primitive integer instruction exposed with a CPS signature
 @sub // owner: CPU/backend; primitive integer instruction exposed with a CPS signature
 @mul // owner: CPU/backend; primitive integer instruction exposed with a CPS signature
 @div // owner: CPU/backend; primitive checked integer division with error and success continuations
-@divint // owner: CPU/backend; primitive checked integer division with error and success continuations
-@addf64 // owner: CPU/backend; primitive floating-point instruction exposed with a CPS signature
-@mulf64 // owner: CPU/backend; primitive floating-point instruction exposed with a CPS signature
-@divf64 // owner: CPU/backend; primitive floating-point instruction exposed with a CPS signature
-@eq // owner: CPU/backend; primitive equality branch emitted as direct control transfer
-@eqi // owner: CPU/backend; primitive integer equality branch emitted as direct control transfer
-@eqs // owner: backend/runtime; string equality over the runtime string representation
+@add_f64 // owner: CPU/backend; primitive floating-point instruction exposed with a CPS signature
+@mul_f64 // owner: CPU/backend; primitive floating-point instruction exposed with a CPS signature
+@div_f64 // owner: CPU/backend; primitive floating-point instruction exposed with a CPS signature
+@add_b8 // owner: CPU/backend; primitive wrapping addition of 8-bit values
+@add_b32 // owner: CPU/backend; primitive wrapping addition of 32-bit values
+@add_b64 // owner: CPU/backend; primitive wrapping addition of 64-bit values
+@add_b128 // owner: CPU/backend; primitive wrapping addition of 128-bit values
+@sub_b8 // owner: CPU/backend; primitive wrapping subtraction of 8-bit values
+@sub_b32 // owner: CPU/backend; primitive wrapping subtraction of 32-bit values
+@sub_b64 // owner: CPU/backend; primitive wrapping subtraction of 64-bit values
+@sub_b128 // owner: CPU/backend; primitive wrapping subtraction of 128-bit values
+@mul_b8 // owner: CPU/backend; primitive wrapping multiplication of 8-bit values
+@mul_b32 // owner: CPU/backend; primitive wrapping multiplication of 32-bit values
+@mul_b64 // owner: CPU/backend; primitive wrapping multiplication of 64-bit values
+@mul_b128 // owner: CPU/backend; primitive wrapping multiplication of 128-bit values
+@div_signed_b8 // owner: CPU/backend; primitive signed division of 8-bit representations
+@div_unsigned_b8 // owner: CPU/backend; primitive unsigned division of 8-bit representations
+@div_signed_b32 // owner: CPU/backend; primitive signed division of 32-bit representations
+@div_unsigned_b32 // owner: CPU/backend; primitive unsigned division of 32-bit representations
+@div_signed_b64 // owner: CPU/backend; primitive signed division of 64-bit representations
+@div_unsigned_b64 // owner: CPU/backend; primitive unsigned division of 64-bit representations
+@div_signed_b128 // owner: CPU/backend; primitive signed division of 128-bit representations
+@div_unsigned_b128 // owner: CPU/backend; primitive unsigned division of 128-bit representations
+@b8_from_i8 // owner: backend/ABI; same-width representation conversion
+@b8_from_u8 // owner: backend/ABI; same-width representation conversion
+@i8_from_b8 // owner: backend/ABI; same-width representation conversion
+@u8_from_b8 // owner: backend/ABI; same-width representation conversion
+@b32_from_i32 // owner: backend/ABI; same-width representation conversion
+@b32_from_u32 // owner: backend/ABI; same-width representation conversion
+@i32_from_b32 // owner: backend/ABI; same-width representation conversion
+@u32_from_b32 // owner: backend/ABI; same-width representation conversion
+@b64_from_i64 // owner: backend/ABI; same-width representation conversion
+@b64_from_u64 // owner: backend/ABI; same-width representation conversion
+@i64_from_b64 // owner: backend/ABI; same-width representation conversion
+@u64_from_b64 // owner: backend/ABI; same-width representation conversion
+@b128_from_i128 // owner: backend/ABI; same-width representation conversion
+@b128_from_u128 // owner: backend/ABI; same-width representation conversion
+@i128_from_b128 // owner: backend/ABI; same-width representation conversion
+@u128_from_b128 // owner: backend/ABI; same-width representation conversion
+@eq_int // owner: CPU/backend; primitive integer equality branch emitted as direct control transfer
+@eq_str // owner: backend/runtime; string equality over the runtime string representation
 @lt // owner: CPU/backend; primitive integer comparison branch emitted as direct control transfer
 @gt // owner: CPU/backend; primitive integer comparison branch emitted as direct control transfer
+@sprintf // owner: libc variadic ABI and runtime buffer; deterministic string formatting
 @write // owner: OS/filesystem descriptor API; byte-stream output operation
+@readfile // owner: OS/filesystem API; whole-file read into a runtime string with error and success continuations
 @exit // owner: OS process ABI; process-completion operation
-@sprintf // owner: libc variadic ABI and runtime buffer; current builtin exception for formatting to a string
 ```
 
-The root namespace is flat:
-
-- no duplicates
-- no categories
-- no groups
-- no second paths
-- no keywords
-
-Builtin references have no path form:
+Builtin aliases occupy the user label namespace. A builtin can be aliased
+under any available label:
 
 ```rgo
 int: @int
+sum: @add
+
 foo: (x: int){
 }
 ```
 
-Only `@name` names builtins.
+Unknown builtin forms such as `@puts` are invalid. `@int` is the direct builtin
+type reference.
 
 Builtin operation signatures:
 
 - integer arithmetic: `add`, `sub`, `mul` take `x: int`, `y: int`, and
   `ok: (int)`
-- integer division: `div` and `divint` take `x: int`, `y: int`, `err: (int)`,
-  and `ok: (int)`
-- floating arithmetic: `addf64`, `mulf64`, `divf64` take `x: f64`, `y: f64`,
+- native integer division: `div` takes `x: int`, `y: int`, `err: ()`, and
+  `ok: (int)`
+- floating arithmetic: `add_f64`, `mul_f64`, `div_f64` take `x: f64`, `y: f64`,
   and `ok: (f64)`
-- equality: `eq`, `eqi`, and `eqs` choose true and false continuations rather
+- sign-neutral fixed-width arithmetic: `add_bW`, `sub_bW`, and `mul_bW` take
+  two `bW` values and continue with their wrapping result
+- sign-sensitive fixed-width division: `div_signed_bW` and
+  `div_unsigned_bW` take two `bW` values, `err: ()`, and `ok: (bW)`; their
+  names specify how the backend interprets the operand representations
+- fixed-width conversions reinterpret the same-width bit representation between
+  `bW` and `iW` or `uW`; ergonomic signed and unsigned arithmetic is ordinary
+  Rgo library code built from these conversions and the corresponding primitive
+- equality: `eq_int` and `eq_str` choose true and false continuations rather
   than returning booleans
-- integer comparisons: `lt` and `gt` jump to their final continuation when the
-  comparison succeeds
-- conversion and output: `write`, `sprintf`, and `exit`
-  perform their named effects through continuations where their signatures
-  require one
+- integer comparisons: `lt` and `gt` take true then false continuations; they
+  jump to the true continuation (the third argument) when the comparison
+  succeeds and the false continuation (the final argument) otherwise
+- formatting: `@sprintf` deterministically produces a string
+- process completion: `@exit` terminates the process
+- output: `@write` continues after writing
+- file input: `readfile` takes `path: str`, `err: ()`, and `ok: (str)`; it
+  reads the whole file named by `path` at runtime, enters `err` when the file
+  cannot be opened or read, and enters `ok` with the complete contents as a
+  runtime string
 
-`sprintf` is a current exception to the builtin design rules. It is a
-higher-level formatting facility and should become ordinary Rgo library code or
-platform-backed library code once the language can express its implementation.
+`sprintf` requires backend support because source code cannot inspect its
+heterogeneous variadic arguments or construct a runtime string. It can move to
+an ordinary source or platform-backed library only when Rgo has a smaller
+source-expressible formatting substrate.
 
 `puts` is not a builtin. It is ordinary source code built from `@write`, and a
-libc-style wrapper always appends a newline before continuing:
+libc-style wrapper always appends a newline before
+continuing:
 
 ```rgo
 str: @str
-write: @write
 puts: (s: str, ok:()) {
-    write(s, () {
-        write("\n", ok)
+    @write(s, () {
+        @write("\n", ok)
+    })
+}
+```
+
+`readfile` follows the same error-continuation convention as `div`: the error
+continuation is entered without a payload when the file cannot be opened or
+read, and the success continuation receives the whole contents as a runtime
+string:
+
+```rgo
+str: @str
+
+show: (path: str) {
+    @readfile(path, @exit(1), (contents: str) {
+        @write(contents, @exit(0))
     })
 }
 ```
@@ -498,10 +730,9 @@ function built from comparison and continuations:
 
 ```rgo
 int: @int
-lt: @lt
 
 max_int: (x: int, y: int, ok: (int)){
-    lt(x, y, (){
+    @lt(x, y, (){
         ok(y)
     }, (){
         ok(x)
@@ -512,6 +743,59 @@ max_int: (x: int, y: int, ok: (int)){
 Language features that do not depend on external functionality are expressed
 with grammar and punctuation rather than English keywords.
 
+## Source Imports
+
+A source package binding introduces a namespace for a folder of Rgo source
+files by project-absolute path:
+
+```rgo
+strings: /lib/strings
+```
+
+Import rules:
+
+- source package bindings are file-root definitions; builtin references are
+  not imports and may appear wherever a label or type is valid
+- source paths start with `/` and resolve against the project root;
+  `@path` and filesystem-relative paths are invalid
+- the path extends until a newline or `;`; earlier path components may contain
+  spaces and hyphens
+- the label before `:` is the namespace and must be a valid identifier; it may
+  be `std` because builtins use `@name`
+- `/` is invalid because the root package is already the compilation entry,
+  cannot be imported
+- an import names a folder, never a single file
+- every `.rgo` file directly inside the folder belongs to that folder's
+  module; subfolders are separate modules and need their own imports
+- all root-level declaration names in a folder share one flat namespace;
+  declaring the same name twice anywhere in one folder is invalid
+- files in the same folder see each other's root declarations regardless of
+  file order; declaration-before-use ordering applies within each file, and
+  mutual reference between files in the same folder is allowed
+- sibling-file visibility is folder-namespace lookup, not same-scope
+  ordering: each file's root scope keeps its own declaration-before-use
+  rule, so this does not weaken the ordering rule within any scope
+- folders reference other folders only through imports, and import
+  dependencies between folders must not form a cycle
+- an import namespace is compile-time only: it is not a value, cannot be passed
+  or stored, and has no runtime representation
+
+Imported declarations are reached through the bound namespace with a dot,
+which is compile-time label lookup into the imported folder's root scope:
+
+```rgo
+strings: /lib/strings
+upper: strings.upper
+```
+
+Aliasing an imported declaration (`upper: strings.upper`) puts it into the
+ordinary scoped namespace, after which it behaves like any local label. Dot
+access is not a runtime operation and does not generalize to values.
+
+Imports are source templates, never precompiled binary artifacts. How a
+compiler caches or reuses work derived from imported sources is an
+implementation concern and belongs in that compiler's own documentation.
+
 ## Punctuation Pattern
 
 Rgo uses a repeated punctuation pattern:
@@ -520,8 +804,16 @@ Rgo uses a repeated punctuation pattern:
 - `<>` provides or fills type slots.
 - `{}` separates or contains choice/body structure.
 - `name:` labels code or values.
-- `@name` references compiler-provided builtin types and functions.
+- `@name` addresses compiler-provided builtins; `name: /path/to/name` binds a
+  compile-time source namespace.
+- `name.member` accesses an imported source member.
 
 Types are not allowed as arguments in `()` because type arguments can often be
 inferred and would clash with value argument counts. Type arguments use `<>`
 instead.
+
+## HIR must remain parseable source
+
+A compiler's high-level intermediate representation (HIR) must be parseable, simplified source code.
+It must be possible to generate valid source code from the HIR AST.
+The HIR AST must be a subset of the source AST.
