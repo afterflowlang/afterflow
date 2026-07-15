@@ -1,53 +1,48 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-add: @add
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_5___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _6___rgo_7374646f7574__printf: _5___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _6___rgo_7374646f7574__printf)
 }
-exit: @exit
-_11_three: (f:(int, (int)), ok:(int), z: int){
+
+_14_three: (f:(int, (int)), ok:(int), z: int){
     f(z, ok)
 }
 
-_9_three: (f:(int, (int)), ok:(int), y: int){
-    _12_three: _11_three(f, ok)
-    f(y, _12_three)
+_12_three: (f:(int, (int)), ok:(int), y: int){
+    _15_three: _14_three(f, ok)
+    f(y, _15_three)
 }
 
 three: (f:(int, (int)), x: int, ok:(int)){
-    _13_three: _9_three(f, ok)
-    f(x, _13_three)
+    _16_three: _12_three(f, ok)
+    f(x, _16_three)
+}
+_20_main: (x: int, ok:(int)){
+    _21: 10
+    @add(x, _21, ok)
+}
+_30_main: (){
+    _31: 0
+    @exit(_31)
 }
 
-_17_main: (x: int, ok:(int)){
-    _18: 10
-    add(x, _18, ok)
-}
-@sprintf: @sprintf
-@write: @write
-_27_main: (){
-    _28: 0
-    exit(_28)
+_28_main: (s: str){
+    @write(s, _30_main)
 }
 
-_25_main: (s: str){
-    @write(s, _27_main)
-}
-
-_22_main: (x: int){
-    _23: "result: %d"
-    @sprintf(_23, x, _25_main)
+_25_main: (x: int){
+    _26: "result: %d"
+    @sprintf(_26, x, _28_main)
 }
 
 main: (){
-    _20: 0
-    three(_17_main, _20, _22_main)
+    _23: 0
+    three(_20_main, _23, _25_main)
 }
 main()

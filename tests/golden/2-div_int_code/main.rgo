@@ -1,17 +1,13 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-div: @div
-exit: @exit
 
 error: (msg: str) {
-    printf("Error: %s\n", msg, exit(1))
+    stdout.printf("Error: %s\n", msg, @exit(1))
 }
 main: () {
-    div(10, 5, error("division by zero"), (result: int){
-        printf("result: %d\n", result, exit(0))
+    @div(10, 5, error("division by zero"), (result: int){
+        stdout.printf("result: %d\n", result, @exit(0))
     })
 }

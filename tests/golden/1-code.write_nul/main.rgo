@@ -1,0 +1,5 @@
+str: @str
+
+main: () {
+    @write("first\0second", @exit(0))
+}

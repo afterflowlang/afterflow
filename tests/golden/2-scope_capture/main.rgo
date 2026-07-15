@@ -1,18 +1,14 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-add: @add
-exit: @exit
 
 print_sum: (ok:()){
-    (total:int) = add(3, 4)
-    printf("sum is %d\n", total, ok)
+    (total:int) = @add(3, 4)
+    stdout.printf("sum is %d\n", total, ok)
 }
 
 main: () {
     () = print_sum
-    exit(0)
+    @exit(0)
 }

@@ -1,19 +1,16 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 tail: (x: int, rest: tail)
 
 identity: (node: tail) {
-    printf("unused\n", exit(0))
+    stdout.printf("unused\n", @exit(0))
 }
 
 hello: () {
-    printf("hi\n", exit(0))
+    stdout.printf("hi\n", @exit(0))
 }
 
 main: () {

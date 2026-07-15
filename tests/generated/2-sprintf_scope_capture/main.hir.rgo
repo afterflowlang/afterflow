@@ -1,37 +1,32 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-sprintf: @sprintf
-write: @write
-add: @add
-exit: @exit
-_12_foo: (){
-    _13: 0
-    exit(_13)
+_11_foo: (){
+    _12: 0
+    @exit(_12)
 }
 
-_10_foo: (s: str){
-    write(s, _12_foo)
+_9_foo: (s: str){
+    @write(s, _11_foo)
 }
 
-_7_foo: (x: int){
-    _8: "result: %d"
-    sprintf(_8, x, _10_foo)
+_6_foo: (x: int){
+    _7: "result: %d"
+    @sprintf(_7, x, _9_foo)
 }
 
 foo: (){
-    _4: 1
-    _5: 2
-    add(_4, _5, _7_foo)
+    _3: 1
+    _4: 2
+    @add(_3, _4, _6_foo)
 }
 
 main: (){

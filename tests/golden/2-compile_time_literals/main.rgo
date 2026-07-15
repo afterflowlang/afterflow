@@ -1,13 +1,10 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 not_const_msg: (fmt: str!, value: int!) {
-    printf(fmt, value, exit(0))
+    stdout.printf(fmt, value, @exit(0))
 }
 const_msg: (fmt: str!, value: int!) {
     not_const_msg(fmt, value)

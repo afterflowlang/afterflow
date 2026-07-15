@@ -1,0 +1,68 @@
+b8: @b8
+i8: @i8
+u8: @u8
+b32: @b32
+i32: @i32
+u32: @u32
+b64: @b64
+i64: @i64
+u64: @u64
+b128: @b128
+i128: @i128
+u128: @u128
+
+mul_i8: (x: i8, y: i8, ok: (i8)) {
+    (x_bits: b8) = @b8_from_i8(x)
+    (y_bits: b8) = @b8_from_i8(y)
+    (result_bits: b8) = @mul_b8(x_bits, y_bits)
+    @i8_from_b8(result_bits, ok)
+}
+
+mul_u8: (x: u8, y: u8, ok: (u8)) {
+    (x_bits: b8) = @b8_from_u8(x)
+    (y_bits: b8) = @b8_from_u8(y)
+    (result_bits: b8) = @mul_b8(x_bits, y_bits)
+    @u8_from_b8(result_bits, ok)
+}
+
+mul_i32: (x: i32, y: i32, ok: (i32)) {
+    (x_bits: b32) = @b32_from_i32(x)
+    (y_bits: b32) = @b32_from_i32(y)
+    (result_bits: b32) = @mul_b32(x_bits, y_bits)
+    @i32_from_b32(result_bits, ok)
+}
+
+mul_u32: (x: u32, y: u32, ok: (u32)) {
+    (x_bits: b32) = @b32_from_u32(x)
+    (y_bits: b32) = @b32_from_u32(y)
+    (result_bits: b32) = @mul_b32(x_bits, y_bits)
+    @u32_from_b32(result_bits, ok)
+}
+
+mul_i64: (x: i64, y: i64, ok: (i64)) {
+    (x_bits: b64) = @b64_from_i64(x)
+    (y_bits: b64) = @b64_from_i64(y)
+    (result_bits: b64) = @mul_b64(x_bits, y_bits)
+    @i64_from_b64(result_bits, ok)
+}
+
+mul_u64: (x: u64, y: u64, ok: (u64)) {
+    (x_bits: b64) = @b64_from_u64(x)
+    (y_bits: b64) = @b64_from_u64(y)
+    (result_bits: b64) = @mul_b64(x_bits, y_bits)
+    @u64_from_b64(result_bits, ok)
+}
+
+mul_i128: (x: i128, y: i128, ok: (i128)) {
+    (x_bits: b128) = @b128_from_i128(x)
+    (y_bits: b128) = @b128_from_i128(y)
+    (result_bits: b128) = @mul_b128(x_bits, y_bits)
+    @i128_from_b128(result_bits, ok)
+}
+
+mul_u128: (x: u128, y: u128, ok: (u128)) {
+    (x_bits: b128) = @b128_from_u128(x)
+    (y_bits: b128) = @b128_from_u128(y)
+    (result_bits: b128) = @mul_b128(x_bits, y_bits)
+    @u128_from_b128(result_bits, ok)
+}

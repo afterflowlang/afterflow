@@ -1,17 +1,14 @@
+__rgo_7374646f7574__str: @str
 str: @str
-exit: @exit
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_2___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _3___rgo_7374646f7574__printf: _2___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _3___rgo_7374646f7574__printf)
 }
-eqi: @eq
 _12_array3: (one:(str), a: str){
     one(a)
 }
@@ -27,21 +24,21 @@ _24_array3: (one:(str), c: str){
 _21_array3: (index: int, one:(str), c: str, none:()){
     _22: 2
     _25_array3: _24_array3(one, c)
-    eqi(index, _22, _25_array3, none)
+    @eq_int(index, _22, _25_array3, none)
 }
 
 _15_array3: (index: int, one:(str), b: str, c: str, none:()){
     _16: 1
     _19_array3: _18_array3(one, b)
     _26_array3: _21_array3(index, one, c, none)
-    eqi(index, _16, _19_array3, _26_array3)
+    @eq_int(index, _16, _19_array3, _26_array3)
 }
 
 _9_array3: (a: str, b: str, c: str, index: int, one:(str), none:()){
     _10: 0
     _13_array3: _12_array3(one, a)
     _27_array3: _15_array3(index, one, b, c, none)
-    eqi(index, _10, _13_array3, _27_array3)
+    @eq_int(index, _10, _13_array3, _27_array3)
 }
 
 array3: (a: str, b: str, c: str, ok:(int, (int, (str), ()))){
@@ -49,11 +46,9 @@ array3: (a: str, b: str, c: str, ok:(int, (int, (str), ()))){
     _28_array3: _9_array3(a, b, c)
     ok(_5, _28_array3)
 }
-@sprintf: @sprintf
-@write: @write
 _48_main: (){
     _49: 0
-    exit(_49)
+    @exit(_49)
 }
 
 _46_main: (s: str){
@@ -64,10 +59,9 @@ _43_main: (s: str){
     _44: "element at index 1 is %s\n"
     @sprintf(_44, s, _46_main)
 }
-
 _59_main: (){
     _60: 0
-    exit(_60)
+    @exit(_60)
 }
 
 _57_main: (s: str){

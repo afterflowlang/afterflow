@@ -1,12 +1,7 @@
+stdout: /stdout
+
 str: @str
 int: @int
-eqi: @eq
-write: @write
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 true: (x: (), y: ()){
     x()
@@ -19,7 +14,7 @@ if: (cond: ((),()), yes:(), no:()){
 }
 main: () {
     () = if(true, () {
-        printf("works", exit(0))
+        stdout.printf("works", @exit(0))
     })
-    printf("doesn't work", exit(0))
+    stdout.printf("doesn't work", @exit(0))
 }

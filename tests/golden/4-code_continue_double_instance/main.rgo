@@ -1,29 +1,24 @@
+stdout: /stdout
+
 str: @str
 int: @int
-exit: @exit
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-add: @add
-eqi: @eq
 
 foo: (x:int, y:int, ok:(int)){
-    add(x, y, ok)
+    @add(x, y, ok)
 }
 run: (ok:()){
     f: foo(1)
     a: f(2)
     b: f(3)
     k: (x:int){
-        printf("number: %d", x, ok) 
+        stdout.printf("number: %d", x, ok)
     }
-    eqi(1, 1, () {
+    @eq_int(1, 1, () {
         a(k)
     }, () {
         b(k)
     })
 }
 main: () {
-    run(exit(0))
+    run(@exit(0))
 }

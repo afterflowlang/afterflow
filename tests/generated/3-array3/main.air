@@ -44,7 +44,7 @@ _46_main_deepcopy($env_end: int):
 
 _43_main($s: str):
     $_46_main = @newclosure<str>(_46_main)
-    @sprintf($_44: str! = "element at index 1 is %s\n", $s: int, $_46_main)
+    @sprintf($_44: str = "element at index 1 is %s\n", $s: str, $_46_main)
 
 
 _43_main_unwrapper($env_end: int):
@@ -111,7 +111,7 @@ _57_main_deepcopy($env_end: int):
 
 _54_main():
     $_57_main = @newclosure<str>(_57_main)
-    @sprintf($_55: str! = "index out of bounds\n", $_57_main)
+    @sprintf($_55: str = "index out of bounds\n", $_57_main)
 
 
 _54_main_unwrapper($env_end: int):
@@ -199,7 +199,7 @@ _38_main_deepcopy_skip_0:
 
 _35_main($len: int, $nth: ()):
     $_65_main = @newclosure<($index: int, $one: (), $none: ()), str>(_38_main, $nth: ())
-    @sprintf($_36: str! = "array has %d elements\n", $len: int, $_65_main)
+    @sprintf($_36: str = "array has %d elements\n", $len: int, $_65_main)
 
 
 _35_main_unwrapper($env_end: int):
@@ -328,11 +328,11 @@ _24_array3_deepcopy_skip_0:
 
 _21_array3($index: int, $one: (), $c: str, $none: ()):
     $_25_array3 = @newclosure<($_8_array3: str), str>(_24_array3, $one: (), $c: str)
-    @eq(eq__25_array3_true_0_0, $index: int, $_22: int = 2)
-eq_none_false_0_0:
+    @eq_int(eq_int__25_array3_true_0_0, $index: int, $_22: int = 2)
+eq_int_none_false_0_0:
     @release($_25_array3)
     @jumpclosure($none)
-eq__25_array3_true_0_0:
+eq_int__25_array3_true_0_0:
     @release($none)
     @jumpclosure($_25_array3)
 
@@ -377,11 +377,11 @@ _21_array3_deepcopy_skip_3:
 _15_array3($index: int, $one: (), $b: str, $c: str, $none: ()):
     $_19_array3 = @newclosure<($_8_array3: str), str>(_18_array3, $one: (), $b: str)
     $_26_array3 = @newclosure<int, ($_8_array3: str), str, ()>(_21_array3, $index: int, $one: (), $c: str, $none: ())
-    @eq(eq__19_array3_true_0_0, $index: int, $_16: int = 1)
-eq__26_array3_false_0_0:
+    @eq_int(eq_int__19_array3_true_0_0, $index: int, $_16: int = 1)
+eq_int__26_array3_false_0_0:
     @release($_19_array3)
     @jumpclosure($_26_array3)
-eq__19_array3_true_0_0:
+eq_int__19_array3_true_0_0:
     @release($_26_array3)
     @jumpclosure($_19_array3)
 
@@ -427,11 +427,11 @@ _15_array3_deepcopy_skip_4:
 _9_array3($a: str, $b: str, $c: str, $index: int, $one: (), $none: ()):
     $_13_array3 = @newclosure<($_8_array3: str), str>(_12_array3, $one: (), $a: str)
     $_27_array3 = @newclosure<int, ($_8_array3: str), str, str, ()>(_15_array3, $index: int, $one: (), $b: str, $c: str, $none: ())
-    @eq(eq__13_array3_true_0_0, $index: int, $_10: int = 0)
-eq__27_array3_false_0_0:
+    @eq_int(eq_int__13_array3_true_0_0, $index: int, $_10: int = 0)
+eq_int__27_array3_false_0_0:
     @release($_13_array3)
     @jumpclosure($_27_array3)
-eq__13_array3_true_0_0:
+eq_int__13_array3_true_0_0:
     @release($_27_array3)
     @jumpclosure($_13_array3)
 

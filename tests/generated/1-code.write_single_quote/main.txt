@@ -1,22 +1,4 @@
 [
-    IdentDef {
-        name: "write",
-        ident: Ident {
-            name: "@write",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
-        name: "exit",
-        ident: Ident {
-            name: "@exit",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
     FunctionDef {
         name: "main",
         lambda: Lambda {
@@ -29,7 +11,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "write",
+                            name: "@write",
                             args: [
                                 Arg {
                                     name: None,
@@ -47,7 +29,7 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "exit",
+                                            name: "@exit",
                                             args: [
                                                 Arg {
                                                     name: None,

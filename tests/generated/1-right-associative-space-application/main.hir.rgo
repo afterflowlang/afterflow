@@ -1,0 +1,15 @@
+_5_main: (){
+    _6: 0
+    @exit(_6)
+}
+
+_2_main: (){
+    _3: "b\n"
+    @write(_3, _5_main)
+}
+
+main: (){
+    _0: "a"
+    @write(_0, _2_main)
+}
+main()

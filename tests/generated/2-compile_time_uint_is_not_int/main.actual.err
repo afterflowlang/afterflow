@@ -1,0 +1,4 @@
+[hir] expected int!, found uint!
+tests/failing/2-compile_time_uint_is_not_int/main.rgo:9
+    accept_int(value, ok)
+               ^^^^^

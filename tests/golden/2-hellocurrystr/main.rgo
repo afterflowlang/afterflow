@@ -1,18 +1,15 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 foo: (n:str, s:str, ok:()){
-	printf("The winning number for %s is %s\n", s, n, ok)
+	stdout.printf("The winning number for %s is %s\n", s, n, ok)
 }
 bar: foo("42")
 baz: foo("43", "Bob")
 main: () {
     bar("Alice", () {
-    	baz(exit(0))
+    baz(@exit(0))
     })
 }

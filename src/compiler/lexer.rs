@@ -11,6 +11,7 @@ pub struct Lexer<R: BufRead> {
     line: usize,
     column: usize,
     offset: usize,
+    span_offset: usize,
 }
 
 impl<R: BufRead> Lexer<R> {
@@ -22,13 +23,19 @@ impl<R: BufRead> Lexer<R> {
             line: 1,
             column: 1,
             offset: 0,
+            span_offset: 0,
+        }
+    }
+
+    pub fn with_offset(reader: R, span_offset: usize) -> Self {
+        Self {
+            span_offset,
+            ..Self::new(reader)
         }
     }
 
     pub fn next_token(&mut self) -> Result<Token, Error> {
-        let has_newline = self
-            .skip_whitespace_and_comments()
-            .map_err(|err| self.io_error(err))?;
+        let (has_leading_whitespace, has_newline) = self.skip_whitespace_and_comments()?;
 
         if has_newline {
             return Ok(Token::new(TokenKind::Newline, self.current_span())); // newline token has zero-width span at current position
@@ -37,33 +44,29 @@ impl<R: BufRead> Lexer<R> {
         let next = self.next_char().map_err(|err| self.io_error(err))?;
         let (ch, span) = match next {
             Some(value) => value,
-            None => return Ok(Token::new(TokenKind::Eof, self.current_span())),
+            None => {
+                let mut token = Token::new(TokenKind::Eof, self.current_span());
+                token.has_leading_whitespace = has_leading_whitespace;
+                return Ok(token);
+            }
         };
 
         let token = match ch {
             '@' => {
-                if let Some(('/', _)) = self.peek_char().map_err(|err| self.io_error(err))? {
+                let name = self.collect_identifier()?;
+                if name.is_empty() {
+                    return Err(Error::new(Code::Lex, "builtin references use @name", span));
+                }
+
+                if let Some(('.', _)) = self.peek_char().map_err(|err| self.io_error(err))? {
                     return Err(Error::new(
                         Code::Lex,
-                        "builtin imports use @name, not @/name or @owner/name",
+                        "builtin references use one name after '@'",
                         span,
                     ));
                 }
 
-                let import_path = self.collect_identifier()?;
-                if import_path.is_empty() {
-                    return Err(Error::new(Code::Lex, "import name cannot be empty", span));
-                }
-
-                if let Some(('/', _)) = self.peek_char().map_err(|err| self.io_error(err))? {
-                    return Err(Error::new(
-                        Code::Lex,
-                        "builtin imports use @name, not @/name or @owner/name",
-                        span,
-                    ));
-                }
-
-                Token::new(TokenKind::Import(import_path), span)
+                Token::new(TokenKind::Builtin(name), span)
             }
             'a'..='z' | 'A'..='Z' | '_' => {
                 let mut ident = String::new();
@@ -82,7 +85,9 @@ impl<R: BufRead> Lexer<R> {
                         let value = literal
                             .parse::<f64>()
                             .map_err(|_| Error::new(Code::Lex, "invalid float literal", span))?;
-                        return Ok(Token::new(TokenKind::FloatLiteral(value), span));
+                        let mut token = Token::new(TokenKind::FloatLiteral(value), span);
+                        token.has_leading_whitespace = has_leading_whitespace;
+                        return Ok(token);
                     }
                 }
                 let value = literal
@@ -124,7 +129,7 @@ impl<R: BufRead> Lexer<R> {
             '*' => Token::new(TokenKind::Star, span),
             '!' => Token::new(TokenKind::Bang, span),
             '?' => Token::new(TokenKind::Question, span),
-            '/' => Token::new(TokenKind::Slash, span),
+            '/' => self.source_path_token(span)?,
             '-' => Token::new(TokenKind::Minus, span),
             '<' => Token::new(TokenKind::AngleOpen, span),
             '>' => Token::new(TokenKind::AngleClose, span),
@@ -140,7 +145,10 @@ impl<R: BufRead> Lexer<R> {
             }
         };
 
-        Ok(token)
+        Ok(Token {
+            has_leading_whitespace,
+            ..token
+        })
     }
 
     fn collect_digits(&mut self) -> Result<String, Error> {
@@ -169,6 +177,21 @@ impl<R: BufRead> Lexer<R> {
         Ok(buf)
     }
 
+    fn source_path_token(&mut self, span: Span) -> Result<Token, Error> {
+        let mut path = String::from("/");
+        while let Some((ch, _)) = self.peek_char().map_err(|err| self.io_error(err))? {
+            if ch == '\n' || ch == '\r' || ch == ';' {
+                break;
+            }
+            path.push(ch);
+            self.next_char().map_err(|err| self.io_error(err))?;
+        }
+        Ok(Token::new(
+            TokenKind::SourcePath(path.trim_end().to_string()),
+            span,
+        ))
+    }
+
     fn collect_dots(&mut self, start_span: Span) -> Result<usize, Error> {
         let mut count = 1;
 
@@ -194,38 +217,72 @@ impl<R: BufRead> Lexer<R> {
         Ok(count)
     }
 
-    fn skip_whitespace_and_comments(&mut self) -> io::Result<bool> {
+    fn skip_whitespace_and_comments(&mut self) -> Result<(bool, bool), Error> {
+        let mut has_whitespace = false;
         let mut seen_nl = false;
 
-        while let Some((ch, _span)) = self.peek_char()? {
+        while let Some((ch, span)) = self.peek_char().map_err(|err| self.io_error(err))? {
             match ch {
                 c if c.is_whitespace() => {
+                    has_whitespace = true;
                     if c == '\n' || c == '\r' {
                         seen_nl = true;
                     }
-                    self.next_char()?; // consume whitespace
+                    self.next_char().map_err(|err| self.io_error(err))?;
                 }
-                '/' => {
-                    let slash = self.next_char()?.expect("peeked char must exist");
-                    if let Some((next, _)) = self.peek_char()? {
-                        if next == '/' {
-                            self.next_char()?; // consume second slash
-                            self.consume_until_newline()?;
-                            seen_nl = true;
-                            continue;
-                        }
+                '/' => match self.peek_byte().map_err(|err| self.io_error(err))? {
+                    Some((b'/', _)) => {
+                        has_whitespace = true;
+                        self.next_char().map_err(|err| self.io_error(err))?;
+                        self.next_char().map_err(|err| self.io_error(err))?;
+                        self.consume_until_newline()
+                            .map_err(|err| self.io_error(err))?;
+                        seen_nl = true;
+                        continue;
                     }
-
-                    // Not a comment, restore slash
-                    self.pending_char = Some(slash);
-                    break;
-                }
+                    Some((b'*', _)) => {
+                        has_whitespace = true;
+                        self.next_char().map_err(|err| self.io_error(err))?;
+                        self.next_char().map_err(|err| self.io_error(err))?;
+                        seen_nl |= self.consume_block_comment(span)?;
+                        continue;
+                    }
+                    _ => break,
+                },
 
                 _ => break,
             }
         }
 
-        Ok(seen_nl)
+        Ok((has_whitespace, seen_nl))
+    }
+
+    fn consume_block_comment(&mut self, start_span: Span) -> Result<bool, Error> {
+        let mut seen_nl = false;
+
+        loop {
+            let Some((ch, _)) = self.next_char().map_err(|err| self.io_error(err))? else {
+                return Err(Error::new(
+                    Code::Lex,
+                    "unterminated block comment",
+                    start_span,
+                ));
+            };
+
+            if ch == '\n' {
+                seen_nl = true;
+            }
+
+            if ch == '*'
+                && self
+                    .peek_char()
+                    .map_err(|err| self.io_error(err))?
+                    .is_some_and(|(next, _)| next == '/')
+            {
+                self.next_char().map_err(|err| self.io_error(err))?;
+                return Ok(seen_nl);
+            }
+        }
     }
 
     fn consume_until_newline(&mut self) -> io::Result<()> {
@@ -352,7 +409,7 @@ impl<R: BufRead> Lexer<R> {
             Some(pair) => pair,
             None => return Ok(None),
         };
-        let span = Span::new(self.line, self.column, offset);
+        let span = Span::new(self.line, self.column, self.span_offset + offset);
         match byte {
             b'\n' => {
                 self.line += 1;
@@ -407,7 +464,7 @@ impl<R: BufRead> Lexer<R> {
     }
 
     fn current_span(&self) -> Span {
-        Span::new(self.line, self.column, self.offset)
+        Span::new(self.line, self.column, self.span_offset + self.offset)
     }
 
     fn io_error(&self, err: io::Error) -> Error {

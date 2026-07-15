@@ -1,17 +1,15 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-add: @add
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_17___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _18___rgo_7374646f7574__printf: _17___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _18___rgo_7374646f7574__printf)
 }
-exit: @exit
+
 zero: (f:(int, (int)), x: int, ok:(int)){
     ok(x)
 }
@@ -20,51 +18,48 @@ one: (f:(int, (int)), x: int, ok:(int)){
     f(x, ok)
 }
 
-_17_two: (f:(int, (int)), ok:(int), y: int){
+_32_two: (f:(int, (int)), ok:(int), y: int){
     f(y, ok)
 }
 
 two: (f:(int, (int)), x: int, ok:(int)){
-    _18_two: _17_two(f, ok)
-    f(x, _18_two)
+    _33_two: _32_two(f, ok)
+    f(x, _33_two)
 }
 
-_26_three: (f:(int, (int)), ok:(int), z: int){
+_41_three: (f:(int, (int)), ok:(int), z: int){
     f(z, ok)
 }
 
-_24_three: (f:(int, (int)), ok:(int), y: int){
-    _27_three: _26_three(f, ok)
-    f(y, _27_three)
+_39_three: (f:(int, (int)), ok:(int), y: int){
+    _42_three: _41_three(f, ok)
+    f(y, _42_three)
 }
 
 three: (f:(int, (int)), x: int, ok:(int)){
-    _28_three: _24_three(f, ok)
-    f(x, _28_three)
+    _43_three: _39_three(f, ok)
+    f(x, _43_three)
+}
+_47_main: (x: int, ok:(int)){
+    _48: 10
+    @add(x, _48, ok)
+}
+_57_main: (){
+    _58: 0
+    @exit(_58)
 }
 
-_32_main: (x: int, ok:(int)){
-    _33: 10
-    add(x, _33, ok)
-}
-@sprintf: @sprintf
-@write: @write
-_42_main: (){
-    _43: 0
-    exit(_43)
+_55_main: (s: str){
+    @write(s, _57_main)
 }
 
-_40_main: (s: str){
-    @write(s, _42_main)
-}
-
-_37_main: (x: int){
-    _38: "result: %d\n"
-    @sprintf(_38, x, _40_main)
+_52_main: (x: int){
+    _53: "result: %d\n"
+    @sprintf(_53, x, _55_main)
 }
 
 main: (){
-    _35: 0
-    three(_32_main, _35, _37_main)
+    _50: 0
+    three(_47_main, _50, _52_main)
 }
 main()

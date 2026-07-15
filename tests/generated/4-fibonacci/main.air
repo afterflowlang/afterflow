@@ -1,107 +1,107 @@
-_29_main():
-    @exit($_30: int = 0)
+_30_main():
+    @exit($_31: int = 0)
 
 
-_29_main_unwrapper($env_end: int):
+_30_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_29_main)
+    @jumpargs(_30_main)
 
 
-_29_main_deep_release($env_end: int):
+_30_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_29_main_deepcopy($env_end: int):
+_30_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_27_main($s: str):
-    $_29_main = @newclosure<>(_29_main)
-    @write($s: str, $_29_main)
+_28_main($s: str):
+    $_30_main = @newclosure<>(_30_main)
+    @write($s: str, $_30_main)
 
 
-_27_main_unwrapper($env_end: int):
+_28_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $s = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_27_main, $s: str)
+    @jumpargs(_28_main, $s: str)
 
 
-_27_main_deep_release($env_end: int):
+_28_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_27_main_deepcopy($env_end: int):
+_28_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_24_main($result: int):
-    $_27_main = @newclosure<str>(_27_main)
-    @sprintf($_25: str! = "fib(7) = %d\n", $result: int, $_27_main)
+_25_main($result: int):
+    $_28_main = @newclosure<str>(_28_main)
+    @sprintf($_26: str = "fib(7) = %d\n", $result: int, $_28_main)
 
 
-_24_main_unwrapper($env_end: int):
+_25_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $result = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_24_main, $result: int)
+    @jumpargs(_25_main, $result: int)
 
 
-_24_main_deep_release($env_end: int):
+_25_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_24_main_deepcopy($env_end: int):
+_25_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_7_fib_iter($k: (), $a: int):
+_8_fib_iter($k: (), $a: int):
     @jumpclosure($k, $a: int)
 
 
-_7_fib_iter_unwrapper($env_end: int):
+_8_fib_iter_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $k = @field($__env_end, -2)
     $a = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_7_fib_iter, $k: (), $a: int)
+    @jumpargs(_8_fib_iter, $k: (), $a: int)
 
 
-_7_fib_iter_deep_release($env_end: int):
+_8_fib_iter_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_7_fib_iter_release_skip_0, $__num_remaining, 1)
-    $_7_fib_iter_release_field_0 = @field($__env_end, -2)
-    @callptr($_7_fib_iter_release_field_0)
-_7_fib_iter_release_skip_0:
+    @gt(_8_fib_iter_release_skip_0, $__num_remaining, 1)
+    $_8_fib_iter_release_field_0 = @field($__env_end, -2)
+    @callptr($_8_fib_iter_release_field_0)
+_8_fib_iter_release_skip_0:
     @release($__env_end)
     @return()
 
 
-_7_fib_iter_deepcopy($env_end: int):
+_8_fib_iter_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_7_fib_iter_deepcopy_skip_0, $num_remaining, 1)
-    @deepcopy($_7_fib_iter_deepcopy_field_0, $__env_end, -2)
-_7_fib_iter_deepcopy_skip_0:
+    @gt(_8_fib_iter_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($_8_fib_iter_deepcopy_field_0, $__env_end, -2)
+_8_fib_iter_deepcopy_skip_0:
     @return()
 
 
-_15_fib_iter($fib_iter: (), $n1: int, $b: int, $k: (), $ab: int):
+_16_fib_iter($fib_iter: (), $n1: int, $b: int, $k: (), $ab: int):
     @jumpclosure($fib_iter, $n1: int, $b: int, $ab: int, $k: int)
 
 
-_15_fib_iter_unwrapper($env_end: int):
+_16_fib_iter_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $fib_iter = @field($__env_end, -5)
     $n1 = @field($__env_end, -4)
@@ -109,42 +109,42 @@ _15_fib_iter_unwrapper($env_end: int):
     $k = @field($__env_end, -2)
     $ab = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_15_fib_iter, $fib_iter: (), $n1: int, $b: int, $k: (), $ab: int)
+    @jumpargs(_16_fib_iter, $fib_iter: (), $n1: int, $b: int, $k: (), $ab: int)
 
 
-_15_fib_iter_deep_release($env_end: int):
+_16_fib_iter_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_15_fib_iter_release_skip_0, $__num_remaining, 4)
-    $_15_fib_iter_release_field_0 = @field($__env_end, -5)
-    @callptr($_15_fib_iter_release_field_0)
-_15_fib_iter_release_skip_0:
-    @gt(_15_fib_iter_release_skip_3, $__num_remaining, 1)
-    $_15_fib_iter_release_field_3 = @field($__env_end, -2)
-    @callptr($_15_fib_iter_release_field_3)
-_15_fib_iter_release_skip_3:
+    @gt(_16_fib_iter_release_skip_0, $__num_remaining, 4)
+    $_16_fib_iter_release_field_0 = @field($__env_end, -5)
+    @callptr($_16_fib_iter_release_field_0)
+_16_fib_iter_release_skip_0:
+    @gt(_16_fib_iter_release_skip_3, $__num_remaining, 1)
+    $_16_fib_iter_release_field_3 = @field($__env_end, -2)
+    @callptr($_16_fib_iter_release_field_3)
+_16_fib_iter_release_skip_3:
     @release($__env_end)
     @return()
 
 
-_15_fib_iter_deepcopy($env_end: int):
+_16_fib_iter_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_15_fib_iter_deepcopy_skip_0, $num_remaining, 4)
-    @deepcopy($_15_fib_iter_deepcopy_field_0, $__env_end, -5)
-_15_fib_iter_deepcopy_skip_0:
-    @gt(_15_fib_iter_deepcopy_skip_3, $num_remaining, 1)
-    @deepcopy($_15_fib_iter_deepcopy_field_3, $__env_end, -2)
-_15_fib_iter_deepcopy_skip_3:
+    @gt(_16_fib_iter_deepcopy_skip_0, $num_remaining, 4)
+    @deepcopy($_16_fib_iter_deepcopy_field_0, $__env_end, -5)
+_16_fib_iter_deepcopy_skip_0:
+    @gt(_16_fib_iter_deepcopy_skip_3, $num_remaining, 1)
+    @deepcopy($_16_fib_iter_deepcopy_field_3, $__env_end, -2)
+_16_fib_iter_deepcopy_skip_3:
     @return()
 
 
-_13_fib_iter($a: int, $b: int, $fib_iter: (), $k: (), $n1: int):
-    $_16_fib_iter = @newclosure<($n: int, $a: int, $b: int, $k: ()), int, int, ($_4_fib_iter: int), int>(_15_fib_iter, $fib_iter: (), $n1: int, $b: int, $k: ())
-    @add($a: int, $b: int, $_16_fib_iter)
+_14_fib_iter($a: int, $b: int, $fib_iter: (), $k: (), $n1: int):
+    $_17_fib_iter = @newclosure<($n: int, $a: int, $b: int, $k: ()), int, int, ($_5_fib_iter: int), int>(_16_fib_iter, $fib_iter: (), $n1: int, $b: int, $k: ())
+    @add($a: int, $b: int, $_17_fib_iter)
 
 
-_13_fib_iter_unwrapper($env_end: int):
+_14_fib_iter_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $a = @field($__env_end, -5)
     $b = @field($__env_end, -4)
@@ -152,42 +152,42 @@ _13_fib_iter_unwrapper($env_end: int):
     $k = @field($__env_end, -2)
     $n1 = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_13_fib_iter, $a: int, $b: int, $fib_iter: (), $k: (), $n1: int)
+    @jumpargs(_14_fib_iter, $a: int, $b: int, $fib_iter: (), $k: (), $n1: int)
 
 
-_13_fib_iter_deep_release($env_end: int):
+_14_fib_iter_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_13_fib_iter_release_skip_2, $__num_remaining, 2)
-    $_13_fib_iter_release_field_2 = @field($__env_end, -3)
-    @callptr($_13_fib_iter_release_field_2)
-_13_fib_iter_release_skip_2:
-    @gt(_13_fib_iter_release_skip_3, $__num_remaining, 1)
-    $_13_fib_iter_release_field_3 = @field($__env_end, -2)
-    @callptr($_13_fib_iter_release_field_3)
-_13_fib_iter_release_skip_3:
+    @gt(_14_fib_iter_release_skip_2, $__num_remaining, 2)
+    $_14_fib_iter_release_field_2 = @field($__env_end, -3)
+    @callptr($_14_fib_iter_release_field_2)
+_14_fib_iter_release_skip_2:
+    @gt(_14_fib_iter_release_skip_3, $__num_remaining, 1)
+    $_14_fib_iter_release_field_3 = @field($__env_end, -2)
+    @callptr($_14_fib_iter_release_field_3)
+_14_fib_iter_release_skip_3:
     @release($__env_end)
     @return()
 
 
-_13_fib_iter_deepcopy($env_end: int):
+_14_fib_iter_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_13_fib_iter_deepcopy_skip_2, $num_remaining, 2)
-    @deepcopy($_13_fib_iter_deepcopy_field_2, $__env_end, -3)
-_13_fib_iter_deepcopy_skip_2:
-    @gt(_13_fib_iter_deepcopy_skip_3, $num_remaining, 1)
-    @deepcopy($_13_fib_iter_deepcopy_field_3, $__env_end, -2)
-_13_fib_iter_deepcopy_skip_3:
+    @gt(_14_fib_iter_deepcopy_skip_2, $num_remaining, 2)
+    @deepcopy($_14_fib_iter_deepcopy_field_2, $__env_end, -3)
+_14_fib_iter_deepcopy_skip_2:
+    @gt(_14_fib_iter_deepcopy_skip_3, $num_remaining, 1)
+    @deepcopy($_14_fib_iter_deepcopy_field_3, $__env_end, -2)
+_14_fib_iter_deepcopy_skip_3:
     @return()
 
 
-_10_fib_iter($n: int, $a: int, $b: int, $fib_iter: (), $k: ()):
-    $_17_fib_iter = @newclosure<int, int, ($n: int, $a: int, $b: int, $k: ()), ($_4_fib_iter: int), int>(_13_fib_iter, $a: int, $b: int, $fib_iter: (), $k: ())
-    @sub($n: int, $_11: int = 1, $_17_fib_iter)
+_11_fib_iter($n: int, $a: int, $b: int, $fib_iter: (), $k: ()):
+    $_18_fib_iter = @newclosure<int, int, ($n: int, $a: int, $b: int, $k: ()), ($_5_fib_iter: int), int>(_14_fib_iter, $a: int, $b: int, $fib_iter: (), $k: ())
+    @sub($n: int, $_12: int = 1, $_18_fib_iter)
 
 
-_10_fib_iter_unwrapper($env_end: int):
+_11_fib_iter_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $n = @field($__env_end, -5)
     $a = @field($__env_end, -4)
@@ -195,47 +195,47 @@ _10_fib_iter_unwrapper($env_end: int):
     $fib_iter = @field($__env_end, -2)
     $k = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_10_fib_iter, $n: int, $a: int, $b: int, $fib_iter: (), $k: ())
+    @jumpargs(_11_fib_iter, $n: int, $a: int, $b: int, $fib_iter: (), $k: ())
 
 
-_10_fib_iter_deep_release($env_end: int):
+_11_fib_iter_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_10_fib_iter_release_skip_3, $__num_remaining, 1)
-    $_10_fib_iter_release_field_3 = @field($__env_end, -2)
-    @callptr($_10_fib_iter_release_field_3)
-_10_fib_iter_release_skip_3:
-    @gt(_10_fib_iter_release_skip_4, $__num_remaining, 0)
-    $_10_fib_iter_release_field_4 = @field($__env_end, -1)
-    @callptr($_10_fib_iter_release_field_4)
-_10_fib_iter_release_skip_4:
+    @gt(_11_fib_iter_release_skip_3, $__num_remaining, 1)
+    $_11_fib_iter_release_field_3 = @field($__env_end, -2)
+    @callptr($_11_fib_iter_release_field_3)
+_11_fib_iter_release_skip_3:
+    @gt(_11_fib_iter_release_skip_4, $__num_remaining, 0)
+    $_11_fib_iter_release_field_4 = @field($__env_end, -1)
+    @callptr($_11_fib_iter_release_field_4)
+_11_fib_iter_release_skip_4:
     @release($__env_end)
     @return()
 
 
-_10_fib_iter_deepcopy($env_end: int):
+_11_fib_iter_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_10_fib_iter_deepcopy_skip_3, $num_remaining, 1)
-    @deepcopy($_10_fib_iter_deepcopy_field_3, $__env_end, -2)
-_10_fib_iter_deepcopy_skip_3:
-    @gt(_10_fib_iter_deepcopy_skip_4, $num_remaining, 0)
-    @deepcopy($_10_fib_iter_deepcopy_field_4, $__env_end, -1)
-_10_fib_iter_deepcopy_skip_4:
+    @gt(_11_fib_iter_deepcopy_skip_3, $num_remaining, 1)
+    @deepcopy($_11_fib_iter_deepcopy_field_3, $__env_end, -2)
+_11_fib_iter_deepcopy_skip_3:
+    @gt(_11_fib_iter_deepcopy_skip_4, $num_remaining, 0)
+    @deepcopy($_11_fib_iter_deepcopy_field_4, $__env_end, -1)
+_11_fib_iter_deepcopy_skip_4:
     @return()
 
 
 fib_iter($n: int, $a: int, $b: int, $k: ()):
-    $_8_fib_iter = @newclosure<($_4_fib_iter: int), int>(_7_fib_iter, $k: (), $a: int)
-    $fib_iter = @newclosure<int, int, int, ($_4_fib_iter: int)>(fib_iter)
-    $_18_fib_iter = @newclosure<int, int, int, ($n: int, $a: int, $b: int, $k: ()), ($_4_fib_iter: int)>(_10_fib_iter, $n: int, $a: int, $b: int, $fib_iter: (), $k: ())
-    @eq(eq__8_fib_iter_true_0_0, $n: int, $_5: int = 0)
-eq__18_fib_iter_false_0_0:
-    @release($_8_fib_iter)
-    @jumpclosure($_18_fib_iter)
-eq__8_fib_iter_true_0_0:
-    @release($_18_fib_iter)
-    @jumpclosure($_8_fib_iter)
+    $_9_fib_iter = @newclosure<($_5_fib_iter: int), int>(_8_fib_iter, $k: (), $a: int)
+    $fib_iter = @newclosure<int, int, int, ($_5_fib_iter: int)>(fib_iter)
+    $_19_fib_iter = @newclosure<int, int, int, ($n: int, $a: int, $b: int, $k: ()), ($_5_fib_iter: int)>(_11_fib_iter, $n: int, $a: int, $b: int, $fib_iter: (), $k: ())
+    @eq_int(eq_int__9_fib_iter_true_0_0, $n: int, $_6: int = 0)
+eq_int__19_fib_iter_false_0_0:
+    @release($_9_fib_iter)
+    @jumpclosure($_19_fib_iter)
+eq_int__9_fib_iter_true_0_0:
+    @release($_19_fib_iter)
+    @jumpclosure($_9_fib_iter)
 
 
 fib_iter_unwrapper($env_end: int):
@@ -269,7 +269,7 @@ fib_iter_deepcopy_skip_3:
 
 
 fib($n: int, $k: ()):
-    @jumpargs(fib_iter, $n: int, $_20: int = 0, $_21: int = 1, $k: ())
+    @jumpargs(fib_iter, $n: int, $_21: int = 0, $_22: int = 1, $k: ())
 
 
 fib_unwrapper($env_end: int):
@@ -301,8 +301,8 @@ fib_deepcopy_skip_1:
 
 
 main():
-    $_24_main = @newclosure<int>(_24_main)
-    @jumpargs(fib, $_22: int = 7, $_24_main: ())
+    $_25_main = @newclosure<int>(_25_main)
+    @jumpargs(fib, $_23: int = 7, $_25_main: ())
 
 
 main_unwrapper($env_end: int):

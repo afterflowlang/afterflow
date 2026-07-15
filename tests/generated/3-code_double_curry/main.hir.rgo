@@ -1,45 +1,42 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_4___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _5___rgo_7374646f7574__printf: _4___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _5___rgo_7374646f7574__printf)
 }
-exit: @exit
+
 foo: (ok:(str)){
-    _5: "charlie"
-    ok(_5)
+    _7: "charlie"
+    ok(_7)
 }
 
 baz: (ok:(str, str)){
-    _8: "bob"
-    _9_ok: ok(_8)
-    foo(_9_ok)
+    _10: "bob"
+    _11_ok: ok(_10)
+    foo(_11_ok)
 }
-@sprintf: @sprintf
-@write: @write
-_14_bar: (){
-    _15: 0
-    exit(_15)
+_16_bar: (){
+    _17: 0
+    @exit(_17)
 }
 
-_12_bar: (s: str){
-    @write(s, _14_bar)
+_14_bar: (s: str){
+    @write(s, _16_bar)
 }
 
 bar: (name0: str, name1: str, name2: str){
-    _10: "hello %s, %s and %s\n"
-    @sprintf(_10, name0, name1, name2, _12_bar)
+    _12: "hello %s, %s and %s\n"
+    @sprintf(_12, name0, name1, name2, _14_bar)
 }
 
 main: (){
-    _18: "alice"
-    _19_bar: bar(_18)
-    baz(_19_bar)
+    _20: "alice"
+    _21_bar: bar(_20)
+    baz(_21_bar)
 }
 main()

@@ -1,20 +1,17 @@
+stdout: /stdout
+
 str: @str
-exit: @exit
 int: @int
-add: @add
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
+
 bar: (a:int, b:int, ok:(int)){
-    add(a, b, ok)
+    @add(a, b, ok)
 }
 foo: (ok:()) {
     b: bar(1)
     c1: b(2)
     c2: b(3)
-    c1((x:int){printf("got: %d\n", x, ok)})
+    c1((x:int){stdout.printf("got: %d\n", x, ok)})
 }
 main: () {
-    foo(exit(0))
+    foo(@exit(0))
 }

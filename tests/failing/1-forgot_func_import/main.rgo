@@ -1,7 +1,7 @@
 int: @int
-exit: @exit
+
 foo: (n: int) {
-    printf("Number: %d\n", n, exit(0)) // Error: forgot to import printf
+    printf("Number: %d\n", n, @exit(0)) // Error: forgot to import printf
 }
 main: () {
     foo(1)

@@ -6,15 +6,60 @@ use std::hash::{Hash, Hasher};
 pub enum SigKind {
     Byte,
     Int,
+    UInt,
+    FixedInt(FixedIntKind),
     Str,
     F64,
     Variadic,
-    CompileTimeInt,
-    CompileTimeStr,
     Ident(SigIdent),
     Sig(Signature),
     GenericInst { name: String, args: Vec<SigKind> },
     Generic(String),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum FixedIntInterpretation {
+    Bits,
+    Signed,
+    Unsigned,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct FixedIntKind {
+    pub interpretation: FixedIntInterpretation,
+    pub bit_width: u16,
+}
+
+impl FixedIntKind {
+    pub const fn bits(bit_width: u16) -> Self {
+        Self {
+            interpretation: FixedIntInterpretation::Bits,
+            bit_width,
+        }
+    }
+
+    pub const fn signed(bit_width: u16) -> Self {
+        Self {
+            interpretation: FixedIntInterpretation::Signed,
+            bit_width,
+        }
+    }
+
+    pub const fn unsigned(bit_width: u16) -> Self {
+        Self {
+            interpretation: FixedIntInterpretation::Unsigned,
+            bit_width,
+        }
+    }
+
+    pub fn name(self) -> String {
+        let prefix = match self.interpretation {
+            FixedIntInterpretation::Bits => "b",
+            FixedIntInterpretation::Signed => "i",
+            FixedIntInterpretation::Unsigned => "u",
+        };
+        format!("{prefix}{}", self.bit_width)
+    }
 }
 
 impl SigKind {
@@ -23,6 +68,10 @@ impl SigKind {
         I: IntoIterator<Item = SigKind>,
     {
         SigKind::Sig(Signature::from_tuple(items))
+    }
+
+    pub fn supports_comptime(&self) -> bool {
+        matches!(self, SigKind::Int | SigKind::UInt | SigKind::Str)
     }
 }
 
@@ -42,7 +91,7 @@ impl Signature {
             .map(|kind| SigItem {
                 name: String::new(),
                 kind,
-                has_bang: false,
+                is_comptime: false,
             })
             .collect();
         Signature {
@@ -64,7 +113,7 @@ impl Signature {
             .map(|kind| SigItem {
                 name: String::new(),
                 kind,
-                has_bang: false,
+                is_comptime: false,
             })
             .collect();
         Signature {
@@ -88,21 +137,21 @@ impl Signature {
 pub struct SigItem {
     pub name: String,
     pub kind: SigKind,
-    pub has_bang: bool,
+    pub is_comptime: bool,
 }
 
 impl Eq for SigItem {}
 
 impl PartialEq for SigItem {
     fn eq(&self, other: &Self) -> bool {
-        self.kind == other.kind && self.has_bang == other.has_bang
+        self.kind == other.kind && self.is_comptime == other.is_comptime
     }
 }
 
 impl Hash for SigItem {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.kind.hash(state);
-        self.has_bang.hash(state);
+        self.is_comptime.hash(state);
     }
 }
 

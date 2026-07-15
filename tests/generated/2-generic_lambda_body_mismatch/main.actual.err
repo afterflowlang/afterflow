@@ -1,1 +1,4 @@
-[hir] expected T, found U at 0:0
+[hir] expected T, found U
+tests/failing/2-generic_lambda_body_mismatch/main.rgo:5
+    ok(y, x) // wrong order here
+       ^

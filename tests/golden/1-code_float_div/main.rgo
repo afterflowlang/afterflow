@@ -1,15 +1,11 @@
+stdout: /stdout
+
 str: @str
 float: @f64
-div: @divf64
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 x: 1.5
 main: () {
-    div(x, 2.0, (y: float){
-        printf("result: %f", x, exit(0))
+    @div_f64(x, 2.0, (y: float){
+        stdout.printf("result: %f", x, @exit(0))
     })
 }

@@ -1,10 +1,8 @@
 byte: @byte
-exit: @exit
 
 print_byte: (value: byte, ok:()) {
     ok()
 }
-
 main: () {
-    print_byte(256, exit(0))
+    print_byte(256, @exit(0))
 }

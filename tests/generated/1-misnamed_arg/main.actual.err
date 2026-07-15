@@ -1,1 +1,4 @@
-[hir] function 'foo' has no parameter named 'c' at 0:0
+[hir] function 'foo' has no parameter named 'c'
+tests/failing/1-misnamed_arg/main.rgo:11
+    foo(b: "world", c: "hello")
+                    ^

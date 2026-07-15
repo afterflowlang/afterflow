@@ -1,11 +1,9 @@
 str: @str
 int: @int
-write: @write
-exit: @exit
 
 x: "Hello world!\n"
 foo: (){
-	write(x, exit(0))
+	@write(x, @exit(0))
 }
 main: () {
     foo

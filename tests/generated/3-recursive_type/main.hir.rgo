@@ -1,46 +1,40 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+tail: (int, tail)
+_5___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _6___rgo_7374646f7574__printf: _5___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _6___rgo_7374646f7574__printf)
 }
-exit: @exit
-tail: (int, tail)
-@sprintf: @sprintf
-@write: @write
-_10_identity: (){
-    _11: 0
-    exit(_11)
+_11_identity: (){
+    _12: 0
+    @exit(_12)
 }
 
-_8_identity: (s: str){
-    @write(s, _10_identity)
+_9_identity: (s: str){
+    @write(s, _11_identity)
 }
 
 identity: (node:(int, tail)){
-    _6: "unused\n"
-    @sprintf(_6, _8_identity)
+    _7: "unused\n"
+    @sprintf(_7, _9_identity)
 }
-@sprintf: @sprintf
-@write: @write
-_18_hello: (){
-    _19: 0
-    exit(_19)
+_19_hello: (){
+    _20: 0
+    @exit(_20)
 }
 
-_16_hello: (s: str){
-    @write(s, _18_hello)
+_17_hello: (s: str){
+    @write(s, _19_hello)
 }
 
 hello: (){
-    _14: "hi\n"
-    @sprintf(_14, _16_hello)
+    _15: "hi\n"
+    @sprintf(_15, _17_hello)
 }
 
 main: (){

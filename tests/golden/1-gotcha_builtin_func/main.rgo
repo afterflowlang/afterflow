@@ -1,15 +1,12 @@
+stdout: /stdout
+
 str: @str
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 int: @int
 
-// This is the gotcha, write is a built-in function! But this is valid in this language.
+// Builtin package members do not occupy the user namespace until imported.
 write: (n: int, ok: ()){
-    printf("Gotcha: %d", n, ok)
+    stdout.printf("Gotcha: %d", n, ok)
 }
 main: () {
-    write(1, exit(0))
+    write(1, @exit(0))
 }

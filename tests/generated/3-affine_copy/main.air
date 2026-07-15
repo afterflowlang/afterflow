@@ -53,7 +53,7 @@ _12_foo_deepcopy_skip_0:
 
 _9_foo($ok: (), $x: int):
     $_13_foo = @newclosure<(), str>(_12_foo, $ok: ())
-    @sprintf($_10: str! = "got: %d\n", $x: int, $_13_foo)
+    @sprintf($_10: str = "got: %d\n", $x: int, $_13_foo)
 
 
 _9_foo_unwrapper($env_end: int):

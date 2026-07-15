@@ -16,9 +16,11 @@ pub struct ContextEntry {
     pub is_root: bool,
     pub is_param: bool,
     pub is_capture: bool,
-    pub span: Span,
+    pub is_comptime: bool,
+    pub is_predeclared: bool,
     pub scope: Vec<String>,
     pub captures: Vec<SigItem>,
+    pub span: Span,
 }
 
 pub struct Context {
@@ -157,7 +159,11 @@ impl Context {
     }
 
     pub fn add(&mut self, key: &str, entry: ContextEntry) -> Result<(), Error> {
-        if self.inner.contains_key(key) {
+        if self
+            .inner
+            .get(key)
+            .is_some_and(|existing| !existing.is_predeclared || entry.is_predeclared)
+        {
             return Err(Error::new(
                 Code::Resolve,
                 format!("duplicate symbol `{}` in this scope", key),
@@ -172,6 +178,7 @@ impl Context {
         &mut self,
         name: &str,
         kind: SigKind,
+        is_comptime: bool,
         span: Span,
         is_capture: bool,
     ) -> Result<(), Error> {
@@ -182,19 +189,22 @@ impl Context {
                 span,
             ));
         }
+        let is_comptime = matches!(kind, SigKind::Sig(_)) || is_comptime;
         self.params.push(name.to_string());
         self.inner.insert(
             name.to_string(),
             ContextEntry {
                 name: name.to_string(),
                 kind: kind.clone(),
-                span,
                 is_builtin: false,
                 is_root: false,
                 is_param: true,
                 is_capture,
+                is_comptime,
+                is_predeclared: false,
                 scope: self.scope_stack.clone(),
                 captures: Vec::new(),
+                span,
             },
         );
         Ok(())
@@ -208,7 +218,7 @@ impl Context {
                 let item = SigItem {
                     name: name.clone(),
                     kind: entry.kind.clone(),
-                    has_bang: false,
+                    is_comptime: entry.is_comptime && entry.kind.supports_comptime(),
                 };
                 if entry.is_capture {
                     capture_params.push(item);
@@ -228,7 +238,7 @@ impl Context {
                 let item = SigItem {
                     name: name.clone(),
                     kind: entry.kind.clone(),
-                    has_bang: false,
+                    is_comptime: entry.is_comptime && entry.kind.supports_comptime(),
                 };
                 if entry.is_capture {
                     capture_params.push(item);
@@ -239,18 +249,21 @@ impl Context {
     }
 
     pub fn add_literal(&mut self, name: &str, kind: SigKind) -> Result<(), Error> {
+        let is_comptime = kind.supports_comptime() || matches!(kind, SigKind::Sig(_));
         self.add(
             name,
             ContextEntry {
                 name: name.to_string(),
                 kind,
-                span: Span::unknown(),
                 is_builtin: false,
                 is_root: false,
                 is_param: false,
                 is_capture: false,
+                is_comptime,
+                is_predeclared: false,
                 scope: self.scope_stack.clone(),
                 captures: Vec::new(),
+                span: Span::unknown(),
             },
         )
     }
@@ -268,13 +281,15 @@ impl Context {
             ContextEntry {
                 name: name.to_string(),
                 kind,
-                span,
                 is_builtin,
                 is_root: true,
                 is_param: false,
                 is_capture: false,
+                is_comptime: false,
+                is_predeclared: false,
                 scope: self.scope_stack.clone(),
                 captures: Vec::new(),
+                span,
             },
         )
     }
@@ -294,19 +309,52 @@ impl Context {
             ContextEntry {
                 name: name.to_string(),
                 kind: SigKind::Sig(sig),
-                span,
                 is_builtin,
                 is_root: true,
                 is_param: false,
                 is_capture: false,
+                is_comptime: true,
+                is_predeclared: false,
                 scope: entry_scope,
                 captures: Vec::new(),
+                span,
             },
         )
     }
 
     pub fn get(&self, name: &str) -> Option<&ContextEntry> {
         self.inner.get(name).or_else(|| self.outer.get(name))
+    }
+
+    pub fn predeclare(
+        &mut self,
+        name: &str,
+        kind: SigKind,
+        is_comptime: bool,
+        span: Span,
+    ) -> Result<(), Error> {
+        self.add(
+            name,
+            ContextEntry {
+                name: name.to_string(),
+                kind,
+                is_builtin: false,
+                is_root: true,
+                is_param: false,
+                is_capture: false,
+                is_comptime,
+                is_predeclared: true,
+                scope: self.scope_stack.clone(),
+                captures: Vec::new(),
+                span,
+            },
+        )
+    }
+
+    pub fn mark_predeclared(&mut self, name: &str) {
+        if let Some(entry) = self.get_mut(name) {
+            entry.is_predeclared = true;
+        }
     }
 
     pub fn get_mut(&mut self, name: &str) -> Option<&mut ContextEntry> {
@@ -350,7 +398,7 @@ impl Context {
 }
 
 fn is_reserved_external_symbol(name: &str) -> bool {
-    matches!(name, "exit" | "printf" | "sprintf" | "write")
+    matches!(name, "exit" | "sprintf" | "write")
 }
 
 pub fn register_import(

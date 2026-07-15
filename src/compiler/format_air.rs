@@ -1,6 +1,7 @@
 use std::fmt;
 
 use crate::compiler::air;
+use crate::compiler::builtins;
 use crate::compiler::span::Span;
 
 pub fn render_air_functions(functions: &[air::AirFunction]) -> String {
@@ -120,17 +121,17 @@ impl fmt::Debug for air::AirStmt {
                 air::AirOp::JumpEqInt(eq) => {
                     let args = format_args_inline(&eq.args);
                     if args.is_empty() {
-                        write!(f, "@eq({})", eq.target)
+                        write!(f, "@eq_int({})", eq.target)
                     } else {
-                        write!(f, "@eq({}, {})", eq.target, args)
+                        write!(f, "@eq_int({}, {})", eq.target, args)
                     }
                 }
                 air::AirOp::JumpEqStr(eq) => {
                     let args = format_args_inline(&eq.args);
                     if args.is_empty() {
-                        write!(f, "@eqs({})", eq.target)
+                        write!(f, "@eq_str({})", eq.target)
                     } else {
-                        write!(f, "@eqs({}, {})", eq.target, args)
+                        write!(f, "@eq_str({}, {})", eq.target, args)
                     }
                 }
                 air::AirOp::JumpLt(jump) => write!(
@@ -151,7 +152,19 @@ impl fmt::Debug for air::AirStmt {
                     write!(
                         f,
                         "{}",
-                        format_binary_instr_op("addf64", &op.input_a, &op.input_b, &op.target)
+                        format_binary_instr_op("add_f64", &op.input_a, &op.input_b, &op.target)
+                    )
+                }
+                air::AirOp::AddBits(op) => {
+                    write!(
+                        f,
+                        "{}",
+                        format_binary_instr_op(
+                            &format!("add_b{}", op.bit_width),
+                            &op.input_a,
+                            &op.input_b,
+                            &op.target,
+                        )
                     )
                 }
                 air::AirOp::Sub(op) => {
@@ -161,6 +174,18 @@ impl fmt::Debug for air::AirStmt {
                         format_binary_instr_op("sub", &op.input_a, &op.input_b, &op.target)
                     )
                 }
+                air::AirOp::SubBits(op) => {
+                    write!(
+                        f,
+                        "{}",
+                        format_binary_instr_op(
+                            &format!("sub_b{}", op.bit_width),
+                            &op.input_a,
+                            &op.input_b,
+                            &op.target,
+                        )
+                    )
+                }
                 air::AirOp::Mul(op) => {
                     write!(
                         f,
@@ -168,11 +193,23 @@ impl fmt::Debug for air::AirStmt {
                         format_binary_instr_op("mul", &op.input_a, &op.input_b, &op.target)
                     )
                 }
+                air::AirOp::MulBits(op) => {
+                    write!(
+                        f,
+                        "{}",
+                        format_binary_instr_op(
+                            &format!("mul_b{}", op.bit_width),
+                            &op.input_a,
+                            &op.input_b,
+                            &op.target,
+                        )
+                    )
+                }
                 air::AirOp::MulF64(op) => {
                     write!(
                         f,
                         "{}",
-                        format_binary_instr_op("mulf64", &op.input_a, &op.input_b, &op.target)
+                        format_binary_instr_op("mul_f64", &op.input_a, &op.input_b, &op.target)
                     )
                 }
                 air::AirOp::DivInt(op) => write!(
@@ -183,13 +220,37 @@ impl fmt::Debug for air::AirStmt {
                     format_arg(&op.input_a),
                     format_arg(&op.input_b)
                 ),
+                air::AirOp::DivBits(op) => write!(
+                    f,
+                    "@{}({}, {}, {}, {})",
+                    builtins::Builtin::DivBits {
+                        bit_width: op.bit_width,
+                        is_signed: op.is_signed,
+                    }
+                    .name(),
+                    op.ok_target,
+                    op.err_target,
+                    format_arg(&op.input_a),
+                    format_arg(&op.input_b),
+                ),
                 air::AirOp::DivF64(op) => {
                     write!(
                         f,
                         "{}",
-                        format_binary_instr_op("divf64", &op.input_a, &op.input_b, &op.target)
+                        format_binary_instr_op("div_f64", &op.input_a, &op.input_b, &op.target)
                     )
                 }
+                air::AirOp::ConvertFixed(op) => write!(
+                    f,
+                    "@{}({}, {})",
+                    builtins::Builtin::ConvertFixed {
+                        from: op.from,
+                        to: op.to,
+                    }
+                    .name(),
+                    format_arg(&op.input),
+                    format_binding_name(&op.target),
+                ),
                 air::AirOp::JumpGt(jump) => write!(
                     f,
                     "@gt({}, {}, {})",
@@ -197,15 +258,19 @@ impl fmt::Debug for air::AirStmt {
                     format_operand(&jump.left),
                     format_operand(&jump.right),
                 ),
-                air::AirOp::Printf(call) => {
-                    write!(f, "{}", format_call_op("printf", &call.args, &call.target))
-                }
                 air::AirOp::Sprintf(call) => {
                     write!(f, "{}", format_call_op("sprintf", &call.args, &call.target))
                 }
                 air::AirOp::Write(call) => {
                     write!(f, "{}", format_call_op("write", &call.args, &call.target))
                 }
+                air::AirOp::ReadFile(op) => write!(
+                    f,
+                    "@readfile({}, {}, {})",
+                    op.ok_target,
+                    op.err_target,
+                    format_arg(&op.path)
+                ),
                 air::AirOp::JumpArgs(ja) => {
                     let args = format_args_inline(&ja.args);
                     let target = if let Some(builtin) = &ja.target.builtin {
@@ -260,21 +325,22 @@ fn format_sig_item(param: &air::SigItem) -> String {
 }
 
 fn format_sig_item_inner(param: &air::SigItem, show_names: bool) -> String {
+    let mut kind = format_sig_kind_inner(&param.kind, show_names);
+    if param.is_comptime {
+        kind.push('!');
+    }
     if show_names && !param.name.is_empty() {
         let binding = format_binding_name(&param.name);
         if matches!(param.kind, air::SigKind::Sig(_)) {
             format!("{binding}: ()")
         } else {
-            format!(
-                "{binding}: {}",
-                format_sig_kind_inner(&param.kind, show_names)
-            )
+            format!("{binding}: {kind}")
         }
     } else {
         if matches!(param.kind, air::SigKind::Sig(_)) {
             "()".to_string()
         } else {
-            format_sig_kind_inner(&param.kind, show_names)
+            kind
         }
     }
 }
@@ -287,11 +353,11 @@ fn format_sig_kind_inner(kind: &air::SigKind, show_names: bool) -> String {
     match kind {
         air::SigKind::Byte => "byte".to_string(),
         air::SigKind::Int => "int".to_string(),
+        air::SigKind::UInt => "uint".to_string(),
+        air::SigKind::FixedInt(kind) => kind.name(),
         air::SigKind::Str => "str".to_string(),
         air::SigKind::F64 => "f64".to_string(),
         air::SigKind::Variadic => "...".to_string(),
-        air::SigKind::CompileTimeInt => "int!".to_string(),
-        air::SigKind::CompileTimeStr => "str!".to_string(),
         air::SigKind::Ident(ident) => ident.name.clone(),
         air::SigKind::Sig(sig) => {
             let items = sig
@@ -400,6 +466,7 @@ fn escape_literal(value: &str) -> String {
             '\n' => "\\n".to_string(),
             '\r' => "\\r".to_string(),
             '\t' => "\\t".to_string(),
+            '\0' => "\\0".to_string(),
             other => other.to_string(),
         })
         .collect::<Vec<_>>()

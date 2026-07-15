@@ -1,1 +1,4 @@
-[hir] expected int, found str! at 0:0
+[hir] expected int, found str!
+tests/failing/1-invalid_arg/main.rgo:12
+    foo("invalid_arg")  // Error: expected int, found str
+        ^^^^^^^^^^^^^

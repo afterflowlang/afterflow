@@ -1,11 +1,34 @@
-_14_bar():
-    @exit($_15: int = 0)
+_16_bar():
+    @exit($_17: int = 0)
+
+
+_16_bar_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_16_bar)
+
+
+_16_bar_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_16_bar_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_14_bar($s: str):
+    $_16_bar = @newclosure<>(_16_bar)
+    @write($s: str, $_16_bar)
 
 
 _14_bar_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
+    $s = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_14_bar)
+    @jumpargs(_14_bar, $s: str)
 
 
 _14_bar_deep_release($env_end: int):
@@ -19,32 +42,9 @@ _14_bar_deepcopy($env_end: int):
     @return()
 
 
-_12_bar($s: str):
-    $_14_bar = @newclosure<>(_14_bar)
-    @write($s: str, $_14_bar)
-
-
-_12_bar_unwrapper($env_end: int):
-    $__env_end = @pin($env_end)
-    $s = @field($__env_end, -1)
-    @release($__env_end)
-    @jumpargs(_12_bar, $s: str)
-
-
-_12_bar_deep_release($env_end: int):
-    $__env_end = @pin($env_end)
-    @release($__env_end)
-    @return()
-
-
-_12_bar_deepcopy($env_end: int):
-    $__env_end = @pin($env_end)
-    @return()
-
-
 bar($name0: str, $name1: str, $name2: str):
-    $_12_bar = @newclosure<str>(_12_bar)
-    @sprintf($_10: str! = "hello %s, %s and %s\n", $name0: int, $name1: int, $name2: int, $_12_bar)
+    $_14_bar = @newclosure<str>(_14_bar)
+    @sprintf($_12: str = "hello %s, %s and %s\n", $name0: str, $name1: str, $name2: str, $_14_bar)
 
 
 bar_unwrapper($env_end: int):
@@ -68,7 +68,7 @@ bar_deepcopy($env_end: int):
 
 
 foo($ok: ()):
-    @jumpclosure($ok, $_5: int = "charlie")
+    @jumpclosure($ok, $_7: int = "charlie")
 
 
 foo_unwrapper($env_end: int):
@@ -99,11 +99,11 @@ foo_deepcopy_skip_0:
 
 
 baz($ok: ()):
-    $_9_ok = @cloneclosure($ok, str, str)
-    $___9_ok_env_end = @pin($_9_ok)
-    @setfield($___9_ok_env_end, -2, $_8: str = "bob")
-    @setfield($___9_ok_env_end, 5, $___9_ok_num_remaining_value: int = 1)
-    @jumpargs(foo, $_9_ok: ())
+    $_11_ok = @cloneclosure($ok, str, str)
+    $___11_ok_env_end = @pin($_11_ok)
+    @setfield($___11_ok_env_end, -2, $_10: str = "bob")
+    @setfield($___11_ok_env_end, 5, $___11_ok_num_remaining_value: int = 1)
+    @jumpargs(foo, $_11_ok: ())
 
 
 baz_unwrapper($env_end: int):
@@ -134,8 +134,8 @@ baz_deepcopy_skip_0:
 
 
 main():
-    $_19_bar = @newclosure<str, str, str>(bar, $_18: str = "alice")
-    @jumpargs(baz, $_19_bar: ())
+    $_21_bar = @newclosure<str, str, str>(bar, $_20: str = "alice")
+    @jumpargs(baz, $_21_bar: ())
 
 
 main_unwrapper($env_end: int):

@@ -4,6 +4,10 @@ use crate::compiler::hir::{self, Block, BlockItem, Closure, Function};
 pub fn render_normalized_rgo(items: &[BlockItem]) -> String {
     let mut out = String::new();
     for (i, item) in items.iter().enumerate() {
+        if matches!(item, BlockItem::Import { label, path } if label.strip_prefix('@') == Some(path))
+        {
+            continue;
+        }
         match item {
             BlockItem::FunctionDef(function) => {
                 write_function(function, &mut out, 0);
@@ -61,12 +65,12 @@ fn write_block_item(item: &BlockItem, out: &mut String, indent: usize) {
             }
         },
         BlockItem::ClosureDef(Closure { name, of, args }) => {
-            write!(out, "{}: {}(", name, of).unwrap();
+            write!(out, "{}: {}(", name, display_name(of)).unwrap();
             write_args(args, out);
             out.push(')');
         }
         BlockItem::Exec(exec) => {
-            write!(out, "{}(", exec.of).unwrap();
+            write!(out, "{}(", display_name(&exec.of)).unwrap();
             write_args(&exec.args, out);
             out.push(')');
         }
@@ -91,7 +95,7 @@ fn write_args(args: &[String], out: &mut String) {
             out.push_str(", ");
         }
         first = false;
-        write!(out, "{}", arg).unwrap();
+        write!(out, "{}", display_name(arg)).unwrap();
     }
 }
 
@@ -105,11 +109,11 @@ fn format_param_list(params: &[hir::SigItem]) -> String {
     let entries: Vec<String> = params
         .iter()
         .map(|param| {
-            let ty = format_sig_kind(&param.kind);
-            let ty = if param.has_bang && !ty.ends_with('!') {
+            let ty = if param.is_comptime {
+                let ty = format_sig_kind(&param.kind);
                 format!("{ty}!")
             } else {
-                ty
+                format_sig_kind(&param.kind)
             };
             let name_label = param.name.clone();
             if ty.starts_with('(') {
@@ -126,20 +130,27 @@ pub fn format_sig_kind(kind: &hir::SigKind) -> String {
     match kind {
         hir::SigKind::Byte => "byte".to_string(),
         hir::SigKind::Int => "int".to_string(),
+        hir::SigKind::UInt => "uint".to_string(),
+        hir::SigKind::FixedInt(kind) => kind.name(),
         hir::SigKind::Str => "str".to_string(),
         hir::SigKind::F64 => "f64".to_string(),
-        hir::SigKind::CompileTimeInt => "int!".to_string(),
-        hir::SigKind::CompileTimeStr => "str!".to_string(),
         hir::SigKind::Sig(inner) => {
             let entries = inner
                 .items
                 .iter()
-                .map(|item| format_sig_kind(&item.kind))
+                .map(|item| {
+                    let kind = format_sig_kind(&item.kind);
+                    if item.is_comptime {
+                        format!("{kind}!")
+                    } else {
+                        kind
+                    }
+                })
                 .collect::<Vec<_>>()
                 .join(", ");
             format!("({})", entries)
         }
-        hir::SigKind::Ident(ident) => ident.name.clone(),
+        hir::SigKind::Ident(ident) => display_name(&ident.name).to_string(),
         hir::SigKind::Variadic => "...".to_string(),
         hir::SigKind::GenericInst { name, args } => {
             let entries = args
@@ -153,6 +164,10 @@ pub fn format_sig_kind(kind: &hir::SigKind) -> String {
     }
 }
 
+fn display_name(name: &str) -> &str {
+    name
+}
+
 fn format_string_literal(value: &str) -> String {
     let mut literal = String::from("\"");
     for ch in value.chars() {
@@ -162,6 +177,7 @@ fn format_string_literal(value: &str) -> String {
             '\n' => literal.push_str("\\n"),
             '\r' => literal.push_str("\\r"),
             '\t' => literal.push_str("\\t"),
+            '\0' => literal.push_str("\\0"),
             other => literal.push(other),
         }
     }

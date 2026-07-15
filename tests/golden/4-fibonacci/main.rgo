@@ -1,19 +1,14 @@
+stdout: /stdout
+
 str: @str
-exit: @exit
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-eqi: @eq
-sub: @sub
-add: @add
+
 fib_iter: (n: int, a: int, b: int, k: (int)){
-    eqi(n, 0, () {
+    @eq_int(n, 0, () {
         k(a)
     }, () {
-        sub(n, 1, (n1: int){
-            add(a, b, (ab: int){
+        @sub(n, 1, (n1: int){
+            @add(a, b, (ab: int){
                 fib_iter(n1, b, ab, k)
             })
         })
@@ -26,6 +21,6 @@ fib: (n: int, k: (int)){
 
 main: () {
     (result: int) = fib(7)
-    () = printf("fib(7) = %d\n", result)
-    exit(0)
+    () = stdout.printf("fib(7) = %d\n", result)
+    @exit(0)
 }

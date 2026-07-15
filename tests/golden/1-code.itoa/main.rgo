@@ -1,12 +1,9 @@
 str: @str
 int: @int
-sprintf: @sprintf
-exit: @exit
 
 itoa: (n: int, ok:(str)) {
-    sprintf("%d", n, ok)
+    @sprintf("%d", n, ok)
 }
-
 main: () {
-    itoa(1, (s: str){ exit(0) })
+    itoa(1, (s: str){ @exit(0) })
 }

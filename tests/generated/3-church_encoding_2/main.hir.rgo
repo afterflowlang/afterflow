@@ -1,48 +1,43 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-add: @add
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_5___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _6___rgo_7374646f7574__printf: _5___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _6___rgo_7374646f7574__printf)
 }
-exit: @exit
-_9_two: (f:(int, (int)), ok:(int), y: int){
+
+_12_two: (f:(int, (int)), ok:(int), y: int){
     f(y, ok)
 }
 
 two: (f:(int, (int)), x: int, ok:(int)){
-    _10_two: _9_two(f, ok)
-    f(x, _10_two)
+    _13_two: _12_two(f, ok)
+    f(x, _13_two)
+}
+_17_main: (x: int, ok:(int)){
+    _18: 10
+    @add(x, _18, ok)
+}
+_27_main: (){
+    _28: 0
+    @exit(_28)
 }
 
-_14_main: (x: int, ok:(int)){
-    _15: 10
-    add(x, _15, ok)
-}
-@sprintf: @sprintf
-@write: @write
-_24_main: (){
-    _25: 0
-    exit(_25)
+_25_main: (s: str){
+    @write(s, _27_main)
 }
 
-_22_main: (s: str){
-    @write(s, _24_main)
-}
-
-_19_main: (x: int){
-    _20: "result: %d"
-    @sprintf(_20, x, _22_main)
+_22_main: (x: int){
+    _23: "result: %d"
+    @sprintf(_23, x, _25_main)
 }
 
 main: (){
-    _17: 0
-    two(_14_main, _17, _19_main)
+    _20: 0
+    two(_17_main, _20, _22_main)
 }
 main()

@@ -44,7 +44,7 @@ _6_foo_deepcopy($env_end: int):
 
 foo($a: str, $b: str, $c: str):
     $_6_foo = @newclosure<str>(_6_foo)
-    @sprintf($_4: str! = "%s %s and %s", $a: int, $b: int, $c: int, $_6_foo)
+    @sprintf($_4: str = "%s %s and %s", $a: str, $b: str, $c: str, $_6_foo)
 
 
 foo_unwrapper($env_end: int):

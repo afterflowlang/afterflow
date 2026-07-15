@@ -6,7 +6,7 @@ _1_main:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
-    mov rdi, 0 ; exit code
+    mov rdi, 0 ; operand literal
     call exit ; call libc exit to flush buffers
 global release_heap_ptr
 release_heap_ptr:
@@ -89,17 +89,8 @@ main:
     mov rax, [rbp-8] ; load operand
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-main_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je main_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp main_write_strlen_loop_0
-main_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-16] ; load continuation env_end pointer
@@ -158,4 +149,6 @@ extern exit
 extern write
 section .rodata
 x:
+    dq x_data, 13 ; string data pointer and byte length
+x_data:
     db "Hello world!", 10, 0

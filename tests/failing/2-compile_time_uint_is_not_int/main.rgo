@@ -1,0 +1,14 @@
+int: @int
+uint: @uint
+
+accept_int: (value: int!, ok: ()) {
+    ok()
+}
+
+forward_uint: (value: uint!, ok: ()) {
+    accept_int(value, ok)
+}
+
+main: () {
+    forward_uint(1, @exit(0))
+}

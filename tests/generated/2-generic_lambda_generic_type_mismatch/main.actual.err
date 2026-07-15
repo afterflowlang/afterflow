@@ -1,1 +1,4 @@
-[hir] expected (T), found (str) at 0:0
+[hir] expected (T), found (str)
+tests/failing/2-generic_lambda_generic_type_mismatch/main.rgo:15
+    foo(42, bar)
+            ^^^

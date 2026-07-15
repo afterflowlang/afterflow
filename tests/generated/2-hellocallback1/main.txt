@@ -8,24 +8,6 @@
         },
         span: ,
     },
-    IdentDef {
-        name: "write",
-        ident: Ident {
-            name: "@write",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
-        name: "exit",
-        ident: Ident {
-            name: "@exit",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
     LitDef {
         name: "msg",
         literal: Literal {
@@ -49,7 +31,7 @@
                                 span: ,
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                     SigItem {
@@ -61,7 +43,7 @@
                                 generics: {},
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],
@@ -72,7 +54,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "write",
+                            name: "@write",
                             args: [
                                 Arg {
                                     name: None,
@@ -126,7 +108,7 @@
                                                 span: ,
                                             },
                                         ),
-                                        has_bang: false,
+                                        is_comptime: false,
                                         span: ,
                                     },
                                     SigItem {
@@ -138,7 +120,7 @@
                                                 generics: {},
                                             },
                                         ),
-                                        has_bang: false,
+                                        is_comptime: false,
                                         span: ,
                                     },
                                 ],
@@ -146,7 +128,7 @@
                                 generics: {},
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                     SigItem {
@@ -158,7 +140,7 @@
                                 generics: {},
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],
@@ -234,7 +216,7 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "exit",
+                                            name: "@exit",
                                             args: [
                                                 Arg {
                                                     name: None,

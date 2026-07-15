@@ -1,50 +1,50 @@
-_7_not_const_msg():
-    @exit($_8: int = 0)
+_6_not_const_msg():
+    @exit($_7: int = 0)
 
 
-_7_not_const_msg_unwrapper($env_end: int):
+_6_not_const_msg_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_7_not_const_msg)
+    @jumpargs(_6_not_const_msg)
 
 
-_7_not_const_msg_deep_release($env_end: int):
+_6_not_const_msg_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_7_not_const_msg_deepcopy($env_end: int):
+_6_not_const_msg_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_5_not_const_msg($s: str):
-    $_7_not_const_msg = @newclosure<>(_7_not_const_msg)
-    @write($s: str, $_7_not_const_msg)
+_4_not_const_msg($s: str):
+    $_6_not_const_msg = @newclosure<>(_6_not_const_msg)
+    @write($s: str, $_6_not_const_msg)
 
 
-_5_not_const_msg_unwrapper($env_end: int):
+_4_not_const_msg_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $s = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_5_not_const_msg, $s: str)
+    @jumpargs(_4_not_const_msg, $s: str)
 
 
-_5_not_const_msg_deep_release($env_end: int):
+_4_not_const_msg_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_5_not_const_msg_deepcopy($env_end: int):
+_4_not_const_msg_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
 not_const_msg($fmt: str!, $value: int!):
-    $_5_not_const_msg = @newclosure<str>(_5_not_const_msg)
-    @sprintf($fmt: str!, $value: int, $_5_not_const_msg)
+    $_4_not_const_msg = @newclosure<str>(_4_not_const_msg)
+    @sprintf($fmt: str, $value: int, $_4_not_const_msg)
 
 
 not_const_msg_unwrapper($env_end: int):
@@ -52,7 +52,7 @@ not_const_msg_unwrapper($env_end: int):
     $fmt = @field($__env_end, -2)
     $value = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(not_const_msg, $fmt: str!, $value: int!)
+    @jumpargs(not_const_msg, $fmt: str, $value: int)
 
 
 not_const_msg_deep_release($env_end: int):
@@ -67,7 +67,7 @@ not_const_msg_deepcopy($env_end: int):
 
 
 const_msg($fmt: str!, $value: int!):
-    @jumpargs(not_const_msg, $fmt: str!, $value: int!)
+    @jumpargs(not_const_msg, $fmt: str, $value: int)
 
 
 const_msg_unwrapper($env_end: int):
@@ -75,7 +75,7 @@ const_msg_unwrapper($env_end: int):
     $fmt = @field($__env_end, -2)
     $value = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(const_msg, $fmt: str!, $value: int!)
+    @jumpargs(const_msg, $fmt: str, $value: int)
 
 
 const_msg_deep_release($env_end: int):
@@ -90,7 +90,7 @@ const_msg_deepcopy($env_end: int):
 
 
 main():
-    @jumpargs(const_msg, $_11: str! = "compile-time value %d\n", $_12: int! = 7)
+    @jumpargs(const_msg, $_10: str = "compile-time value %d\n", $_11: int = 7)
 
 
 main_unwrapper($env_end: int):

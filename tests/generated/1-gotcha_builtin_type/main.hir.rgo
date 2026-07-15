@@ -1,34 +1,29 @@
+__rgo_7374646f7574__str: @str
 str: @str
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_6_w: (ok:(), s: str){
+_5_w: (ok:(), s: str){
     @write(s, ok)
 }
 
 w: (s: str, ok:()){
-    _4: "Gotcha: %s"
-    _7_w: _6_w(ok)
-    @sprintf(_4, s, _7_w)
+    _3: "Gotcha: %s"
+    _6_w: _5_w(ok)
+    @sprintf(_3, s, _6_w)
 }
-
-_10_main: (){
-    _11: 0
-    exit(_11)
+_9_main: (){
+    _10: 0
+    @exit(_10)
 }
 
 main: (){
-    _8: "one"
-    w(_8, _10_main)
+    _7: "one"
+    w(_7, _9_main)
 }
 main()

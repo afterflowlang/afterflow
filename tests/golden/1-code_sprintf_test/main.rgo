@@ -1,11 +1,8 @@
-int: @int
 str: @str
-sprintf: @sprintf
-write: @write
-exit: @exit
+int: @int
 
 main: () {
-    sprintf("result: %d", 3, (s:str){
-        write(s, exit(0))
+    @sprintf("result: %d", 3, (s:str){
+        @write(s, @exit(0))
     })
 }

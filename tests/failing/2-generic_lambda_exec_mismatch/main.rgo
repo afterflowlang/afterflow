@@ -1,15 +1,12 @@
-int: @int
 str: @str
-exit: @exit
+int: @int
 
 foo: <T>(x:T, y:T, ok:()){
     ok
 }
-
 done: (){
-    exit(0)
+    @exit(0)
 }
-
 main: () {
     foo(1, "bad", done)
 }

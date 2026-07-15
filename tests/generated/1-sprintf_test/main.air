@@ -44,7 +44,7 @@ _3_main_deepcopy($env_end: int):
 
 main():
     $_3_main = @newclosure<str>(_3_main)
-    @sprintf($_0: str! = "result: %d", $_1: int = 3, $_3_main)
+    @sprintf($_0: str = "result: %d", $_1: int = 3, $_3_main)
 
 
 main_unwrapper($env_end: int):

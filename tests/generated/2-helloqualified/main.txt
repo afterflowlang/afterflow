@@ -17,24 +17,6 @@
         },
         span: ,
     },
-    IdentDef {
-        name: "write",
-        ident: Ident {
-            name: "@write",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
-        name: "exit",
-        ident: Ident {
-            name: "@exit",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
     LitDef {
         name: "x",
         literal: Literal {
@@ -59,7 +41,7 @@
                                 generics: {},
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],
@@ -70,7 +52,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "write",
+                            name: "@write",
                             args: [
                                 Arg {
                                     name: None,
@@ -124,7 +106,7 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "exit",
+                                            name: "@exit",
                                             args: [
                                                 Arg {
                                                     name: None,

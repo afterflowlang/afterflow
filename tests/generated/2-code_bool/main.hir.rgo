@@ -1,15 +1,14 @@
+__rgo_7374646f7574__str: @str
 str: @str
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_3___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _4___rgo_7374646f7574__printf: _3___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _4___rgo_7374646f7574__printf)
 }
-exit: @exit
+
 true: (x:(), y:()){
     x()
 }
@@ -17,42 +16,38 @@ true: (x:(), y:()){
 false: (x:(), y:()){
     y()
 }
-@sprintf: @sprintf
-@write: @write
-_12_if: (){
-    _13: 0
-    exit(_13)
+_13_if: (){
+    _14: 0
+    @exit(_14)
 }
 
-_10_if: (s: str){
-    @write(s, _12_if)
+_11_if: (s: str){
+    @write(s, _13_if)
 }
 
-_7_if: (){
-    _8: "does not work\n"
-    @sprintf(_8, _10_if)
+_8_if: (){
+    _9: "does not work\n"
+    @sprintf(_9, _11_if)
 }
 
 if: (cond:((), ()), on_true:()){
-    cond(on_true, _7_if)
+    cond(on_true, _8_if)
 }
-@sprintf: @sprintf
-@write: @write
-_23_main: (){
-    _24: 0
-    exit(_24)
+_24_main: (){
+    _25: 0
+    @exit(_25)
 }
 
-_21_main: (s: str){
-    @write(s, _23_main)
+_22_main: (s: str){
+    @write(s, _24_main)
 }
 
-_18_main: (){
-    _19: "works\n"
-    @sprintf(_19, _21_main)
+_19_main: (){
+    _20: "works\n"
+    @sprintf(_20, _22_main)
 }
 
 main: (){
-    if(true, _18_main)
+    if(true, _19_main)
 }
 main()

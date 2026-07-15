@@ -3,12 +3,17 @@ use crate::compiler::span::Span;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
+    pub has_leading_whitespace: bool,
     pub span: Span,
 }
 
 impl Token {
     pub fn new(kind: TokenKind, span: Span) -> Self {
-        Self { kind, span }
+        Self {
+            kind,
+            has_leading_whitespace: false,
+            span,
+        }
     }
 }
 
@@ -16,7 +21,8 @@ impl Token {
 pub enum TokenKind {
     Eof,
     Ident(String),
-    Import(String),
+    Builtin(String),
+    SourcePath(String),
     IntLiteral(i64),
     FloatLiteral(f64),
     StringLiteral(String),
@@ -37,7 +43,6 @@ pub enum TokenKind {
     Plus,
     Minus,
     Star,
-    Slash,
     Bang,
     Newline,
     Question,

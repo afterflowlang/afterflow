@@ -1,58 +1,51 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+int_or_str: ((int), (str))
+_12___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _13___rgo_7374646f7574__printf: _12___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _13___rgo_7374646f7574__printf)
 }
-add: @add
-as_int: (x: int, ok:(int), _5_as_int:(str)){
+
+as_int: (x: int, ok:(int), _15_as_int:(str)){
     ok(x)
 }
-int_or_str: ((int), (str))
-@sprintf: @sprintf
-@write: @write
-_15_foo: (ok:(), s: str){
+_21_foo: (ok:(), s: str){
     @write(s, ok)
 }
 
-_12_foo: (ok:(), x: int){
-    _13: "number: %d"
-    _16_foo: _15_foo(ok)
-    @sprintf(_13, x, _16_foo)
+_18_foo: (ok:(), x: int){
+    _19: "number: %d"
+    _22_foo: _21_foo(ok)
+    @sprintf(_19, x, _22_foo)
 }
-@sprintf: @sprintf
-@write: @write
-_22_foo: (ok:(), s: str){
+_28_foo: (ok:(), s: str){
     @write(s, ok)
 }
 
-_19_foo: (ok:(), x: str){
-    _20: "x is str: %s\n"
-    _23_foo: _22_foo(ok)
-    @sprintf(_20, x, _23_foo)
+_25_foo: (ok:(), x: str){
+    _26: "x is str: %s\n"
+    _29_foo: _28_foo(ok)
+    @sprintf(_26, x, _29_foo)
 }
 
 foo: (x:((int), (str)), ok:()){
-    _17_foo: _12_foo(ok)
-    _24_foo: _19_foo(ok)
-    x(_17_foo, _24_foo)
+    _23_foo: _18_foo(ok)
+    _30_foo: _25_foo(ok)
+    x(_23_foo, _30_foo)
 }
-
-_28_main: (){
-    _29: 0
-    exit(_29)
+_34_main: (){
+    _35: 0
+    @exit(_35)
 }
 
 main: (){
-    _25: 42
-    _26_as_int: as_int(_25)
-    foo(_26_as_int, _28_main)
+    _31: 42
+    _32_as_int: as_int(_31)
+    foo(_32_as_int, _34_main)
 }
 main()

@@ -1,1 +1,4 @@
-[hir] byte literal must be between 0 and 255, found 256 at 0:0
+[hir] byte literal must be between 0 and 255, found 256
+tests/failing/1-byte_literal_out_of_range/main.rgo:7
+    print_byte(256, @exit(0))
+               ^^^

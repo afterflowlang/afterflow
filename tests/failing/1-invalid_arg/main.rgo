@@ -1,12 +1,12 @@
 str: @str
 int: @int
+
 printf: (fmt: str!, args: ..., ok:()) {
     (s: str) = @sprintf(fmt, args)
     @write(s, ok)
 }
-exit: @exit
 foo: (n: int) {
-    printf("Number: %d\n", n, exit(0))
+    printf("Number: %d\n", n, @exit(0))
 }
 main: () {
     foo("invalid_arg")  // Error: expected int, found str

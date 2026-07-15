@@ -1,38 +1,34 @@
+__rgo_7374646f7574__str: @str
 str: @str
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-@sprintf: @sprintf
-@write: @write
-_8_foo: (){
-    _9: 0
-    exit(_9)
+_7_foo: (){
+    _8: 0
+    @exit(_8)
 }
 
-_6_foo: (s: str){
-    @write(s, _8_foo)
+_5_foo: (s: str){
+    @write(s, _7_foo)
 }
 
 foo: (a: str, b: str){
-    _4: "%s %s"
-    @sprintf(_4, a, b, _6_foo)
+    _3: "%s %s"
+    @sprintf(_3, a, b, _5_foo)
 }
 
-_12_main: (b: str, a: str){
+_11_main: (b: str, a: str){
     foo(a, b)
 }
 
 main: (){
-    _13: "world"
-    _14: "hello"
-    _12_main(_13, _14)
+    _12: "world"
+    _13: "hello"
+    _11_main(_12, _13)
 }
 main()

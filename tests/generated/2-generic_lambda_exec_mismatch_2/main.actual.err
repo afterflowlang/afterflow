@@ -1,1 +1,4 @@
-[hir] expected (T, U), found (str, int) at 0:0
+[hir] expected (T, U), found (str, int)
+tests/failing/2-generic_lambda_exec_mismatch_2/main.rgo:11
+    foo(1, "bad", done)
+                  ^^^^

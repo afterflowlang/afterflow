@@ -32,7 +32,7 @@ _14_main_deepcopy_skip_0:
 
 _10_main($_4_foo: ()):
     $_15_main = @newclosure<(), str>(_14_main, $_4_foo: ())
-    @sprintf($_11: str! = "result: %d", $_12: int = 1, $_15_main)
+    @sprintf($_11: str = "result: %d", $_12: int = 1, $_15_main)
 
 
 _10_main_unwrapper($env_end: int):

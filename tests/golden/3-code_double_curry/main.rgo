@@ -1,10 +1,7 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 foo: (ok:(str)){
     ok("charlie")
@@ -13,7 +10,7 @@ baz: (ok:(str, str)){
     foo(ok("bob"))
 }
 bar: (name0: str, name1: str, name2: str){
-    printf("hello %s, %s and %s\n", name0, name1, name2, exit(0))
+    stdout.printf("hello %s, %s and %s\n", name0, name1, name2, @exit(0))
 }
 main: () {
     baz(bar("alice"))

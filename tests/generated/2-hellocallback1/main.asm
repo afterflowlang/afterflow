@@ -11,17 +11,8 @@ foo:
     mov rax, [rbp-8] ; load operand
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-foo_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je foo_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp foo_write_strlen_loop_0
-foo_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-16] ; load continuation env_end pointer
@@ -167,15 +158,15 @@ foo_deepcopy_skip_1:
     leave
     ret
 
-global _3_main
-_3_main:
+global _5_main
+_5_main:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
-    mov rdi, 0 ; exit code
+    mov rdi, 0 ; operand literal
     call exit ; call libc exit to flush buffers
-global _3_main_unwrapper
-_3_main_unwrapper:
+global _5_main_unwrapper
+_5_main_unwrapper:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -184,9 +175,9 @@ _3_main_unwrapper:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
     leave ; unwind before named jump
-    jmp _3_main
-global _3_main_deep_release
-_3_main_deep_release:
+    jmp _5_main
+global _5_main_deep_release
+_5_main_deep_release:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -197,8 +188,8 @@ _3_main_deep_release:
     leave
     ret
 
-global _3_main_deepcopy
-_3_main_deepcopy:
+global _5_main_deepcopy
+_5_main_deepcopy:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -358,14 +349,14 @@ main:
     mov qword [r12+24], rax ; env size metadata
     mov rax, 48 ; store heap size metadata
     mov qword [r12+32], rax ; heap size metadata
-    lea rax, [_3_main_unwrapper] ; load unwrapper entry point
+    lea rax, [_5_main_unwrapper] ; load unwrapper entry point
     mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [_3_main_deep_release] ; load release helper entry point
+    lea rax, [_5_main_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [_3_main_deepcopy] ; load deep copy helper entry point
+    lea rax, [_5_main_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 0 ; store num_remaining
-    mov rax, r12 ; copy _3_main closure env_end to rax
+    mov rax, r12 ; copy _5_main closure env_end to rax
     mov [rbp-24], rax ; store value
     mov rax, [rbp-24] ; load operand
     push rax ; stack arg
@@ -429,4 +420,6 @@ extern exit
 extern write
 section .rodata
 msg:
+    dq msg_data, 11 ; string data pointer and byte length
+msg_data:
     db "hello world", 0

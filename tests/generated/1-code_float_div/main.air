@@ -1,74 +1,74 @@
-_11_main():
-    @exit($_12: int = 0)
+_10_main():
+    @exit($_11: int = 0)
 
 
-_11_main_unwrapper($env_end: int):
+_10_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_11_main)
+    @jumpargs(_10_main)
 
 
-_11_main_deep_release($env_end: int):
+_10_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_11_main_deepcopy($env_end: int):
+_10_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_9_main($s: str):
-    $_11_main = @newclosure<>(_11_main)
-    @write($s: str, $_11_main)
+_8_main($s: str):
+    $_10_main = @newclosure<>(_10_main)
+    @write($s: str, $_10_main)
 
 
-_9_main_unwrapper($env_end: int):
+_8_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $s = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_9_main, $s: str)
+    @jumpargs(_8_main, $s: str)
 
 
-_9_main_deep_release($env_end: int):
+_8_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_9_main_deepcopy($env_end: int):
+_8_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_6_main($x: f64, $y: f64):
-    $_9_main = @newclosure<str>(_9_main)
-    @sprintf($_7: str! = "result: %f", $x: int, $_9_main)
+_5_main($x: f64, $y: f64):
+    $_8_main = @newclosure<str>(_8_main)
+    @sprintf($_6: str = "result: %f", $x: f64, $_8_main)
 
 
-_6_main_unwrapper($env_end: int):
+_5_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $x = @field($__env_end, -2)
     $y = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_6_main, $x: f64, $y: f64)
+    @jumpargs(_5_main, $x: f64, $y: f64)
 
 
-_6_main_deep_release($env_end: int):
+_5_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_6_main_deepcopy($env_end: int):
+_5_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
 main($x: f64):
-    $_15_main = @newclosure<f64, f64>(_6_main, $x: f64)
-    @divf64($x: f64, $_4: f64 = 2, $_15_main)
+    $_14_main = @newclosure<f64, f64>(_5_main, $x: f64)
+    @div_f64($x: f64, $_3: f64 = 2, $_14_main)
 
 
 main_unwrapper($env_end: int):

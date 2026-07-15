@@ -6,7 +6,7 @@ _6_main:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
-    mov rdi, 0 ; exit code
+    mov rdi, 0 ; operand literal
     call exit ; call libc exit to flush buffers
 global release_heap_ptr
 release_heap_ptr:
@@ -88,17 +88,8 @@ _3_main:
     lea rax, [rel _4] ; point to string literal
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-_3_main_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je _3_main_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp _3_main_write_strlen_loop_0
-_3_main_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-8] ; load continuation env_end pointer
@@ -144,7 +135,7 @@ _14_main:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
-    mov rdi, 0 ; exit code
+    mov rdi, 0 ; operand literal
     call exit ; call libc exit to flush buffers
 global _14_main_unwrapper
 _14_main_unwrapper:
@@ -210,17 +201,8 @@ _11_main:
     lea rax, [rel _12] ; point to string literal
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-_11_main_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je _11_main_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp _11_main_write_strlen_loop_0
-_11_main_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-8] ; load continuation env_end pointer
@@ -315,7 +297,23 @@ main:
     mov rax, 1 ; operand literal
     mov rbx, 2 ; operand literal
     cmp rax, rbx
-    jl _11_main
+    jl lt__3_main_true_0_0
+lt__11_main_false_0_0:
+    mov rdi, [rbp-8] ; load _3_main closure env_end pointer
+    call release_heap_ptr ; release _3_main closure environment
+    mov rbx, [rbp-16] ; load _11_main closure env_end pointer
+    mov rdi, rbx ; pass env_end pointer to closure
+    mov rax, [rdi+0] ; load closure unwrapper entry point
+    leave ; unwind before jumping
+    jmp rax ; tail call into closure
+lt__3_main_true_0_0:
+    mov rdi, [rbp-16] ; load _11_main closure env_end pointer
+    call release_heap_ptr ; release _11_main closure environment
+    mov rbx, [rbp-8] ; load _3_main closure env_end pointer
+    mov rdi, rbx ; pass env_end pointer to closure
+    mov rax, [rdi+0] ; load closure unwrapper entry point
+    leave ; unwind before jumping
+    jmp rax ; tail call into closure
 global main_unwrapper
 main_unwrapper:
     push rbp ; save executor frame pointer
@@ -359,6 +357,10 @@ extern exit
 extern write
 section .rodata
 _4:
+    dq _4_data, 8 ; string data pointer and byte length
+_4_data:
     db "lt: true", 0
 _12:
+    dq _12_data, 9 ; string data pointer and byte length
+_12_data:
     db "lt: false", 0

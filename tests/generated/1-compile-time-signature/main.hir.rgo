@@ -1,0 +1,7 @@
+str: @str
+format: (str!, ())
+main: (){
+    _4: 0
+    @exit(_4)
+}
+main()

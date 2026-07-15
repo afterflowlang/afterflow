@@ -105,6 +105,7 @@ pub struct AirLowerContext<'a> {
     generated_functions: Vec<AirFunction>,
     unused_params: HashSet<String>,
     literals: HashMap<String, Lit>,
+    value_kinds: HashMap<String, SigKind>,
     closure_remaining: HashMap<String, Vec<SigKind>>, // TODO: Why is this needed?
     remaining_uses: HashMap<String, usize>,
 }
@@ -122,6 +123,7 @@ impl<'a> AirLowerContext<'a> {
             generated_functions: Vec::new(),
             unused_params: HashSet::new(),
             literals: HashMap::new(),
+            value_kinds: HashMap::new(),
             closure_remaining: HashMap::new(),
             remaining_uses,
         }
@@ -277,6 +279,10 @@ pub fn lower_function(
     );
     for param in func.sig.items.iter() {
         ctx.locals.insert(param.name.clone());
+        ctx.value_kinds.insert(
+            param.name.clone(),
+            air_sig_kind_from_hir(&param.kind, &func.sig.generics),
+        );
         if let SigKind::Sig(signature) = &param.kind {
             ctx.closure_remaining
                 .insert(param.name.clone(), signature.kinds());
@@ -325,7 +331,7 @@ fn air_sig_items_from_hir(items: &[SigItem], generics: &BTreeSet<String>) -> Vec
         .map(|item| SigItem {
             name: item.name.clone(),
             kind: air_sig_kind_from_hir(&item.kind, generics),
-            has_bang: item.has_bang,
+            is_comptime: item.is_comptime,
         })
         .collect()
 }
@@ -367,6 +373,14 @@ fn lower_block_item(
         }
         hir::BlockItem::LitDef { name, literal } => {
             ctx.locals.insert(name.clone());
+            ctx.value_kinds.insert(
+                name.clone(),
+                match &literal {
+                    Lit::Str(_) => SigKind::Str,
+                    Lit::Int(_) => SigKind::Int,
+                    Lit::F64(_) => SigKind::F64,
+                },
+            );
             ctx.literals.insert(name.clone(), literal);
             vec![]
         }
@@ -419,7 +433,7 @@ fn ensure_target(
     } else {
         resolve_target(target_name, ctx.symbols)?
     };
-    let args = extract_closure_sig_info(&target, args, &ctx.literals);
+    let args = extract_closure_sig_info(&target, args, &ctx.literals, &ctx.value_kinds);
     if let AirExecTarget::Function(sig) = &mut target {
         ctx.function_lowerer.ensure(&sig.name, ctx.symbols)?;
         create_closure(ctx, target_name, Some(sig))?;
@@ -465,7 +479,7 @@ fn lower_new_closure(
                 Code::Internal,
                 "expected function target when creating new closure".to_string(),
                 Span::unknown(),
-            ))
+            ));
         }
     };
     block_items.push(AirStmt::op(AirOp::NewClosure(AirNewClosure {
@@ -686,7 +700,7 @@ fn build_closure_unwrapper(function: &AirFunction) -> Option<AirFunction> {
     let env_param = SigItem {
         name: "env_end".to_string(),
         kind: SigKind::Int,
-        has_bang: false,
+        is_comptime: false,
     };
 
     Some(build_unwrapper_function(
@@ -701,9 +715,10 @@ fn extract_closure_sig_info(
     target: &AirExecTarget,
     args: &[String],
     literals: &HashMap<String, Lit>,
+    value_kinds: &HashMap<String, SigKind>,
 ) -> Vec<AirArg> {
     if let Some(params) = target_signature(target) {
-        return consume_signature_for_args(params, args, literals);
+        return consume_signature_for_args(params, args, literals, value_kinds);
     }
     let fallback_args = args
         .iter()
@@ -727,6 +742,7 @@ fn consume_signature_for_args(
     params: &[SigItem],
     args: &[String],
     literals: &HashMap<String, Lit>,
+    value_kinds: &HashMap<String, SigKind>,
 ) -> Vec<AirArg> {
     let mut consumed = 0;
     let mut sig_index = 0;
@@ -741,7 +757,10 @@ fn consume_signature_for_args(
                 for _ in 0..variadic_count {
                     air_args.push(AirArg {
                         name: args[consumed].clone(),
-                        kind: SigKind::Int,
+                        kind: value_kinds
+                            .get(&args[consumed])
+                            .cloned()
+                            .unwrap_or(SigKind::Int),
                         literal: literal_for_arg(&args[consumed], literals),
                     });
                     consumed += 1;
@@ -847,7 +866,7 @@ fn build_deep_release_helper(function: &AirFunction) -> Option<AirFunction> {
     let env_param = SigItem {
         name: "env_end".to_string(),
         kind: SigKind::Int,
-        has_bang: false,
+        is_comptime: false,
     };
 
     let offsets = env_word_offsets_from_params(&function.sig.params);
@@ -931,7 +950,7 @@ fn build_deep_copy_helper(function: &AirFunction) -> Option<AirFunction> {
     let env_param = SigItem {
         name: "env_end".to_string(),
         kind: SigKind::Int,
-        has_bang: false,
+        is_comptime: false,
     };
 
     let offsets = env_word_offsets_from_params(&function.sig.params);
@@ -999,20 +1018,45 @@ fn build_deep_copy_helper(function: &AirFunction) -> Option<AirFunction> {
 }
 
 fn env_word_count_from_params(params: &[SigItem]) -> usize {
-    params.len()
+    params
+        .iter()
+        .map(|param| word_count_from_kind(&param.kind))
+        .sum()
 }
 
 fn env_word_offsets_from_params(params: &[SigItem]) -> Vec<usize> {
-    (0..params.len()).collect()
+    let mut offset = 0;
+    params
+        .iter()
+        .map(|param| {
+            let current = offset;
+            offset += word_count_from_kind(&param.kind);
+            current
+        })
+        .collect()
 }
 
 fn word_count_from_kinds(kinds: &[SigKind]) -> usize {
-    kinds.len()
+    kinds.iter().map(word_count_from_kind).sum()
 }
 
 fn suffix_word_counts(kinds: &[SigKind]) -> Vec<usize> {
-    let len = kinds.len();
-    (0..len).map(|idx| len - idx).collect()
+    let mut remaining = word_count_from_kinds(kinds);
+    kinds
+        .iter()
+        .map(|kind| {
+            let current = remaining;
+            remaining -= word_count_from_kind(kind);
+            current
+        })
+        .collect()
+}
+
+fn word_count_from_kind(kind: &SigKind) -> usize {
+    match kind {
+        SigKind::FixedInt(kind) if kind.bit_width == 128 => 2,
+        _ => 1,
+    }
 }
 
 fn is_reference_type(ty: &SigKind) -> bool {
@@ -1045,6 +1089,15 @@ fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
                 target: continuation_target,
             })
         }
+        builtins::Builtin::AddBits(bit_width) => {
+            let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
+            AirOp::AddBits(AirBinaryBits {
+                input_a,
+                input_b,
+                target: continuation_target,
+                bit_width,
+            })
+        }
         builtins::Builtin::Sub => {
             let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
             AirOp::Sub(AirSub {
@@ -1053,12 +1106,30 @@ fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
                 target: continuation_target,
             })
         }
+        builtins::Builtin::SubBits(bit_width) => {
+            let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
+            AirOp::SubBits(AirBinaryBits {
+                input_a,
+                input_b,
+                target: continuation_target,
+                bit_width,
+            })
+        }
         builtins::Builtin::Mul => {
             let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
             AirOp::Mul(AirMul {
                 input_a,
                 input_b,
                 target: continuation_target,
+            })
+        }
+        builtins::Builtin::MulBits(bit_width) => {
+            let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
+            AirOp::MulBits(AirBinaryBits {
+                input_a,
+                input_b,
+                target: continuation_target,
+                bit_width,
             })
         }
         builtins::Builtin::MulF64 => {
@@ -1084,6 +1155,26 @@ fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
                 ok_target: continuation_target,
             })
         }
+        builtins::Builtin::DivBits {
+            bit_width,
+            is_signed,
+        } => {
+            let err_target = args
+                .get(arg_len - 2)
+                .expect("fixed division requires an error continuation")
+                .name
+                .clone();
+            let (input_a, input_b) =
+                binary_input_args(builtin.name(), args[..arg_len - 2].to_vec());
+            AirOp::DivBits(AirDivBits {
+                input_a,
+                input_b,
+                err_target,
+                ok_target: continuation_target,
+                bit_width,
+                is_signed,
+            })
+        }
         builtins::Builtin::DivF64 => {
             let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
             AirOp::DivF64(AirDivF64 {
@@ -1092,30 +1183,26 @@ fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
                 target: continuation_target,
             })
         }
-        builtins::Builtin::Eq | builtins::Builtin::Eqi => AirOp::JumpEqInt(AirJumpEq {
+        builtins::Builtin::ConvertFixed { from, to } => {
+            let input = inputs
+                .into_iter()
+                .next()
+                .expect("fixed integer conversion requires one input");
+            AirOp::ConvertFixed(AirConvertFixed {
+                input,
+                target: continuation_target,
+                from,
+                to,
+            })
+        }
+        builtins::Builtin::EqInt => AirOp::JumpEqInt(AirJumpEq {
             args: inputs,
             target: continuation_target,
         }),
-        builtins::Builtin::Eqs => AirOp::JumpEqStr(AirJumpEq {
+        builtins::Builtin::EqStr => AirOp::JumpEqStr(AirJumpEq {
             args: inputs,
             target: continuation_target,
         }),
-        builtins::Builtin::Lt => {
-            let (left, right) = binary_operands(builtin.name(), inputs);
-            AirOp::JumpLt(AirJumpLt {
-                left,
-                right,
-                target: continuation_target,
-            })
-        }
-        builtins::Builtin::Gt => {
-            let (left, right) = binary_operands(builtin.name(), inputs);
-            AirOp::JumpGt(AirJumpGt {
-                left,
-                right,
-                target: continuation_target,
-            })
-        }
         _ => unreachable!("unexpected instruction op: {}", builtin.name()),
     }
 }
@@ -1162,11 +1249,6 @@ fn call_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
         .collect::<Vec<_>>();
 
     match builtin {
-        builtins::Builtin::Printf => AirOp::Printf(AirPrintf {
-            args: call_args,
-            arg_kinds,
-            target: continuation_target,
-        }),
         builtins::Builtin::Sprintf => AirOp::Sprintf(AirSprintf {
             args: call_args,
             arg_kinds,
@@ -1177,6 +1259,22 @@ fn call_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
             arg_kinds,
             target: continuation_target,
         }),
+        builtins::Builtin::ReadFile => {
+            let err_target = call_args
+                .last()
+                .expect("readfile requires an error continuation")
+                .name
+                .clone();
+            let path = call_args
+                .first()
+                .cloned()
+                .expect("readfile requires a path argument");
+            AirOp::ReadFile(AirReadFile {
+                path,
+                err_target,
+                ok_target: continuation_target,
+            })
+        }
         builtins::Builtin::Exit => AirOp::SysExit(AirSysExit { args }),
         _ => unreachable!("unexpected call op: {}", builtin.name()),
     }
@@ -1190,24 +1288,40 @@ fn build_conditional_builtin_bridge(
     let arg_len = args.len();
     let true_cont = &args[arg_len - 2];
     let false_cont = &args[arg_len - 1];
-    let inputs = args[..arg_len - 2].to_vec();
     let true_label = conditional_builtin_branch_label(sig, true_cont, "true");
     let false_label = conditional_builtin_branch_label(sig, false_cont, "false");
+    let inputs = args[..arg_len - 2].to_vec();
 
-    let eq_jump = if matches!(builtin, builtins::Builtin::Eqs) {
-        AirOp::JumpEqStr(AirJumpEq {
-            args: inputs.clone(),
+    let branch = match builtin {
+        builtins::Builtin::EqInt => AirOp::JumpEqInt(AirJumpEq {
+            args: inputs,
             target: true_label.clone(),
-        })
-    } else {
-        AirOp::JumpEqInt(AirJumpEq {
-            args: inputs.clone(),
+        }),
+        builtins::Builtin::EqStr => AirOp::JumpEqStr(AirJumpEq {
+            args: inputs,
             target: true_label.clone(),
-        })
+        }),
+        builtins::Builtin::Lt => {
+            let (left, right) = binary_operands(builtin.name(), inputs);
+            AirOp::JumpLt(AirJumpLt {
+                left,
+                right,
+                target: true_label.clone(),
+            })
+        }
+        builtins::Builtin::Gt => {
+            let (left, right) = binary_operands(builtin.name(), inputs);
+            AirOp::JumpGt(AirJumpGt {
+                left,
+                right,
+                target: true_label.clone(),
+            })
+        }
+        _ => unreachable!("unexpected conditional builtin: {}", builtin.name()),
     };
 
     vec![
-        AirStmt::op(eq_jump),
+        AirStmt::op(branch),
         AirStmt::Label(AirLabel {
             name: false_label.clone(),
         }),
@@ -1261,9 +1375,13 @@ fn is_inline_builtin(builtin: builtins::Builtin) -> bool {
             | builtins::Builtin::AddF64
             | builtins::Builtin::MulF64
             | builtins::Builtin::DivF64
-            | builtins::Builtin::Eq
-            | builtins::Builtin::Eqi
-            | builtins::Builtin::Eqs
+            | builtins::Builtin::AddBits(_)
+            | builtins::Builtin::SubBits(_)
+            | builtins::Builtin::MulBits(_)
+            | builtins::Builtin::DivBits { .. }
+            | builtins::Builtin::ConvertFixed { .. }
+            | builtins::Builtin::EqInt
+            | builtins::Builtin::EqStr
             | builtins::Builtin::Lt
             | builtins::Builtin::Gt
     )

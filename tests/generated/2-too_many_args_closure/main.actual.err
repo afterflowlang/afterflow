@@ -1,1 +1,4 @@
-[hir] function 'foo' expected 2 arguments but got 3 at 0:0
+[hir] function 'foo' expected 2 arguments but got 3
+tests/failing/2-too_many_args_closure/main.rgo:10
+    bar(foo(1, 2, 3))
+                  ^

@@ -53,7 +53,7 @@ _10_run_k_deepcopy_skip_0:
 
 _7_run_k($ok: (), $x: int):
     $_11_run_k = @newclosure<(), str>(_10_run_k, $ok: ())
-    @sprintf($_8: str! = "number: %d", $x: int, $_11_run_k)
+    @sprintf($_8: str = "number: %d", $x: int, $_11_run_k)
 
 
 _7_run_k_unwrapper($env_end: int):

@@ -1,14 +1,11 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 main: () {
     (x:int){
-        () = printf("the answer is: %d", x)
-        exit(0)
+        () = stdout.printf("the answer is: %d", x)
+        @exit(0)
     }(42)
 }

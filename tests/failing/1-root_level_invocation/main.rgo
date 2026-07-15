@@ -1,3 +1,1 @@
-exit: @exit
-
-exit(0)
+@exit(0)

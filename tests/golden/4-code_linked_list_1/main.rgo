@@ -1,10 +1,7 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 list: ((int, list), ())
 nil: (next:(int, list), end: ()){
@@ -25,9 +22,9 @@ iterate: (handler:(int, ()), arr:list, end:()){
 }
 mylist: cons(1, cons(2, cons(3, cons(4, nil))))
 handler: (n: int, ok: ()){
-    printf("%d, ", n, ok)
+    stdout.printf("%d, ", n, ok)
 }
-end: () {printf("end\n", exit(0))}
+end: () {stdout.printf("end\n", @exit(0))}
 main: () {
     iterate(handler, mylist, end)
 }

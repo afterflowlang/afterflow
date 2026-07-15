@@ -8,7 +8,7 @@ _3_main:
     sub rsp, 16 ; reserve stack space for locals
     mov [rbp-8], rdi ; store n arg in frame
     ; load exit code
-    mov rdi, 0 ; exit code
+    mov rdi, 0 ; operand literal
     call exit ; call libc exit to flush buffers
 global release_heap_ptr
 release_heap_ptr:

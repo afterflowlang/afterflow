@@ -1,59 +1,59 @@
-_10_main():
-    @exit($_11: int = 0)
+_9_main():
+    @exit($_10: int = 0)
 
 
-_10_main_unwrapper($env_end: int):
+_9_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_10_main)
+    @jumpargs(_9_main)
 
 
-_10_main_deep_release($env_end: int):
+_9_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_10_main_deepcopy($env_end: int):
+_9_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_6_print_byte($ok: (), $s: str):
+_5_print_byte($ok: (), $s: str):
     @write($s: str, $ok)
 
 
-_6_print_byte_unwrapper($env_end: int):
+_5_print_byte_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $ok = @field($__env_end, -2)
     $s = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_6_print_byte, $ok: (), $s: str)
+    @jumpargs(_5_print_byte, $ok: (), $s: str)
 
 
-_6_print_byte_deep_release($env_end: int):
+_5_print_byte_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_6_print_byte_release_skip_0, $__num_remaining, 1)
-    $_6_print_byte_release_field_0 = @field($__env_end, -2)
-    @callptr($_6_print_byte_release_field_0)
-_6_print_byte_release_skip_0:
+    @gt(_5_print_byte_release_skip_0, $__num_remaining, 1)
+    $_5_print_byte_release_field_0 = @field($__env_end, -2)
+    @callptr($_5_print_byte_release_field_0)
+_5_print_byte_release_skip_0:
     @release($__env_end)
     @return()
 
 
-_6_print_byte_deepcopy($env_end: int):
+_5_print_byte_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_6_print_byte_deepcopy_skip_0, $num_remaining, 1)
-    @deepcopy($_6_print_byte_deepcopy_field_0, $__env_end, -2)
-_6_print_byte_deepcopy_skip_0:
+    @gt(_5_print_byte_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($_5_print_byte_deepcopy_field_0, $__env_end, -2)
+_5_print_byte_deepcopy_skip_0:
     @return()
 
 
 print_byte($value: byte, $ok: ()):
-    $_7_print_byte = @newclosure<(), str>(_6_print_byte, $ok: ())
-    @sprintf($_4: str! = "byte %d\n", $value: int, $_7_print_byte)
+    $_6_print_byte = @newclosure<(), str>(_5_print_byte, $ok: ())
+    @sprintf($_3: str = "byte %d\n", $value: byte, $_6_print_byte)
 
 
 print_byte_unwrapper($env_end: int):
@@ -85,8 +85,8 @@ print_byte_deepcopy_skip_1:
 
 
 main():
-    $_10_main = @newclosure<>(_10_main)
-    @jumpargs(print_byte, $_8: byte = 255, $_10_main: ())
+    $_9_main = @newclosure<>(_9_main)
+    @jumpargs(print_byte, $_7: byte = 255, $_9_main: ())
 
 
 main_unwrapper($env_end: int):

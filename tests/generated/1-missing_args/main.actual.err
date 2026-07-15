@@ -1,1 +1,4 @@
-[hir] cannot execute function 'foo': not all args have been provided (expected at least 3, got 0) at 0:0
+[hir] cannot execute function 'foo': not all args have been provided (expected at least 3, got 0)
+tests/failing/1-missing_args/main.rgo:11
+    foo
+    ^^^

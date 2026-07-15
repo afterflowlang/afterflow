@@ -1,0 +1,11 @@
+stdout: /stdout
+
+uint: @uint
+
+print_uint: (value: uint!, ok: ()) {
+    stdout.printf("uint %lu\n", value, ok)
+}
+
+main: () {
+    print_uint(42, @exit(0))
+}

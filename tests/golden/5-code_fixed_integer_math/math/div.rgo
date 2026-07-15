@@ -1,0 +1,55 @@
+div_i8: (dividend: i8, divisor: i8, err: (), ok: (i8)) {
+    (dividend_bits: b8) = @b8_from_i8(dividend)
+    (divisor_bits: b8) = @b8_from_i8(divisor)
+    (quotient_bits: b8) = @div_signed_b8(dividend_bits, divisor_bits, err)
+    @i8_from_b8(quotient_bits, ok)
+}
+
+div_u8: (dividend: u8, divisor: u8, err: (), ok: (u8)) {
+    (dividend_bits: b8) = @b8_from_u8(dividend)
+    (divisor_bits: b8) = @b8_from_u8(divisor)
+    (quotient_bits: b8) = @div_unsigned_b8(dividend_bits, divisor_bits, err)
+    @u8_from_b8(quotient_bits, ok)
+}
+
+div_i32: (dividend: i32, divisor: i32, err: (), ok: (i32)) {
+    (dividend_bits: b32) = @b32_from_i32(dividend)
+    (divisor_bits: b32) = @b32_from_i32(divisor)
+    (quotient_bits: b32) = @div_signed_b32(dividend_bits, divisor_bits, err)
+    @i32_from_b32(quotient_bits, ok)
+}
+
+div_u32: (dividend: u32, divisor: u32, err: (), ok: (u32)) {
+    (dividend_bits: b32) = @b32_from_u32(dividend)
+    (divisor_bits: b32) = @b32_from_u32(divisor)
+    (quotient_bits: b32) = @div_unsigned_b32(dividend_bits, divisor_bits, err)
+    @u32_from_b32(quotient_bits, ok)
+}
+
+div_i64: (dividend: i64, divisor: i64, err: (), ok: (i64)) {
+    (dividend_bits: b64) = @b64_from_i64(dividend)
+    (divisor_bits: b64) = @b64_from_i64(divisor)
+    (quotient_bits: b64) = @div_signed_b64(dividend_bits, divisor_bits, err)
+    @i64_from_b64(quotient_bits, ok)
+}
+
+div_u64: (dividend: u64, divisor: u64, err: (), ok: (u64)) {
+    (dividend_bits: b64) = @b64_from_u64(dividend)
+    (divisor_bits: b64) = @b64_from_u64(divisor)
+    (quotient_bits: b64) = @div_unsigned_b64(dividend_bits, divisor_bits, err)
+    @u64_from_b64(quotient_bits, ok)
+}
+
+div_i128: (dividend: i128, divisor: i128, err: (), ok: (i128)) {
+    (dividend_bits: b128) = @b128_from_i128(dividend)
+    (divisor_bits: b128) = @b128_from_i128(divisor)
+    (quotient_bits: b128) = @div_signed_b128(dividend_bits, divisor_bits, err)
+    @i128_from_b128(quotient_bits, ok)
+}
+
+div_u128: (dividend: u128, divisor: u128, err: (), ok: (u128)) {
+    (dividend_bits: b128) = @b128_from_u128(dividend)
+    (divisor_bits: b128) = @b128_from_u128(divisor)
+    (quotient_bits: b128) = @div_unsigned_b128(dividend_bits, divisor_bits, err)
+    @u128_from_b128(quotient_bits, ok)
+}

@@ -1,15 +1,13 @@
+stdout: /stdout
+
 str: @str
-exit: @exit
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
+
 foo: <T>(x: T, ok:(T)){
     ok(x)
 }
 bar: (x: int){
-    printf("%d", x, exit(0))
+    stdout.printf("%d", x, @exit(0))
 }
 main: () {
     foo(42, bar)

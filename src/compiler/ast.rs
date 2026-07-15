@@ -61,11 +61,9 @@ pub enum SigKind {
     Int,
     Str,
     F64,
-    Variadic, // TODO: This is before we have staged DSL
-    CompileTimeInt,
-    CompileTimeStr,
-    Ident(SigIdent),                                  // `foo`, `str`, `list`
-    Sig(Signature), // Nested tuple signature: `(int, b:int, tail:list)`
+    Variadic,        // TODO: This is before we have staged DSL
+    Ident(SigIdent), // `foo`, `str`, `list`
+    Sig(Signature),  // Nested tuple signature: `(int, b:int, tail:list)`
     GenericInst { name: String, args: Vec<SigKind> }, // Generic instantiation: `arr<int, list>`
     Generic(String), // Unbound generic type parameter: `T`
 }
@@ -99,7 +97,7 @@ impl Signature {
             .map(|kind| SigItem {
                 name: String::new(), // TODO: could avoid empty string...
                 kind,
-                has_bang: false,
+                is_comptime: false,
                 span: Span::unknown(),
             })
             .collect();
@@ -122,7 +120,7 @@ impl Signature {
             .map(|kind| SigItem {
                 name: String::new(), // TODO: could avoid empty string...
                 kind,                // TODO: Rename to kind
-                has_bang: false,
+                is_comptime: false,
                 span: Span::unknown(),
             })
             .collect();
@@ -146,21 +144,22 @@ impl Signature {
 pub struct SigItem {
     pub name: String,
     pub kind: SigKind,
-    pub has_bang: bool,
+    pub is_comptime: bool,
     pub span: Span,
 }
+
 impl Eq for SigItem {}
 impl PartialEq for SigItem {
     fn eq(&self, other: &Self) -> bool {
         // name is ignored for comparison
-        self.kind == other.kind && self.has_bang == other.has_bang
+        self.kind == other.kind && self.is_comptime == other.is_comptime
     }
 }
 
 impl std::hash::Hash for SigItem {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.kind.hash(state);
-        self.has_bang.hash(state);
+        self.is_comptime.hash(state);
     }
 }
 

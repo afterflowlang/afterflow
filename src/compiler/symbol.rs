@@ -87,7 +87,7 @@ pub fn builtin_function_sig(builtin_name: &str) -> Result<FunctionSig, Error> {
     })?;
 
     if let builtins::BuiltinSpec::Function(sig) = spec {
-        let builtin = builtins::Builtin::from_name(builtin_name).ok_or_else(|| {
+        let builtin = builtins::function_from_name(builtin_name).ok_or_else(|| {
             Error::new(
                 Code::Internal,
                 format!("unknown builtin '{}'", builtin_name),
@@ -95,7 +95,7 @@ pub fn builtin_function_sig(builtin_name: &str) -> Result<FunctionSig, Error> {
             )
         })?;
         return Ok(FunctionSig {
-            name: builtin_name.into(),
+            name: builtin.name().into(),
             params: sig.items,
             generics: sig.generics,
             builtin: Some(builtin),

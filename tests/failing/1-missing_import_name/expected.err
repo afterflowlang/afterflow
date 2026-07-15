@@ -1,1 +1,1 @@
-builtin imports use @name, not @/name or @owner/name
+must be bound as 'name: /foo-bar'

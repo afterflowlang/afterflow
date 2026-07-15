@@ -1,47 +1,39 @@
+__rgo_7374646f7574__str: @str
 str: @str
-exit: @exit
 int: @int
-add: @add
-sub: @sub
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-@sprintf: @sprintf
-@write: @write
-_8_bar: (){
-    _9: 0
-    exit(_9)
+_7_bar: (){
+    _8: 0
+    @exit(_8)
 }
 
-_6_bar: (s: str){
-    @write(s, _8_bar)
+_5_bar: (s: str){
+    @write(s, _7_bar)
 }
 
 bar: (){
-    _4: "outer bar"
-    @sprintf(_4, _6_bar)
+    _3: "outer bar"
+    @sprintf(_3, _5_bar)
 }
-@sprintf: @sprintf
-@write: @write
-_15_foo_bar: (ok:(), s: str){
+_14_foo_bar: (ok:(), s: str){
     @write(s, ok)
 }
 
-_12_foo_bar: (ok:()){
-    _13: "inner bar\n"
-    _16_foo_bar: _15_foo_bar(ok)
-    @sprintf(_13, _16_foo_bar)
+_11_foo_bar: (ok:()){
+    _12: "inner bar\n"
+    _15_foo_bar: _14_foo_bar(ok)
+    @sprintf(_12, _15_foo_bar)
 }
 
 foo: (ok:()){
-    _12_foo_bar(ok)
+    _11_foo_bar(ok)
 }
 
 main: (){

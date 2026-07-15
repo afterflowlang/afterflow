@@ -1,4 +1,5 @@
 str: @str
+
 // Double curried continuation
 printf: (fmt: str!, args: ..., ok:()) {
     (s: str) = @sprintf(fmt, args)

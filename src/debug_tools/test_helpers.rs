@@ -1,11 +1,47 @@
 use std::collections::HashMap;
+use std::path::Path;
 
 use crate::compiler::{
-    air,
+    air, ast,
     error::Error,
-    hir,
+    hir, source,
     symbol::{self, SymbolRegistry},
 };
+
+pub fn generate_hir_block_items(path: &Path, target: &str) -> Result<Vec<hir::BlockItem>, Error> {
+    let project = source::load(path, target)?;
+    let sources = project.sources;
+    let mut ctx = hir::Context::new();
+    crate::compiler::predeclare_package(&mut ctx, &project.items)
+        .map_err(|error| source::attach_source(error, &sources))?;
+    let mut lowerer = hir::Lowerer::new();
+    lowerer.register_package_functions(&project.items);
+    let mut items = Vec::new();
+
+    for item in project.items {
+        lowerer
+            .consume(&mut ctx, item)
+            .map_err(|error| source::attach_source(error, &sources))?;
+        while let Some(lowered) = lowerer.produce() {
+            items.push(lowered);
+        }
+    }
+
+    lowerer
+        .consume(
+            &mut ctx,
+            ast::BlockItem::Ident(ast::Ident {
+                name: project.target,
+                args: Vec::new(),
+                span: crate::compiler::span::Span::unknown(),
+            }),
+        )
+        .map_err(|error| source::attach_source(error, &sources))?;
+    while let Some(lowered) = lowerer.produce() {
+        items.push(lowered);
+    }
+    Ok(items)
+}
 
 pub fn generate_air_functions(items: &[hir::BlockItem]) -> Result<Vec<air::AirFunction>, Error> {
     let mut symbols = SymbolRegistry::new();

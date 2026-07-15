@@ -1,10 +1,26 @@
-use compiler::compile;
+use compiler::compile_path;
 use std::env;
-use std::error::Error;
+use std::error::Error as StdError;
 use std::fs::File;
-use std::io::{BufReader, BufWriter};
+use std::io::{self, BufWriter, IsTerminal, Write};
+use std::path::Path;
+use std::process::ExitCode;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> ExitCode {
+    match run() {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            if let Some(error) = error.downcast_ref::<compiler::Error>() {
+                eprintln!("{}", error.display(io::stderr().is_terminal()));
+            } else {
+                eprintln!("Error: {error}");
+            }
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn run() -> Result<(), Box<dyn StdError>> {
     let mut args = env::args().skip(1);
     let input = args.next();
     let target = args.next();
@@ -18,9 +34,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         _ => return Err("compiler requires <input> <target> <output>".into()),
     };
 
-    let input = File::open(input_path)?;
+    let mut assembly = Vec::new();
+    compile_path(Path::new(&input_path), &target, &mut assembly)?;
     let mut output = BufWriter::new(File::create(output_path)?);
-    compile(BufReader::new(input), &target, &mut output)?;
+    output.write_all(&assembly)?;
 
     Ok(())
 }

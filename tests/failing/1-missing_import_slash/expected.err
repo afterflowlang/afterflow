@@ -1,1 +1,1 @@
-builtin imports use @name, not @/name or @owner/name
+unknown builtin '@foo'

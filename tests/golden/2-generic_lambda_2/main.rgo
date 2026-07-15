@@ -1,17 +1,14 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 foo: <T, U>(x:T, y:U, ok:(T, U)){
     ok(x, y)
 }
 
 done: (a:int, b:str){
-    printf("a=%d b=%s\n", a, b, exit(0))
+    stdout.printf("a=%d b=%s\n", a, b, @exit(0))
 }
 
 main: () {

@@ -1,14 +1,5 @@
 [
     IdentDef {
-        name: "int",
-        ident: Ident {
-            name: "@int",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
         name: "str",
         ident: Ident {
             name: "@str",
@@ -18,9 +9,9 @@
         span: ,
     },
     IdentDef {
-        name: "exit",
+        name: "int",
         ident: Ident {
-            name: "@exit",
+            name: "@int",
             args: [],
             span: ,
         },
@@ -43,7 +34,7 @@
                                             span: ,
                                         },
                                     ),
-                                    has_bang: false,
+                                    is_comptime: false,
                                     span: ,
                                 },
                                 SigItem {
@@ -59,7 +50,7 @@
                                                             span: ,
                                                         },
                                                     ),
-                                                    has_bang: false,
+                                                    is_comptime: false,
                                                     span: ,
                                                 },
                                                 SigItem {
@@ -71,7 +62,7 @@
                                                             generics: {},
                                                         },
                                                     ),
-                                                    has_bang: false,
+                                                    is_comptime: false,
                                                     span: ,
                                                 },
                                                 SigItem {
@@ -84,7 +75,7 @@
                                                                     kind: Generic(
                                                                         "T",
                                                                     ),
-                                                                    has_bang: false,
+                                                                    is_comptime: false,
                                                                     span: ,
                                                                 },
                                                             ],
@@ -92,7 +83,7 @@
                                                             generics: {},
                                                         },
                                                     ),
-                                                    has_bang: false,
+                                                    is_comptime: false,
                                                     span: ,
                                                 },
                                             ],
@@ -100,7 +91,7 @@
                                             generics: {},
                                         },
                                     ),
-                                    has_bang: false,
+                                    is_comptime: false,
                                     span: ,
                                 },
                             ],
@@ -108,7 +99,7 @@
                             generics: {},
                         },
                     ),
-                    has_bang: false,
+                    is_comptime: false,
                     span: ,
                 },
             ],
@@ -137,7 +128,7 @@
                                 ),
                             ],
                         },
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],
@@ -148,7 +139,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "exit",
+                            name: "@exit",
                             args: [
                                 Arg {
                                     name: None,
@@ -186,7 +177,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "exit",
+                            name: "@exit",
                             args: [
                                 Arg {
                                     name: None,

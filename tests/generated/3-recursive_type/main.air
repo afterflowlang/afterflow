@@ -1,50 +1,50 @@
-_18_hello():
-    @exit($_19: int = 0)
+_19_hello():
+    @exit($_20: int = 0)
 
 
-_18_hello_unwrapper($env_end: int):
+_19_hello_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_18_hello)
+    @jumpargs(_19_hello)
 
 
-_18_hello_deep_release($env_end: int):
+_19_hello_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_18_hello_deepcopy($env_end: int):
+_19_hello_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_16_hello($s: str):
-    $_18_hello = @newclosure<>(_18_hello)
-    @write($s: str, $_18_hello)
+_17_hello($s: str):
+    $_19_hello = @newclosure<>(_19_hello)
+    @write($s: str, $_19_hello)
 
 
-_16_hello_unwrapper($env_end: int):
+_17_hello_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $s = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_16_hello, $s: str)
+    @jumpargs(_17_hello, $s: str)
 
 
-_16_hello_deep_release($env_end: int):
+_17_hello_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_16_hello_deepcopy($env_end: int):
+_17_hello_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
 hello():
-    $_16_hello = @newclosure<str>(_16_hello)
-    @sprintf($_14: str! = "hi\n", $_16_hello)
+    $_17_hello = @newclosure<str>(_17_hello)
+    @sprintf($_15: str = "hi\n", $_17_hello)
 
 
 hello_unwrapper($env_end: int):

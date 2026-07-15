@@ -1,53 +1,46 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-div: @div
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_8_error: (){
-    _9: 1
-    exit(_9)
+_7_error: (){
+    _8: 1
+    @exit(_8)
 }
 
-_6_error: (s: str){
-    @write(s, _8_error)
+_5_error: (s: str){
+    @write(s, _7_error)
 }
 
 error: (msg: str){
-    _4: "Error: %s\n"
-    @sprintf(_4, msg, _6_error)
+    _3: "Error: %s\n"
+    @sprintf(_3, msg, _5_error)
 }
-@sprintf: @sprintf
-@write: @write
-_22_main: (){
-    _23: 0
-    exit(_23)
+_21_main: (){
+    _22: 0
+    @exit(_22)
 }
 
-_20_main: (s: str){
-    @write(s, _22_main)
+_19_main: (s: str){
+    @write(s, _21_main)
 }
 
-_17_main: (result: int){
-    _18: "result: %d\n"
-    @sprintf(_18, result, _20_main)
+_16_main: (result: int){
+    _17: "result: %d\n"
+    @sprintf(_17, result, _19_main)
 }
 
 main: (){
-    _12: 10
-    _13: 0
-    _14: "division by zero"
-    _15_error: error(_14)
-    div(_12, _13, _15_error, _17_main)
+    _11: 10
+    _12: 0
+    _13: "division by zero"
+    _14_error: error(_13)
+    @div(_11, _12, _14_error, _16_main)
 }
 main()

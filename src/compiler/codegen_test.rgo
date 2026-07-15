@@ -1,16 +1,14 @@
+str: @str
 int: @int
-add: @add
-write: @write
-exit: @exit
 
 itoa: (n: int, ok:(str)) {
-    sprintf("%d", n, ok)
+    @sprintf("%d", n, ok)
 }
 
 foo: (a: int, b: int) {
-    add(a, b, (n: int){
+    @add(a, b, (n: int){
         itoa(n, (s: str){
-            write(s, exit(0))
+            @write(s, @exit(0))
         })
     })
 }

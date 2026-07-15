@@ -1,35 +1,30 @@
+__rgo_7374646f7574__str: @str
 str: @str
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
-    @write(s, ok)
-}
-
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
-}
-exit: @exit
 int: @int
-@sprintf: @sprintf
-@write: @write
-_7_write: (ok:(), s: str){
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_4_write: (n: int, ok:()){
-    _5: "Gotcha: %d"
-    _8_write: _7_write(ok)
-    @sprintf(_5, n, _8_write)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
+}
+_6_write: (ok:(), s: str){
+    @write(s, ok)
 }
 
-_11_main: (){
-    _12: 0
-    exit(_12)
+_3_write: (n: int, ok:()){
+    _4: "Gotcha: %d"
+    _7_write: _6_write(ok)
+    @sprintf(_4, n, _7_write)
+}
+_10_main: (){
+    _11: 0
+    @exit(_11)
 }
 
 main: (){
-    _9: 1
-    _4_write(_9, _11_main)
+    _8: 1
+    _3_write(_8, _10_main)
 }
 main()

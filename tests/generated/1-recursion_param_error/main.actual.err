@@ -1,1 +1,4 @@
-[hir] expected (), found (()) at 0:0
+[hir] expected (), found (())
+tests/failing/1-recursion_param_error/main.rgo:5
+    foo(foo)
+        ^^^

@@ -306,8 +306,8 @@ cons_deepcopy_skip_3:
     leave
     ret
 
-global _26_handler
-_26_handler:
+global _35_handler
+_35_handler:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -316,17 +316,8 @@ _26_handler:
     mov rax, [rbp-16] ; load operand
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-_26_handler_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je _26_handler_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp _26_handler_write_strlen_loop_0
-_26_handler_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-8] ; load continuation env_end pointer
@@ -334,8 +325,8 @@ _26_handler_write_strlen_done_0:
     mov rdi, r12 ; pass env_end pointer to continuation
     leave ; unwind before jumping
     jmp rax
-global _26_handler_unwrapper
-_26_handler_unwrapper:
+global _35_handler_unwrapper
+_35_handler_unwrapper:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 32 ; reserve stack space for locals
@@ -354,9 +345,9 @@ _26_handler_unwrapper:
     pop rdi ; restore arg into register
     pop rsi ; restore arg into register
     leave ; unwind before named jump
-    jmp _26_handler
-global _26_handler_deep_release
-_26_handler_deep_release:
+    jmp _35_handler
+global _35_handler_deep_release
+_35_handler_deep_release:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 32 ; reserve stack space for locals
@@ -367,19 +358,19 @@ _26_handler_deep_release:
     mov rax, [rbp-16] ; load operand
     mov rbx, 1 ; operand literal
     cmp rax, rbx
-    jg _26_handler_release_skip_0
-    mov rax, [r12-16] ; load _26_handler_release_field_0 env field
+    jg _35_handler_release_skip_0
+    mov rax, [r12-16] ; load _35_handler_release_field_0 env field
     mov [rbp-24], rax ; store value
     mov rdi, [rbp-24] ; load operand
     call release_heap_ptr ; release heap pointer
-_26_handler_release_skip_0:
+_35_handler_release_skip_0:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
     leave
     ret
 
-global _26_handler_deepcopy
-_26_handler_deepcopy:
+global _35_handler_deepcopy
+_35_handler_deepcopy:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 32 ; reserve stack space for locals
@@ -390,13 +381,13 @@ _26_handler_deepcopy:
     mov rax, [rbp-16] ; load operand
     mov rbx, 1 ; operand literal
     cmp rax, rbx
-    jg _26_handler_deepcopy_skip_0
+    jg _35_handler_deepcopy_skip_0
     mov rcx, [r12-16] ; load field pointer
     mov rdi, rcx ; copy pointer argument for deepcopy
     call deepcopy_heap_ptr ; duplicate heap pointer
     mov [r12-16], rax ; store duplicated pointer
     mov [rbp-24], rax ; store value
-_26_handler_deepcopy_skip_0:
+_35_handler_deepcopy_skip_0:
     leave
     ret
 
@@ -455,33 +446,36 @@ handler:
     mov qword [r12+24], rax ; env size metadata
     mov rax, 64 ; store heap size metadata
     mov qword [r12+32], rax ; heap size metadata
-    lea rax, [_26_handler_unwrapper] ; load unwrapper entry point
+    lea rax, [_35_handler_unwrapper] ; load unwrapper entry point
     mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [_26_handler_deep_release] ; load release helper entry point
+    lea rax, [_35_handler_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [_26_handler_deepcopy] ; load deep copy helper entry point
+    lea rax, [_35_handler_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy _27_handler closure env_end to rax
+    mov rax, r12 ; copy _36_handler closure env_end to rax
     mov [rbp-24], rax ; store value
     mov rax, [rbp-8] ; load operand
     push rax ; stack arg
-    lea rax, [rel _24] ; point to string literal
+    lea rax, [rel _33] ; point to string literal
+    mov rax, [rax] ; string data pointer for libc
     push rax ; stack arg
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 1024 ; length for allocation
+    mov rsi, 1040 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
     mov rbx, rax ; keep sprintf buffer pointer
+    lea r15, [rbx+1024] ; descriptor after sprintf buffer
     pop rdi ; restore arg into register
     pop rsi ; restore arg into register
     mov rdx, rsi ; shift sprintf args for buffer insertion
     mov rsi, rdi ; shift sprintf args for buffer insertion
     mov rdi, rbx ; destination buffer for sprintf
+    xor eax, eax ; no vector arguments for variadic sprintf
     push rbp ; helper prologue
     mov rbp, rsp
     push r12
@@ -493,7 +487,9 @@ handler:
     add rsp, r12
     pop r12
     pop rbp
-    mov rax, rbx ; return formatted string pointer
+    mov [r15], rbx ; store formatted data pointer
+    mov [r15+8], rax ; store formatted byte length
+    mov rax, r15 ; return formatted string descriptor
     mov r12, [rbp-24] ; load continuation env_end pointer
     mov [r12-8], rax ; store env field
     mov rax, [r12+0] ; load continuation entry point
@@ -566,15 +562,15 @@ handler_deepcopy_skip_1:
     leave
     ret
 
-global _32_end
-_32_end:
+global _41_end
+_41_end:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
-    mov rdi, 0 ; exit code
+    mov rdi, 0 ; operand literal
     call exit ; call libc exit to flush buffers
-global _32_end_unwrapper
-_32_end_unwrapper:
+global _41_end_unwrapper
+_41_end_unwrapper:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -583,9 +579,9 @@ _32_end_unwrapper:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
     leave ; unwind before named jump
-    jmp _32_end
-global _32_end_deep_release
-_32_end_deep_release:
+    jmp _41_end
+global _41_end_deep_release
+_41_end_deep_release:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -596,8 +592,8 @@ _32_end_deep_release:
     leave
     ret
 
-global _32_end_deepcopy
-_32_end_deepcopy:
+global _41_end_deepcopy
+_41_end_deepcopy:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -606,8 +602,8 @@ _32_end_deepcopy:
     leave
     ret
 
-global _30_end
-_30_end:
+global _39_end
+_39_end:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -626,29 +622,20 @@ _30_end:
     mov qword [r12+24], rax ; env size metadata
     mov rax, 48 ; store heap size metadata
     mov qword [r12+32], rax ; heap size metadata
-    lea rax, [_32_end_unwrapper] ; load unwrapper entry point
+    lea rax, [_41_end_unwrapper] ; load unwrapper entry point
     mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [_32_end_deep_release] ; load release helper entry point
+    lea rax, [_41_end_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [_32_end_deepcopy] ; load deep copy helper entry point
+    lea rax, [_41_end_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 0 ; store num_remaining
-    mov rax, r12 ; copy _32_end closure env_end to rax
+    mov rax, r12 ; copy _41_end closure env_end to rax
     mov [rbp-16], rax ; store value
     mov rax, [rbp-8] ; load operand
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-_30_end_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je _30_end_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp _30_end_write_strlen_loop_0
-_30_end_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-16] ; load continuation env_end pointer
@@ -656,8 +643,8 @@ _30_end_write_strlen_done_0:
     mov rdi, r12 ; pass env_end pointer to continuation
     leave ; unwind before jumping
     jmp rax
-global _30_end_unwrapper
-_30_end_unwrapper:
+global _39_end_unwrapper
+_39_end_unwrapper:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -671,9 +658,9 @@ _30_end_unwrapper:
     push rax ; stack arg
     pop rdi ; restore arg into register
     leave ; unwind before named jump
-    jmp _30_end
-global _30_end_deep_release
-_30_end_deep_release:
+    jmp _39_end
+global _39_end_deep_release
+_39_end_deep_release:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -684,8 +671,8 @@ _30_end_deep_release:
     leave
     ret
 
-global _30_end_deepcopy
-_30_end_deepcopy:
+global _39_end_deepcopy
+_39_end_deepcopy:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -714,29 +701,32 @@ end:
     mov qword [r12+24], rax ; env size metadata
     mov rax, 56 ; store heap size metadata
     mov qword [r12+32], rax ; heap size metadata
-    lea rax, [_30_end_unwrapper] ; load unwrapper entry point
+    lea rax, [_39_end_unwrapper] ; load unwrapper entry point
     mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [_30_end_deep_release] ; load release helper entry point
+    lea rax, [_39_end_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [_30_end_deepcopy] ; load deep copy helper entry point
+    lea rax, [_39_end_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy _30_end closure env_end to rax
+    mov rax, r12 ; copy _39_end closure env_end to rax
     mov [rbp-8], rax ; store value
-    lea rax, [rel _28] ; point to string literal
+    lea rax, [rel _37] ; point to string literal
+    mov rax, [rax] ; string data pointer for libc
     push rax ; stack arg
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 1024 ; length for allocation
+    mov rsi, 1040 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
     mov rbx, rax ; keep sprintf buffer pointer
+    lea r15, [rbx+1024] ; descriptor after sprintf buffer
     pop rdi ; restore arg into register
     mov rsi, rdi ; shift sprintf args for buffer insertion
     mov rdi, rbx ; destination buffer for sprintf
+    xor eax, eax ; no vector arguments for variadic sprintf
     push rbp ; helper prologue
     mov rbp, rsp
     push r12
@@ -748,7 +738,9 @@ end:
     add rsp, r12
     pop r12
     pop rbp
-    mov rax, rbx ; return formatted string pointer
+    mov [r15], rbx ; store formatted data pointer
+    mov [r15+8], rax ; store formatted byte length
+    mov rax, r15 ; return formatted string descriptor
     mov r12, [rbp-8] ; load continuation env_end pointer
     mov [r12-8], rax ; store env field
     mov rax, [r12+0] ; load continuation entry point
@@ -788,8 +780,8 @@ end_deepcopy:
     leave
     ret
 
-global _15_iterate
-_15_iterate:
+global _31_iterate
+_31_iterate:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 64 ; reserve stack space for locals
@@ -876,8 +868,8 @@ _15_iterate:
     mov rax, [rdi+0] ; load closure unwrapper entry point
     leave ; unwind before jumping
     jmp rax ; tail call into closure
-global _15_iterate_unwrapper
-_15_iterate_unwrapper:
+global _31_iterate_unwrapper
+_31_iterate_unwrapper:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 48 ; reserve stack space for locals
@@ -911,9 +903,9 @@ _15_iterate_unwrapper:
     pop rcx ; restore arg into register
     pop r8 ; restore arg into register
     leave ; unwind before named jump
-    jmp _15_iterate
-global _15_iterate_deep_release
-_15_iterate_deep_release:
+    jmp _31_iterate
+global _31_iterate_deep_release
+_31_iterate_deep_release:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 48 ; reserve stack space for locals
@@ -924,46 +916,46 @@ _15_iterate_deep_release:
     mov rax, [rbp-16] ; load operand
     mov rbx, 4 ; operand literal
     cmp rax, rbx
-    jg _15_iterate_release_skip_0
-    mov rax, [r12-40] ; load _15_iterate_release_field_0 env field
+    jg _31_iterate_release_skip_0
+    mov rax, [r12-40] ; load _31_iterate_release_field_0 env field
     mov [rbp-24], rax ; store value
     mov rdi, [rbp-24] ; load operand
     call release_heap_ptr ; release heap pointer
-_15_iterate_release_skip_0:
+_31_iterate_release_skip_0:
     mov rax, [rbp-16] ; load operand
     mov rbx, 3 ; operand literal
     cmp rax, rbx
-    jg _15_iterate_release_skip_1
-    mov rax, [r12-32] ; load _15_iterate_release_field_1 env field
+    jg _31_iterate_release_skip_1
+    mov rax, [r12-32] ; load _31_iterate_release_field_1 env field
     mov [rbp-32], rax ; store value
     mov rdi, [rbp-32] ; load operand
     call release_heap_ptr ; release heap pointer
-_15_iterate_release_skip_1:
+_31_iterate_release_skip_1:
     mov rax, [rbp-16] ; load operand
     mov rbx, 2 ; operand literal
     cmp rax, rbx
-    jg _15_iterate_release_skip_2
-    mov rax, [r12-24] ; load _15_iterate_release_field_2 env field
+    jg _31_iterate_release_skip_2
+    mov rax, [r12-24] ; load _31_iterate_release_field_2 env field
     mov [rbp-40], rax ; store value
     mov rdi, [rbp-40] ; load operand
     call release_heap_ptr ; release heap pointer
-_15_iterate_release_skip_2:
+_31_iterate_release_skip_2:
     mov rax, [rbp-16] ; load operand
     mov rbx, 0 ; operand literal
     cmp rax, rbx
-    jg _15_iterate_release_skip_4
-    mov rax, [r12-8] ; load _15_iterate_release_field_4 env field
+    jg _31_iterate_release_skip_4
+    mov rax, [r12-8] ; load _31_iterate_release_field_4 env field
     mov [rbp-48], rax ; store value
     mov rdi, [rbp-48] ; load operand
     call release_heap_ptr ; release heap pointer
-_15_iterate_release_skip_4:
+_31_iterate_release_skip_4:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
     leave
     ret
 
-global _15_iterate_deepcopy
-_15_iterate_deepcopy:
+global _31_iterate_deepcopy
+_31_iterate_deepcopy:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 48 ; reserve stack space for locals
@@ -974,43 +966,43 @@ _15_iterate_deepcopy:
     mov rax, [rbp-16] ; load operand
     mov rbx, 4 ; operand literal
     cmp rax, rbx
-    jg _15_iterate_deepcopy_skip_0
+    jg _31_iterate_deepcopy_skip_0
     mov rcx, [r12-40] ; load field pointer
     mov rdi, rcx ; copy pointer argument for deepcopy
     call deepcopy_heap_ptr ; duplicate heap pointer
     mov [r12-40], rax ; store duplicated pointer
     mov [rbp-24], rax ; store value
-_15_iterate_deepcopy_skip_0:
+_31_iterate_deepcopy_skip_0:
     mov rax, [rbp-16] ; load operand
     mov rbx, 3 ; operand literal
     cmp rax, rbx
-    jg _15_iterate_deepcopy_skip_1
+    jg _31_iterate_deepcopy_skip_1
     mov rcx, [r12-32] ; load field pointer
     mov rdi, rcx ; copy pointer argument for deepcopy
     call deepcopy_heap_ptr ; duplicate heap pointer
     mov [r12-32], rax ; store duplicated pointer
     mov [rbp-32], rax ; store value
-_15_iterate_deepcopy_skip_1:
+_31_iterate_deepcopy_skip_1:
     mov rax, [rbp-16] ; load operand
     mov rbx, 2 ; operand literal
     cmp rax, rbx
-    jg _15_iterate_deepcopy_skip_2
+    jg _31_iterate_deepcopy_skip_2
     mov rcx, [r12-24] ; load field pointer
     mov rdi, rcx ; copy pointer argument for deepcopy
     call deepcopy_heap_ptr ; duplicate heap pointer
     mov [r12-24], rax ; store duplicated pointer
     mov [rbp-40], rax ; store value
-_15_iterate_deepcopy_skip_2:
+_31_iterate_deepcopy_skip_2:
     mov rax, [rbp-16] ; load operand
     mov rbx, 0 ; operand literal
     cmp rax, rbx
-    jg _15_iterate_deepcopy_skip_4
+    jg _31_iterate_deepcopy_skip_4
     mov rcx, [r12-8] ; load field pointer
     mov rdi, rcx ; copy pointer argument for deepcopy
     call deepcopy_heap_ptr ; duplicate heap pointer
     mov [r12-8], rax ; store duplicated pointer
     mov [rbp-48], rax ; store value
-_15_iterate_deepcopy_skip_4:
+_31_iterate_deepcopy_skip_4:
     leave
     ret
 
@@ -1160,14 +1152,14 @@ iterate:
     mov qword [r12+24], rax ; env size metadata
     mov rax, 88 ; store heap size metadata
     mov qword [r12+32], rax ; heap size metadata
-    lea rax, [_15_iterate_unwrapper] ; load unwrapper entry point
+    lea rax, [_31_iterate_unwrapper] ; load unwrapper entry point
     mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [_15_iterate_deep_release] ; load release helper entry point
+    lea rax, [_31_iterate_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [_15_iterate_deepcopy] ; load deep copy helper entry point
+    lea rax, [_31_iterate_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 2 ; store num_remaining
-    mov rax, r12 ; copy _16_iterate closure env_end to rax
+    mov rax, r12 ; copy _32_iterate closure env_end to rax
     mov [rbp-40], rax ; store value
     mov rbx, [rbp-16] ; load arr closure env_end pointer
     mov rax, [rbp-40] ; load operand
@@ -1498,7 +1490,7 @@ _start:
     lea rax, [cons_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 2 ; store num_remaining
-    mov rax, r12 ; copy _21_cons closure env_end to rax
+    mov rax, r12 ; copy _18_cons closure env_end to rax
     mov [rbp-16], rax ; store value
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
@@ -1557,7 +1549,7 @@ _start:
     lea rax, [cons_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 2 ; store num_remaining
-    mov rax, r12 ; copy _22_cons closure env_end to rax
+    mov rax, r12 ; copy _19_cons closure env_end to rax
     mov [rbp-24], rax ; store value
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
@@ -1616,7 +1608,7 @@ _start:
     lea rax, [cons_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 2 ; store num_remaining
-    mov rax, r12 ; copy _23_cons closure env_end to rax
+    mov rax, r12 ; copy _20_cons closure env_end to rax
     mov [rbp-32], rax ; store value
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
@@ -1686,7 +1678,11 @@ extern exit
 extern sprintf
 extern write
 section .rodata
-_24:
+_33:
+    dq _33_data, 4 ; string data pointer and byte length
+_33_data:
     db "%d, ", 0
-_28:
+_37:
+    dq _37_data, 4 ; string data pointer and byte length
+_37_data:
     db "end", 10, 0

@@ -1,0 +1,5 @@
+main: (){
+    @write("foo")
+    @write("bar\n")
+    @exit(0)
+}

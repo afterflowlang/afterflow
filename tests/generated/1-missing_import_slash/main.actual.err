@@ -1,1 +1,1 @@
-[lex] builtin imports use @name, not @/name or @owner/name at 1:6
+[parse] unknown builtin '@foo' at 1:1

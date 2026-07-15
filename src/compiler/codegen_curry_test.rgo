@@ -1,14 +1,14 @@
 str: @str
+
 printf: (fmt: str!, args: ..., ok:()) {
     (s: str) = @sprintf(fmt, args)
     @write(s, ok)
 }
-exit: @exit
 foo: (ok:(str)){
     ok("bob")
 }
 bar: (name0: str, name1: str){
-    printf("hello %s and %s\n", name0, name1, exit(0))
+    printf("hello %s and %s\n", name0, name1, @exit(0))
 }
 main: () {
     foo(bar("alice"))

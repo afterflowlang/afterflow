@@ -1,0 +1,4 @@
+[hir] `!` is only valid for int, uint, and str parameters
+tests/failing/1-compile_time_f64/main.rgo:3
+main: (value: f64!) {
+^^^^

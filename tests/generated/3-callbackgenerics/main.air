@@ -32,7 +32,7 @@ _7_print1_deepcopy_skip_0:
 
 print1($n: str, $ok: ()):
     $_8_print1 = @newclosure<(), str>(_7_print1, $ok: ())
-    @sprintf($_5: str! = "The losing number is %s\n", $n: int, $_8_print1)
+    @sprintf($_5: str = "The losing number is %s\n", $n: str, $_8_print1)
 
 
 print1_unwrapper($env_end: int):
@@ -128,7 +128,7 @@ _11_print2_deepcopy_skip_0:
 
 print2($n: str, $ok: ()):
     $_12_print2 = @newclosure<(), str>(_11_print2, $ok: ())
-    @sprintf($_9: str! = "The winning number is %s\n", $n: int, $_12_print2)
+    @sprintf($_9: str = "The winning number is %s\n", $n: str, $_12_print2)
 
 
 print2_unwrapper($env_end: int):

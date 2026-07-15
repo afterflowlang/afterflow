@@ -1,5 +1,5 @@
 use crate::compiler::builtins;
-pub use crate::compiler::hir::{Lit, SigItem, SigKind};
+pub use crate::compiler::hir::{FixedIntKind, Lit, SigItem, SigKind};
 use std::collections::BTreeSet;
 
 #[derive(Debug, Clone)]
@@ -150,18 +150,23 @@ pub enum AirOp {
     JumpGt(AirJumpGt),
 
     Add(AirAdd),
+    AddBits(AirBinaryBits),
     Sub(AirSub),
+    SubBits(AirBinaryBits),
     Mul(AirMul),
+    MulBits(AirBinaryBits),
     DivInt(AirDivInt),
+    DivBits(AirDivBits),
     AddF64(AirAddF64),
     MulF64(AirMulF64),
     DivF64(AirDivF64),
+    ConvertFixed(AirConvertFixed),
 
     SysExit(AirSysExit),
 
-    Printf(AirPrintf),
     Sprintf(AirSprintf),
     Write(AirWrite),
+    ReadFile(AirReadFile),
 
     CallPtr(AirCallPtr),
     NewClosure(AirNewClosure),
@@ -210,11 +215,29 @@ pub struct AirMul {
 }
 
 #[derive(Clone, Debug)]
+pub struct AirBinaryBits {
+    pub input_a: AirArg,
+    pub input_b: AirArg,
+    pub target: String,
+    pub bit_width: u16,
+}
+
+#[derive(Clone, Debug)]
 pub struct AirDivInt {
     pub input_a: AirArg,
     pub input_b: AirArg,
     pub err_target: String,
     pub ok_target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirDivBits {
+    pub input_a: AirArg,
+    pub input_b: AirArg,
+    pub err_target: String,
+    pub ok_target: String,
+    pub bit_width: u16,
+    pub is_signed: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -239,16 +262,17 @@ pub struct AirDivF64 {
 }
 
 #[derive(Clone, Debug)]
-pub struct AirJumpGt {
-    pub left: AirValue,
-    pub right: AirValue,
+pub struct AirConvertFixed {
+    pub input: AirArg,
     pub target: String,
+    pub from: FixedIntKind,
+    pub to: FixedIntKind,
 }
 
 #[derive(Clone, Debug)]
-pub struct AirPrintf {
-    pub args: Vec<AirArg>,
-    pub arg_kinds: Vec<SigKind>,
+pub struct AirJumpGt {
+    pub left: AirValue,
+    pub right: AirValue,
     pub target: String,
 }
 
@@ -264,6 +288,13 @@ pub struct AirWrite {
     pub args: Vec<AirArg>,
     pub arg_kinds: Vec<SigKind>,
     pub target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirReadFile {
+    pub path: AirArg,
+    pub err_target: String,
+    pub ok_target: String,
 }
 
 #[derive(Clone, Debug)]

@@ -1,5 +1,6 @@
 use crate::compiler::ast;
 use crate::compiler::builtins;
+use crate::compiler::error::{Code, Error};
 use crate::compiler::hir;
 use crate::compiler::hir_context as ctx;
 use crate::compiler::span::Span;
@@ -28,27 +29,37 @@ pub fn hir_signature_to_ast(signature: hir::Signature) -> ast::Signature {
     }
 }
 
-pub fn resolve_signature(signature: &hir::Signature, ctx: &mut ctx::Context) -> hir::Signature {
-    hir::Signature {
+pub fn resolve_signature(
+    signature: &hir::Signature,
+    ctx: &mut ctx::Context,
+) -> Result<hir::Signature, Error> {
+    Ok(hir::Signature {
         items: signature
             .items
             .iter()
-            .map(|item| {
+            .map(|item| -> Result<hir::SigItem, Error> {
                 let name = if item.name.is_empty() {
                     ctx.new_name()
                 } else {
                     item.name.clone()
                 };
-                let ty = lower_sig_kind(&item.kind, ctx, item.has_bang);
-                hir::SigItem {
-                    name,
-                    kind: ty,
-                    has_bang: item.has_bang,
+                let kind = lower_sig_kind(&item.kind, ctx)?;
+                if item.is_comptime && !normalize_sig_kind(&kind, ctx).supports_comptime() {
+                    return Err(Error::new(
+                        Code::HIR,
+                        "`!` is only valid for int, uint, and str parameters",
+                        Span::unknown(),
+                    ));
                 }
+                Ok(hir::SigItem {
+                    name,
+                    kind,
+                    is_comptime: item.is_comptime,
+                })
             })
-            .collect(),
+            .collect::<Result<Vec<_>, _>>()?,
         generics: signature.generics.clone(),
-    }
+    })
 }
 /// Normalize a HIR SigKind by resolving any `Ident` that refers to an imported builtin (ctxentry.is_builtin=true),
 /// converting e.g. `Ident("str") -> SigKind::Str`, `Ident("int") -> SigKind::Int`, etc.
@@ -200,7 +211,7 @@ fn ast_sig_item_to_hir(item: ast::SigItem) -> hir::SigItem {
     hir::SigItem {
         name: item.name,
         kind: ast_sig_kind_to_hir(item.kind),
-        has_bang: item.has_bang,
+        is_comptime: item.is_comptime,
     }
 }
 
@@ -211,8 +222,6 @@ fn ast_sig_kind_to_hir(kind: ast::SigKind) -> hir::SigKind {
         ast::SigKind::Str => hir::SigKind::Str,
         ast::SigKind::F64 => hir::SigKind::F64,
         ast::SigKind::Variadic => hir::SigKind::Variadic,
-        ast::SigKind::CompileTimeInt => hir::SigKind::CompileTimeInt,
-        ast::SigKind::CompileTimeStr => hir::SigKind::CompileTimeStr,
         ast::SigKind::Ident(ident) => hir::SigKind::Ident(hir::SigIdent { name: ident.name }),
         ast::SigKind::Sig(signature) => hir::SigKind::Sig(ast_signature_to_hir(signature)),
         ast::SigKind::GenericInst { name, args } => hir::SigKind::GenericInst {
@@ -227,7 +236,7 @@ fn hir_sig_item_to_ast(item: hir::SigItem) -> ast::SigItem {
     ast::SigItem {
         name: item.name,
         kind: hir_sig_kind_to_ast(item.kind),
-        has_bang: item.has_bang,
+        is_comptime: item.is_comptime,
         span: Span::unknown(),
     }
 }
@@ -236,11 +245,17 @@ fn hir_sig_kind_to_ast(kind: hir::SigKind) -> ast::SigKind {
     match kind {
         hir::SigKind::Byte => ast::SigKind::Byte,
         hir::SigKind::Int => ast::SigKind::Int,
+        hir::SigKind::UInt => ast::SigKind::Ident(ast::SigIdent {
+            name: "uint".to_string(),
+            span: Span::unknown(),
+        }),
+        hir::SigKind::FixedInt(kind) => ast::SigKind::Ident(ast::SigIdent {
+            name: kind.name(),
+            span: Span::unknown(),
+        }),
         hir::SigKind::Str => ast::SigKind::Str,
         hir::SigKind::F64 => ast::SigKind::F64,
         hir::SigKind::Variadic => ast::SigKind::Variadic,
-        hir::SigKind::CompileTimeInt => ast::SigKind::CompileTimeInt,
-        hir::SigKind::CompileTimeStr => ast::SigKind::CompileTimeStr,
         hir::SigKind::Ident(ident) => ast::SigKind::Ident(ast::SigIdent {
             name: ident.name,
             span: Span::unknown(),
@@ -254,52 +269,28 @@ fn hir_sig_kind_to_ast(kind: hir::SigKind) -> ast::SigKind {
     }
 }
 
-fn lower_sig_kind(kind: &hir::SigKind, ctx: &mut ctx::Context, has_bang: bool) -> hir::SigKind {
-    match kind {
-        hir::SigKind::Ident(ident) => {
-            let resolved = resolve_ident(ident, ctx);
-            if has_bang {
-                match resolved {
-                    hir::SigKind::Int => hir::SigKind::CompileTimeInt,
-                    hir::SigKind::Str => hir::SigKind::CompileTimeStr,
-                    hir::SigKind::CompileTimeInt => hir::SigKind::CompileTimeInt,
-                    hir::SigKind::CompileTimeStr => hir::SigKind::CompileTimeStr,
-                    other => other,
-                }
-            } else {
-                resolved
-            }
-        }
-        hir::SigKind::Sig(signature) => hir::SigKind::Sig(resolve_signature(signature, ctx)),
+fn lower_sig_kind(kind: &hir::SigKind, ctx: &mut ctx::Context) -> Result<hir::SigKind, Error> {
+    Ok(match kind {
+        hir::SigKind::Ident(ident) => resolve_ident(ident, ctx),
+        hir::SigKind::Sig(signature) => hir::SigKind::Sig(resolve_signature(signature, ctx)?),
         hir::SigKind::GenericInst { name, args } => {
             let resolved_args = args
                 .iter()
-                .map(|arg| lower_sig_kind(arg, ctx, false))
-                .collect::<Vec<_>>();
+                .map(|arg| lower_sig_kind(arg, ctx))
+                .collect::<Result<Vec<_>, _>>()?;
 
             instantiate_generic_inst(name, &resolved_args, ctx)
                 .unwrap_or_else(|| hir::SigKind::Ident(hir::SigIdent { name: name.clone() }))
         }
         hir::SigKind::Generic(name) => hir::SigKind::Generic(name.clone()),
-        hir::SigKind::Int => {
-            if has_bang {
-                hir::SigKind::CompileTimeInt
-            } else {
-                hir::SigKind::Int
-            }
-        }
-        hir::SigKind::Str => {
-            if has_bang {
-                hir::SigKind::CompileTimeStr
-            } else {
-                hir::SigKind::Str
-            }
-        }
-        hir::SigKind::Byte | hir::SigKind::F64 => kind.clone(),
+        hir::SigKind::Byte
+        | hir::SigKind::Int
+        | hir::SigKind::UInt
+        | hir::SigKind::FixedInt(_)
+        | hir::SigKind::Str
+        | hir::SigKind::F64 => kind.clone(),
         hir::SigKind::Variadic => hir::SigKind::Variadic,
-        hir::SigKind::CompileTimeInt => hir::SigKind::CompileTimeInt,
-        hir::SigKind::CompileTimeStr => hir::SigKind::CompileTimeStr,
-    }
+    })
 }
 
 fn instantiate_generic_inst(

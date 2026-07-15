@@ -1,27 +1,24 @@
+stdout: /stdout
+
 str: @str
-exit: @exit
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-eqi: @eq
+
 array3: (a:str, b:str, c:str, ok:(len:int, nth:(index:int, one:(str), none:()))){
     ok(3, (index:int, one:(str), none:()){
-        eqi(index, 0, () {one(a)}, () {
-            eqi(index, 1, () {one(b)}, () {
-                eqi(index, 2, () {one(c)}, none)
+        @eq_int(index, 0, () {one(a)}, () {
+            @eq_int(index, 1, () {one(b)}, () {
+                @eq_int(index, 2, () {one(c)}, none)
             })
         })
     })
 }
 main: () {
     array3("alice", "bob", "charlie", (len:int, nth:(index:int, one:(str), none:())){
-        () = printf("array has %d elements\n", len)
+        () = stdout.printf("array has %d elements\n", len)
         nth(1, (s:str){
-            printf("element at index 1 is %s\n", s, exit(0))
+            stdout.printf("element at index 1 is %s\n", s, @exit(0))
         }, () {
-            printf("index out of bounds\n", exit(0))
+            stdout.printf("index out of bounds\n", @exit(0))
         })
     })
 }

@@ -13,7 +13,7 @@
                                 generics: {},
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],

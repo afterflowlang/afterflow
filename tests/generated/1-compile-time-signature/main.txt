@@ -1,0 +1,89 @@
+[
+    IdentDef {
+        name: "str",
+        ident: Ident {
+            name: "@str",
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    SigDef {
+        name: "format",
+        sig: Signature {
+            items: [
+                SigItem {
+                    name: "",
+                    kind: Ident(
+                        SigIdent {
+                            name: "str",
+                            span: ,
+                        },
+                    ),
+                    is_comptime: true,
+                    span: ,
+                },
+                SigItem {
+                    name: "",
+                    kind: Sig(
+                        Signature {
+                            items: [],
+                            span: ,
+                            generics: {},
+                        },
+                    ),
+                    is_comptime: false,
+                    span: ,
+                },
+            ],
+            span: ,
+            generics: {},
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "main",
+        lambda: Lambda {
+            params: Signature {
+                items: [],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "@exit",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: Int(
+                                                0,
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    Ident(
+        Ident {
+            name: "main",
+            args: [],
+            span: ,
+        },
+    ),
+]

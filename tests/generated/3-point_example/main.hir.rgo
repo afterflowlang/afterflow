@@ -1,44 +1,41 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+point: (int, int)
+_6___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _7___rgo_7374646f7574__printf: _6___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _7___rgo_7374646f7574__printf)
 }
-point: (int, int)
+
 new_point: (x: int, y: int, ok:(int, int)){
     ok(x, y)
 }
-@sprintf: @sprintf
-@write: @write
-_13_bar: (){
-    _14: 0
-    exit(_14)
+_15_bar: (){
+    _16: 0
+    @exit(_16)
 }
 
-_11_bar: (s: str){
-    @write(s, _13_bar)
+_13_bar: (s: str){
+    @write(s, _15_bar)
 }
 
-_8_bar: (x: int, y: int){
-    _9: "x: %d, y: %d"
-    @sprintf(_9, x, y, _11_bar)
+_10_bar: (x: int, y: int){
+    _11: "x: %d, y: %d"
+    @sprintf(_11, x, y, _13_bar)
 }
 
 bar: (p:((int, int))){
-    p(_8_bar)
+    p(_10_bar)
 }
 
 foo: (){
-    _18: 1
-    _19: 2
-    p: new_point(_18, _19)
+    _20: 1
+    _21: 2
+    p: new_point(_20, _21)
     bar(p)
 }
 

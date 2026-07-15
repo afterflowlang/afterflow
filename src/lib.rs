@@ -1,8 +1,8 @@
 pub mod compiler;
 pub mod debug_tools;
 
-pub use compiler::compile;
 pub use compiler::error::{Code, Error};
+pub use compiler::{compile, compile_path};
 
 pub fn escape_literal_for_rodata(literal: &str) -> String {
     fn append_part(output: &mut String, part: &str) {
@@ -82,21 +82,17 @@ mod tests {
     #[test]
     fn compile_simple_program() {
         let source = r#"
-int: @int
 str: @str
-add: @add
-exit: @exit
-write: @write
-sprintf: @sprintf
+int: @int
 
 print_int: (value: int) {
-    sprintf("%d", value, (res: str){
-        write(res, exit(0))    
+    @sprintf("%d", value, (res: str){
+        @write(res, @exit(0))
     })
 }
 
 add_five: (ok:(int)) {
-    add(5, 0, ok)
+    @add(5, 0, ok)
 }
 
 main: () {
@@ -114,39 +110,35 @@ main: () {
     }
 
     #[test]
-    fn compile_direct_builtin_references() {
+    fn rejects_dotted_builtin_references() {
         let source = r#"
 main: () {
-    @add(5, 0, (res: @int) {
-        (s: @str) = @sprintf("%d", res)
-        @write(s, @exit(0))
+    @std.add(5, 0, (res: @int) {
+        @write("unreachable", @exit(0))
     })
 }
         "#;
         let mut output = Vec::new();
-        compile(Cursor::new(source.as_bytes()), "main", &mut output)
-            .expect("compiler produced asm");
-        let asm = String::from_utf8(output).expect("valid utf8");
-        assert!(asm.contains("global _start"));
-        assert!(asm.contains("extern sprintf"));
-        assert!(asm.contains("extern write"));
+        let err = compile(Cursor::new(source.as_bytes()), "main", &mut output)
+            .expect_err("builtin references have one name");
+        assert!(err
+            .to_string()
+            .contains("builtin references use one name after '@'"));
     }
 
     #[test]
     fn compile_user_defined_puts() {
         let source = r#"
 str: @str
-exit: @exit
-write: @write
 
 puts: (s: str, ok:()) {
-    write(s, () {
-        write("\n", ok)
+    @write(s, () {
+        @write("\n", ok)
     })
 }
 
 main: () {
-    puts("hello", exit(0))
+    puts("hello", @exit(0))
 }
         "#;
         let mut output = Vec::new();
@@ -160,16 +152,57 @@ main: () {
     }
 
     #[test]
-    fn reject_builtin_puts_import() {
+    fn compile_direct_builtin_functions() {
+        let source = r#"
+main: () {
+    @write("hello", @exit(0))
+}
+        "#;
+        let mut output = Vec::new();
+        compile(Cursor::new(source.as_bytes()), "main", &mut output)
+            .expect("direct builtins compile");
+        let asm = String::from_utf8(output).expect("valid utf8");
+        assert!(asm.contains("extern write"));
+    }
+
+    #[test]
+    fn builtins_are_available_without_root_imports() {
+        let source = r#"
+main: () {
+    @exit(0)
+}
+        "#;
+        let mut output = Vec::new();
+        compile(Cursor::new(source.as_bytes()), "main", &mut output)
+            .expect("builtin use does not require a root import");
+    }
+
+    #[test]
+    fn rejects_unknown_builtins() {
         let source = r#"
 puts: @puts
 main: () {
-    puts("hello", exit(0))
+    puts("hello", @exit(0))
 }
         "#;
         let mut output = Vec::new();
         let err = compile(Cursor::new(source.as_bytes()), "main", &mut output)
-            .expect_err("puts should no longer be a builtin import");
+            .expect_err("puts is not a builtin");
         assert!(err.to_string().contains("@puts"));
+    }
+
+    #[test]
+    fn builtins_can_follow_declarations() {
+        let source = r#"
+name: "late"
+main: () {
+    @write(name, () {
+        @exit(0)
+    })
+}
+        "#;
+        let mut output = Vec::new();
+        compile(Cursor::new(source.as_bytes()), "main", &mut output)
+            .expect("builtins are not imports");
     }
 }

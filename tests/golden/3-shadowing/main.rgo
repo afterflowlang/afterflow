@@ -1,18 +1,14 @@
+stdout: /stdout
+
 str: @str
-exit: @exit
 int: @int
-add: @add
-sub: @sub
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
+
 bar: (){
-    printf("outer bar", exit(0))
+    stdout.printf("outer bar", @exit(0))
 }
 foo: (ok:()) {
     bar: (){
-        printf("inner bar\n", ok)
+        stdout.printf("inner bar\n", ok)
     }
     bar
 }

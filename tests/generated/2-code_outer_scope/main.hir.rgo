@@ -1,13 +1,11 @@
 str: @str
-write: @write
-exit: @exit
-bar: (v: str, ok:()){
-    write(v, ok)
-}
 msg: "hi"
+bar: (v: str, ok:()){
+    @write(v, ok)
+}
 _1_foo: (){
     _2: 0
-    exit(_2)
+    @exit(_2)
 }
 
 foo: (msg: str!){

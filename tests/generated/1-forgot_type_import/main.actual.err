@@ -1,1 +1,4 @@
-[hir] type `int` is not defined at 0:0
+[hir] type `int` is not defined
+tests/failing/1-forgot_type_import/main.rgo:11
+    foo(1)
+        ^

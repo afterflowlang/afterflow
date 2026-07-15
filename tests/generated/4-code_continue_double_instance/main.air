@@ -86,7 +86,7 @@ _11_run_k_deepcopy_skip_0:
 
 _8_run_k($ok: (), $x: int):
     $_12_run_k = @newclosure<(), str>(_11_run_k, $ok: ())
-    @sprintf($_9: str! = "number: %d", $x: int, $_12_run_k)
+    @sprintf($_9: str = "number: %d", $x: int, $_12_run_k)
 
 
 _8_run_k_unwrapper($env_end: int):
@@ -202,11 +202,11 @@ run($ok: ()):
     $_18_run = @newclosure<($ok: ()), ()>(_16_run, $a: (), $ok: ())
     $b = @newclosure<int, int, ($_4_foo: int)>(foo, $_5: int = 1, $_7: int = 3)
     $_22_run = @newclosure<($ok: ()), ()>(_20_run, $b: (), $ok: ())
-    @eq(eq__18_run_true_0_0, $_13: int = 1, $_14: int = 1)
-eq__22_run_false_0_0:
+    @eq_int(eq_int__18_run_true_0_0, $_13: int = 1, $_14: int = 1)
+eq_int__22_run_false_0_0:
     @release($_18_run)
     @jumpclosure($_22_run)
-eq__18_run_true_0_0:
+eq_int__18_run_true_0_0:
     @release($_22_run)
     @jumpclosure($_18_run)
 

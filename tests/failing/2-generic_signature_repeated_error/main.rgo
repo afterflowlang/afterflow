@@ -1,10 +1,8 @@
-int: @int
 str: @str
-exit: @exit
-write: @write
+int: @int
 
 arr: <T, T>((len: int, nth:(idx:int, none:(), one:(T))))
 
 foo: (items: arr<str>) {
-    write("done", exit(0))
+    @write("done", @exit(0))
 }

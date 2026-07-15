@@ -1,5 +1,6 @@
 use std::io::Cursor;
 
+use super::error::Code;
 use super::lexer::Lexer;
 use super::token::TokenKind;
 
@@ -9,13 +10,13 @@ fn lexer_test() {
     let cursor = Cursor::new(&source[..]);
     let mut lexer = Lexer::new(cursor);
     let ident = |name: &str| TokenKind::Ident(name.to_string());
-    let import = |name: &str| TokenKind::Import(name.to_string());
+    let builtin = |name: &str| TokenKind::Builtin(name.to_string());
     let str_lit = |value: &str| TokenKind::StringLiteral(value.to_string());
 
     let expected_tokens = vec![
         ident("str"),
         TokenKind::Colon,
-        import("str"),
+        builtin("str"),
         TokenKind::Newline,
         ident("printf"),
         TokenKind::Colon,
@@ -42,14 +43,14 @@ fn lexer_test() {
         ident("str"),
         TokenKind::RParen,
         TokenKind::Equals,
-        import("sprintf"),
+        builtin("sprintf"),
         TokenKind::LParen,
         ident("fmt"),
         TokenKind::Comma,
         ident("args"),
         TokenKind::RParen,
         TokenKind::Newline,
-        import("write"),
+        builtin("write"),
         TokenKind::LParen,
         ident("s"),
         TokenKind::Comma,
@@ -203,4 +204,80 @@ fn ellipsis_is_single_token() {
 
     let eof = lexer.next_token().expect("should reach EOF");
     assert!(matches!(eof.kind, TokenKind::Eof));
+}
+
+#[test]
+fn source_paths_start_with_slash() {
+    let cursor = Cursor::new(b"math: /math\n");
+    let mut lexer = Lexer::new(cursor);
+
+    let actual_tokens = [
+        lexer.next_token().expect("should lex namespace"),
+        lexer.next_token().expect("should lex colon"),
+        lexer.next_token().expect("should lex source path"),
+        lexer.next_token().expect("should lex newline"),
+    ];
+
+    assert_eq!(actual_tokens[0].kind, TokenKind::Ident("math".to_string()));
+    assert_eq!(actual_tokens[1].kind, TokenKind::Colon);
+    assert_eq!(
+        actual_tokens[2].kind,
+        TokenKind::SourcePath("/math".to_string())
+    );
+    assert_eq!(actual_tokens[3].kind, TokenKind::Newline);
+}
+
+#[test]
+fn source_paths_cannot_use_the_builtin_marker() {
+    let cursor = Cursor::new(b"@/math");
+    let mut lexer = Lexer::new(cursor);
+
+    let error = lexer
+        .next_token()
+        .expect_err("source paths should start with slash");
+    assert_eq!(error.code, Code::Lex);
+    assert_eq!(error.message, "builtin references use @name");
+}
+
+#[test]
+fn block_comments_are_skipped_and_preserve_newline_tokens() {
+    let cursor = Cursor::new(b"foo/* inline */bar\nbaz/* across\n lines */qux");
+    let mut lexer = Lexer::new(cursor);
+
+    let mut actual_tokens = Vec::new();
+    loop {
+        let token = lexer.next_token().expect("lexer should succeed");
+        let is_eof = matches!(token.kind, TokenKind::Eof);
+        actual_tokens.push(token.kind);
+        if is_eof {
+            break;
+        }
+    }
+
+    assert_eq!(
+        actual_tokens,
+        vec![
+            TokenKind::Ident("foo".to_string()),
+            TokenKind::Ident("bar".to_string()),
+            TokenKind::Newline,
+            TokenKind::Ident("baz".to_string()),
+            TokenKind::Newline,
+            TokenKind::Ident("qux".to_string()),
+            TokenKind::Eof,
+        ]
+    );
+}
+
+#[test]
+fn unterminated_block_comments_are_rejected() {
+    let cursor = Cursor::new(b"/* missing end");
+    let mut lexer = Lexer::new(cursor);
+
+    let error = lexer
+        .next_token()
+        .expect_err("unterminated block comments should fail");
+    assert_eq!(error.code, Code::Lex);
+    assert_eq!(error.message, "unterminated block comment");
+    assert_eq!(error.span.line, 1);
+    assert_eq!(error.span.column, 1);
 }

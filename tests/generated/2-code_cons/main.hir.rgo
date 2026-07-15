@@ -1,17 +1,16 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+list: ((int, list), ())
+_9___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _10___rgo_7374646f7574__printf: _9___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _10___rgo_7374646f7574__printf)
 }
-exit: @exit
-list: ((int, list), ())
+
 nil: (cb:(int, ((int, list), ())), end:()){
     end()
 }
@@ -19,9 +18,8 @@ nil: (cb:(int, ((int, list), ())), end:()){
 cons: (h: int, t:((int, list), ()), cb:(int, ((int, list), ())), end:()){
     cb(h, t)
 }
-
 main: (){
-    _8: 0
-    exit(_8)
+    _11: 0
+    @exit(_11)
 }
 main()

@@ -17,24 +17,6 @@
         },
         span: ,
     },
-    IdentDef {
-        name: "sprintf",
-        ident: Ident {
-            name: "@sprintf",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
-        name: "exit",
-        ident: Ident {
-            name: "@exit",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
     FunctionDef {
         name: "itoa",
         lambda: Lambda {
@@ -48,7 +30,7 @@
                                 span: ,
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                     SigItem {
@@ -64,7 +46,7 @@
                                                 span: ,
                                             },
                                         ),
-                                        has_bang: false,
+                                        is_comptime: false,
                                         span: ,
                                     },
                                 ],
@@ -72,7 +54,7 @@
                                 generics: {},
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],
@@ -83,7 +65,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "sprintf",
+                            name: "@sprintf",
                             args: [
                                 Arg {
                                     name: None,
@@ -171,7 +153,7 @@
                                                                 span: ,
                                                             },
                                                         ),
-                                                        has_bang: false,
+                                                        is_comptime: false,
                                                         span: ,
                                                     },
                                                 ],
@@ -182,7 +164,7 @@
                                                 items: [
                                                     Ident(
                                                         Ident {
-                                                            name: "exit",
+                                                            name: "@exit",
                                                             args: [
                                                                 Arg {
                                                                     name: None,

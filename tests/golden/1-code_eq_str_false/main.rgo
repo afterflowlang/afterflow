@@ -1,0 +1,7 @@
+main: () {
+    @eq_str("aaa", "aab", () {
+        @write("true", @exit(0))
+    }, () {
+        @write("false", @exit(0))
+    })
+}

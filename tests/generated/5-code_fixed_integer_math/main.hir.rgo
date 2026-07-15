@@ -1,0 +1,1088 @@
+__rgo_6d617468__b8: @b8
+__rgo_6d617468__i8: @i8
+__rgo_6d617468__u8: @u8
+__rgo_6d617468__b32: @b32
+__rgo_6d617468__i32: @i32
+__rgo_6d617468__u32: @u32
+__rgo_6d617468__b64: @b64
+__rgo_6d617468__i64: @i64
+__rgo_6d617468__u64: @u64
+__rgo_6d617468__b128: @b128
+__rgo_6d617468__i128: @i128
+__rgo_6d617468__u128: @u128
+str: @str
+_38___rgo_6d617468__add_i8: (ok:(i8), result_bits: b8){
+    @i8_from_b8(result_bits, ok)
+}
+
+_36___rgo_6d617468__add_i8: (x_bits: b8, ok:(i8), y_bits: b8){
+    _39___rgo_6d617468__add_i8: _38___rgo_6d617468__add_i8(ok)
+    @add_b8(x_bits, y_bits, _39___rgo_6d617468__add_i8)
+}
+
+_34___rgo_6d617468__add_i8: (y: i8, ok:(i8), x_bits: b8){
+    _40___rgo_6d617468__add_i8: _36___rgo_6d617468__add_i8(x_bits, ok)
+    @b8_from_i8(y, _40___rgo_6d617468__add_i8)
+}
+
+__rgo_6d617468__add_i8: (x: i8, y: i8, ok:(i8)){
+    _41___rgo_6d617468__add_i8: _34___rgo_6d617468__add_i8(y, ok)
+    @b8_from_i8(x, _41___rgo_6d617468__add_i8)
+}
+_48___rgo_6d617468__add_u8: (ok:(u8), result_bits: b8){
+    @u8_from_b8(result_bits, ok)
+}
+
+_46___rgo_6d617468__add_u8: (x_bits: b8, ok:(u8), y_bits: b8){
+    _49___rgo_6d617468__add_u8: _48___rgo_6d617468__add_u8(ok)
+    @add_b8(x_bits, y_bits, _49___rgo_6d617468__add_u8)
+}
+
+_44___rgo_6d617468__add_u8: (y: u8, ok:(u8), x_bits: b8){
+    _50___rgo_6d617468__add_u8: _46___rgo_6d617468__add_u8(x_bits, ok)
+    @b8_from_u8(y, _50___rgo_6d617468__add_u8)
+}
+
+__rgo_6d617468__add_u8: (x: u8, y: u8, ok:(u8)){
+    _51___rgo_6d617468__add_u8: _44___rgo_6d617468__add_u8(y, ok)
+    @b8_from_u8(x, _51___rgo_6d617468__add_u8)
+}
+_58___rgo_6d617468__add_i32: (ok:(i32), result_bits: b32){
+    @i32_from_b32(result_bits, ok)
+}
+
+_56___rgo_6d617468__add_i32: (x_bits: b32, ok:(i32), y_bits: b32){
+    _59___rgo_6d617468__add_i32: _58___rgo_6d617468__add_i32(ok)
+    @add_b32(x_bits, y_bits, _59___rgo_6d617468__add_i32)
+}
+
+_54___rgo_6d617468__add_i32: (y: i32, ok:(i32), x_bits: b32){
+    _60___rgo_6d617468__add_i32: _56___rgo_6d617468__add_i32(x_bits, ok)
+    @b32_from_i32(y, _60___rgo_6d617468__add_i32)
+}
+
+__rgo_6d617468__add_i32: (x: i32, y: i32, ok:(i32)){
+    _61___rgo_6d617468__add_i32: _54___rgo_6d617468__add_i32(y, ok)
+    @b32_from_i32(x, _61___rgo_6d617468__add_i32)
+}
+_68___rgo_6d617468__add_u32: (ok:(u32), result_bits: b32){
+    @u32_from_b32(result_bits, ok)
+}
+
+_66___rgo_6d617468__add_u32: (x_bits: b32, ok:(u32), y_bits: b32){
+    _69___rgo_6d617468__add_u32: _68___rgo_6d617468__add_u32(ok)
+    @add_b32(x_bits, y_bits, _69___rgo_6d617468__add_u32)
+}
+
+_64___rgo_6d617468__add_u32: (y: u32, ok:(u32), x_bits: b32){
+    _70___rgo_6d617468__add_u32: _66___rgo_6d617468__add_u32(x_bits, ok)
+    @b32_from_u32(y, _70___rgo_6d617468__add_u32)
+}
+
+__rgo_6d617468__add_u32: (x: u32, y: u32, ok:(u32)){
+    _71___rgo_6d617468__add_u32: _64___rgo_6d617468__add_u32(y, ok)
+    @b32_from_u32(x, _71___rgo_6d617468__add_u32)
+}
+_78___rgo_6d617468__add_i64: (ok:(i64), result_bits: b64){
+    @i64_from_b64(result_bits, ok)
+}
+
+_76___rgo_6d617468__add_i64: (x_bits: b64, ok:(i64), y_bits: b64){
+    _79___rgo_6d617468__add_i64: _78___rgo_6d617468__add_i64(ok)
+    @add_b64(x_bits, y_bits, _79___rgo_6d617468__add_i64)
+}
+
+_74___rgo_6d617468__add_i64: (y: i64, ok:(i64), x_bits: b64){
+    _80___rgo_6d617468__add_i64: _76___rgo_6d617468__add_i64(x_bits, ok)
+    @b64_from_i64(y, _80___rgo_6d617468__add_i64)
+}
+
+__rgo_6d617468__add_i64: (x: i64, y: i64, ok:(i64)){
+    _81___rgo_6d617468__add_i64: _74___rgo_6d617468__add_i64(y, ok)
+    @b64_from_i64(x, _81___rgo_6d617468__add_i64)
+}
+_88___rgo_6d617468__add_u64: (ok:(u64), result_bits: b64){
+    @u64_from_b64(result_bits, ok)
+}
+
+_86___rgo_6d617468__add_u64: (x_bits: b64, ok:(u64), y_bits: b64){
+    _89___rgo_6d617468__add_u64: _88___rgo_6d617468__add_u64(ok)
+    @add_b64(x_bits, y_bits, _89___rgo_6d617468__add_u64)
+}
+
+_84___rgo_6d617468__add_u64: (y: u64, ok:(u64), x_bits: b64){
+    _90___rgo_6d617468__add_u64: _86___rgo_6d617468__add_u64(x_bits, ok)
+    @b64_from_u64(y, _90___rgo_6d617468__add_u64)
+}
+
+__rgo_6d617468__add_u64: (x: u64, y: u64, ok:(u64)){
+    _91___rgo_6d617468__add_u64: _84___rgo_6d617468__add_u64(y, ok)
+    @b64_from_u64(x, _91___rgo_6d617468__add_u64)
+}
+_98___rgo_6d617468__add_i128: (ok:(i128), result_bits: b128){
+    @i128_from_b128(result_bits, ok)
+}
+
+_96___rgo_6d617468__add_i128: (x_bits: b128, ok:(i128), y_bits: b128){
+    _99___rgo_6d617468__add_i128: _98___rgo_6d617468__add_i128(ok)
+    @add_b128(x_bits, y_bits, _99___rgo_6d617468__add_i128)
+}
+
+_94___rgo_6d617468__add_i128: (y: i128, ok:(i128), x_bits: b128){
+    _100___rgo_6d617468__add_i128: _96___rgo_6d617468__add_i128(x_bits, ok)
+    @b128_from_i128(y, _100___rgo_6d617468__add_i128)
+}
+
+__rgo_6d617468__add_i128: (x: i128, y: i128, ok:(i128)){
+    _101___rgo_6d617468__add_i128: _94___rgo_6d617468__add_i128(y, ok)
+    @b128_from_i128(x, _101___rgo_6d617468__add_i128)
+}
+_108___rgo_6d617468__add_u128: (ok:(u128), result_bits: b128){
+    @u128_from_b128(result_bits, ok)
+}
+
+_106___rgo_6d617468__add_u128: (x_bits: b128, ok:(u128), y_bits: b128){
+    _109___rgo_6d617468__add_u128: _108___rgo_6d617468__add_u128(ok)
+    @add_b128(x_bits, y_bits, _109___rgo_6d617468__add_u128)
+}
+
+_104___rgo_6d617468__add_u128: (y: u128, ok:(u128), x_bits: b128){
+    _110___rgo_6d617468__add_u128: _106___rgo_6d617468__add_u128(x_bits, ok)
+    @b128_from_u128(y, _110___rgo_6d617468__add_u128)
+}
+
+__rgo_6d617468__add_u128: (x: u128, y: u128, ok:(u128)){
+    _111___rgo_6d617468__add_u128: _104___rgo_6d617468__add_u128(y, ok)
+    @b128_from_u128(x, _111___rgo_6d617468__add_u128)
+}
+_118___rgo_6d617468__div_i8: (ok:(i8), quotient_bits: b8){
+    @i8_from_b8(quotient_bits, ok)
+}
+
+_116___rgo_6d617468__div_i8: (dividend_bits: b8, err:(), ok:(i8), divisor_bits: b8){
+    _119___rgo_6d617468__div_i8: _118___rgo_6d617468__div_i8(ok)
+    @div_signed_b8(dividend_bits, divisor_bits, err, _119___rgo_6d617468__div_i8)
+}
+
+_114___rgo_6d617468__div_i8: (divisor: i8, err:(), ok:(i8), dividend_bits: b8){
+    _120___rgo_6d617468__div_i8: _116___rgo_6d617468__div_i8(dividend_bits, err, ok)
+    @b8_from_i8(divisor, _120___rgo_6d617468__div_i8)
+}
+
+__rgo_6d617468__div_i8: (dividend: i8, divisor: i8, err:(), ok:(i8)){
+    _121___rgo_6d617468__div_i8: _114___rgo_6d617468__div_i8(divisor, err, ok)
+    @b8_from_i8(dividend, _121___rgo_6d617468__div_i8)
+}
+_128___rgo_6d617468__div_u8: (ok:(u8), quotient_bits: b8){
+    @u8_from_b8(quotient_bits, ok)
+}
+
+_126___rgo_6d617468__div_u8: (dividend_bits: b8, err:(), ok:(u8), divisor_bits: b8){
+    _129___rgo_6d617468__div_u8: _128___rgo_6d617468__div_u8(ok)
+    @div_unsigned_b8(dividend_bits, divisor_bits, err, _129___rgo_6d617468__div_u8)
+}
+
+_124___rgo_6d617468__div_u8: (divisor: u8, err:(), ok:(u8), dividend_bits: b8){
+    _130___rgo_6d617468__div_u8: _126___rgo_6d617468__div_u8(dividend_bits, err, ok)
+    @b8_from_u8(divisor, _130___rgo_6d617468__div_u8)
+}
+
+__rgo_6d617468__div_u8: (dividend: u8, divisor: u8, err:(), ok:(u8)){
+    _131___rgo_6d617468__div_u8: _124___rgo_6d617468__div_u8(divisor, err, ok)
+    @b8_from_u8(dividend, _131___rgo_6d617468__div_u8)
+}
+_138___rgo_6d617468__div_i32: (ok:(i32), quotient_bits: b32){
+    @i32_from_b32(quotient_bits, ok)
+}
+
+_136___rgo_6d617468__div_i32: (dividend_bits: b32, err:(), ok:(i32), divisor_bits: b32){
+    _139___rgo_6d617468__div_i32: _138___rgo_6d617468__div_i32(ok)
+    @div_signed_b32(dividend_bits, divisor_bits, err, _139___rgo_6d617468__div_i32)
+}
+
+_134___rgo_6d617468__div_i32: (divisor: i32, err:(), ok:(i32), dividend_bits: b32){
+    _140___rgo_6d617468__div_i32: _136___rgo_6d617468__div_i32(dividend_bits, err, ok)
+    @b32_from_i32(divisor, _140___rgo_6d617468__div_i32)
+}
+
+__rgo_6d617468__div_i32: (dividend: i32, divisor: i32, err:(), ok:(i32)){
+    _141___rgo_6d617468__div_i32: _134___rgo_6d617468__div_i32(divisor, err, ok)
+    @b32_from_i32(dividend, _141___rgo_6d617468__div_i32)
+}
+_148___rgo_6d617468__div_u32: (ok:(u32), quotient_bits: b32){
+    @u32_from_b32(quotient_bits, ok)
+}
+
+_146___rgo_6d617468__div_u32: (dividend_bits: b32, err:(), ok:(u32), divisor_bits: b32){
+    _149___rgo_6d617468__div_u32: _148___rgo_6d617468__div_u32(ok)
+    @div_unsigned_b32(dividend_bits, divisor_bits, err, _149___rgo_6d617468__div_u32)
+}
+
+_144___rgo_6d617468__div_u32: (divisor: u32, err:(), ok:(u32), dividend_bits: b32){
+    _150___rgo_6d617468__div_u32: _146___rgo_6d617468__div_u32(dividend_bits, err, ok)
+    @b32_from_u32(divisor, _150___rgo_6d617468__div_u32)
+}
+
+__rgo_6d617468__div_u32: (dividend: u32, divisor: u32, err:(), ok:(u32)){
+    _151___rgo_6d617468__div_u32: _144___rgo_6d617468__div_u32(divisor, err, ok)
+    @b32_from_u32(dividend, _151___rgo_6d617468__div_u32)
+}
+_158___rgo_6d617468__div_i64: (ok:(i64), quotient_bits: b64){
+    @i64_from_b64(quotient_bits, ok)
+}
+
+_156___rgo_6d617468__div_i64: (dividend_bits: b64, err:(), ok:(i64), divisor_bits: b64){
+    _159___rgo_6d617468__div_i64: _158___rgo_6d617468__div_i64(ok)
+    @div_signed_b64(dividend_bits, divisor_bits, err, _159___rgo_6d617468__div_i64)
+}
+
+_154___rgo_6d617468__div_i64: (divisor: i64, err:(), ok:(i64), dividend_bits: b64){
+    _160___rgo_6d617468__div_i64: _156___rgo_6d617468__div_i64(dividend_bits, err, ok)
+    @b64_from_i64(divisor, _160___rgo_6d617468__div_i64)
+}
+
+__rgo_6d617468__div_i64: (dividend: i64, divisor: i64, err:(), ok:(i64)){
+    _161___rgo_6d617468__div_i64: _154___rgo_6d617468__div_i64(divisor, err, ok)
+    @b64_from_i64(dividend, _161___rgo_6d617468__div_i64)
+}
+_168___rgo_6d617468__div_u64: (ok:(u64), quotient_bits: b64){
+    @u64_from_b64(quotient_bits, ok)
+}
+
+_166___rgo_6d617468__div_u64: (dividend_bits: b64, err:(), ok:(u64), divisor_bits: b64){
+    _169___rgo_6d617468__div_u64: _168___rgo_6d617468__div_u64(ok)
+    @div_unsigned_b64(dividend_bits, divisor_bits, err, _169___rgo_6d617468__div_u64)
+}
+
+_164___rgo_6d617468__div_u64: (divisor: u64, err:(), ok:(u64), dividend_bits: b64){
+    _170___rgo_6d617468__div_u64: _166___rgo_6d617468__div_u64(dividend_bits, err, ok)
+    @b64_from_u64(divisor, _170___rgo_6d617468__div_u64)
+}
+
+__rgo_6d617468__div_u64: (dividend: u64, divisor: u64, err:(), ok:(u64)){
+    _171___rgo_6d617468__div_u64: _164___rgo_6d617468__div_u64(divisor, err, ok)
+    @b64_from_u64(dividend, _171___rgo_6d617468__div_u64)
+}
+_178___rgo_6d617468__div_i128: (ok:(i128), quotient_bits: b128){
+    @i128_from_b128(quotient_bits, ok)
+}
+
+_176___rgo_6d617468__div_i128: (dividend_bits: b128, err:(), ok:(i128), divisor_bits: b128){
+    _179___rgo_6d617468__div_i128: _178___rgo_6d617468__div_i128(ok)
+    @div_signed_b128(dividend_bits, divisor_bits, err, _179___rgo_6d617468__div_i128)
+}
+
+_174___rgo_6d617468__div_i128: (divisor: i128, err:(), ok:(i128), dividend_bits: b128){
+    _180___rgo_6d617468__div_i128: _176___rgo_6d617468__div_i128(dividend_bits, err, ok)
+    @b128_from_i128(divisor, _180___rgo_6d617468__div_i128)
+}
+
+__rgo_6d617468__div_i128: (dividend: i128, divisor: i128, err:(), ok:(i128)){
+    _181___rgo_6d617468__div_i128: _174___rgo_6d617468__div_i128(divisor, err, ok)
+    @b128_from_i128(dividend, _181___rgo_6d617468__div_i128)
+}
+_188___rgo_6d617468__div_u128: (ok:(u128), quotient_bits: b128){
+    @u128_from_b128(quotient_bits, ok)
+}
+
+_186___rgo_6d617468__div_u128: (dividend_bits: b128, err:(), ok:(u128), divisor_bits: b128){
+    _189___rgo_6d617468__div_u128: _188___rgo_6d617468__div_u128(ok)
+    @div_unsigned_b128(dividend_bits, divisor_bits, err, _189___rgo_6d617468__div_u128)
+}
+
+_184___rgo_6d617468__div_u128: (divisor: u128, err:(), ok:(u128), dividend_bits: b128){
+    _190___rgo_6d617468__div_u128: _186___rgo_6d617468__div_u128(dividend_bits, err, ok)
+    @b128_from_u128(divisor, _190___rgo_6d617468__div_u128)
+}
+
+__rgo_6d617468__div_u128: (dividend: u128, divisor: u128, err:(), ok:(u128)){
+    _191___rgo_6d617468__div_u128: _184___rgo_6d617468__div_u128(divisor, err, ok)
+    @b128_from_u128(dividend, _191___rgo_6d617468__div_u128)
+}
+_198___rgo_6d617468__mul_i8: (ok:(i8), result_bits: b8){
+    @i8_from_b8(result_bits, ok)
+}
+
+_196___rgo_6d617468__mul_i8: (x_bits: b8, ok:(i8), y_bits: b8){
+    _199___rgo_6d617468__mul_i8: _198___rgo_6d617468__mul_i8(ok)
+    @mul_b8(x_bits, y_bits, _199___rgo_6d617468__mul_i8)
+}
+
+_194___rgo_6d617468__mul_i8: (y: i8, ok:(i8), x_bits: b8){
+    _200___rgo_6d617468__mul_i8: _196___rgo_6d617468__mul_i8(x_bits, ok)
+    @b8_from_i8(y, _200___rgo_6d617468__mul_i8)
+}
+
+__rgo_6d617468__mul_i8: (x: i8, y: i8, ok:(i8)){
+    _201___rgo_6d617468__mul_i8: _194___rgo_6d617468__mul_i8(y, ok)
+    @b8_from_i8(x, _201___rgo_6d617468__mul_i8)
+}
+_208___rgo_6d617468__mul_u8: (ok:(u8), result_bits: b8){
+    @u8_from_b8(result_bits, ok)
+}
+
+_206___rgo_6d617468__mul_u8: (x_bits: b8, ok:(u8), y_bits: b8){
+    _209___rgo_6d617468__mul_u8: _208___rgo_6d617468__mul_u8(ok)
+    @mul_b8(x_bits, y_bits, _209___rgo_6d617468__mul_u8)
+}
+
+_204___rgo_6d617468__mul_u8: (y: u8, ok:(u8), x_bits: b8){
+    _210___rgo_6d617468__mul_u8: _206___rgo_6d617468__mul_u8(x_bits, ok)
+    @b8_from_u8(y, _210___rgo_6d617468__mul_u8)
+}
+
+__rgo_6d617468__mul_u8: (x: u8, y: u8, ok:(u8)){
+    _211___rgo_6d617468__mul_u8: _204___rgo_6d617468__mul_u8(y, ok)
+    @b8_from_u8(x, _211___rgo_6d617468__mul_u8)
+}
+_218___rgo_6d617468__mul_i32: (ok:(i32), result_bits: b32){
+    @i32_from_b32(result_bits, ok)
+}
+
+_216___rgo_6d617468__mul_i32: (x_bits: b32, ok:(i32), y_bits: b32){
+    _219___rgo_6d617468__mul_i32: _218___rgo_6d617468__mul_i32(ok)
+    @mul_b32(x_bits, y_bits, _219___rgo_6d617468__mul_i32)
+}
+
+_214___rgo_6d617468__mul_i32: (y: i32, ok:(i32), x_bits: b32){
+    _220___rgo_6d617468__mul_i32: _216___rgo_6d617468__mul_i32(x_bits, ok)
+    @b32_from_i32(y, _220___rgo_6d617468__mul_i32)
+}
+
+__rgo_6d617468__mul_i32: (x: i32, y: i32, ok:(i32)){
+    _221___rgo_6d617468__mul_i32: _214___rgo_6d617468__mul_i32(y, ok)
+    @b32_from_i32(x, _221___rgo_6d617468__mul_i32)
+}
+_228___rgo_6d617468__mul_u32: (ok:(u32), result_bits: b32){
+    @u32_from_b32(result_bits, ok)
+}
+
+_226___rgo_6d617468__mul_u32: (x_bits: b32, ok:(u32), y_bits: b32){
+    _229___rgo_6d617468__mul_u32: _228___rgo_6d617468__mul_u32(ok)
+    @mul_b32(x_bits, y_bits, _229___rgo_6d617468__mul_u32)
+}
+
+_224___rgo_6d617468__mul_u32: (y: u32, ok:(u32), x_bits: b32){
+    _230___rgo_6d617468__mul_u32: _226___rgo_6d617468__mul_u32(x_bits, ok)
+    @b32_from_u32(y, _230___rgo_6d617468__mul_u32)
+}
+
+__rgo_6d617468__mul_u32: (x: u32, y: u32, ok:(u32)){
+    _231___rgo_6d617468__mul_u32: _224___rgo_6d617468__mul_u32(y, ok)
+    @b32_from_u32(x, _231___rgo_6d617468__mul_u32)
+}
+_238___rgo_6d617468__mul_i64: (ok:(i64), result_bits: b64){
+    @i64_from_b64(result_bits, ok)
+}
+
+_236___rgo_6d617468__mul_i64: (x_bits: b64, ok:(i64), y_bits: b64){
+    _239___rgo_6d617468__mul_i64: _238___rgo_6d617468__mul_i64(ok)
+    @mul_b64(x_bits, y_bits, _239___rgo_6d617468__mul_i64)
+}
+
+_234___rgo_6d617468__mul_i64: (y: i64, ok:(i64), x_bits: b64){
+    _240___rgo_6d617468__mul_i64: _236___rgo_6d617468__mul_i64(x_bits, ok)
+    @b64_from_i64(y, _240___rgo_6d617468__mul_i64)
+}
+
+__rgo_6d617468__mul_i64: (x: i64, y: i64, ok:(i64)){
+    _241___rgo_6d617468__mul_i64: _234___rgo_6d617468__mul_i64(y, ok)
+    @b64_from_i64(x, _241___rgo_6d617468__mul_i64)
+}
+_248___rgo_6d617468__mul_u64: (ok:(u64), result_bits: b64){
+    @u64_from_b64(result_bits, ok)
+}
+
+_246___rgo_6d617468__mul_u64: (x_bits: b64, ok:(u64), y_bits: b64){
+    _249___rgo_6d617468__mul_u64: _248___rgo_6d617468__mul_u64(ok)
+    @mul_b64(x_bits, y_bits, _249___rgo_6d617468__mul_u64)
+}
+
+_244___rgo_6d617468__mul_u64: (y: u64, ok:(u64), x_bits: b64){
+    _250___rgo_6d617468__mul_u64: _246___rgo_6d617468__mul_u64(x_bits, ok)
+    @b64_from_u64(y, _250___rgo_6d617468__mul_u64)
+}
+
+__rgo_6d617468__mul_u64: (x: u64, y: u64, ok:(u64)){
+    _251___rgo_6d617468__mul_u64: _244___rgo_6d617468__mul_u64(y, ok)
+    @b64_from_u64(x, _251___rgo_6d617468__mul_u64)
+}
+_258___rgo_6d617468__mul_i128: (ok:(i128), result_bits: b128){
+    @i128_from_b128(result_bits, ok)
+}
+
+_256___rgo_6d617468__mul_i128: (x_bits: b128, ok:(i128), y_bits: b128){
+    _259___rgo_6d617468__mul_i128: _258___rgo_6d617468__mul_i128(ok)
+    @mul_b128(x_bits, y_bits, _259___rgo_6d617468__mul_i128)
+}
+
+_254___rgo_6d617468__mul_i128: (y: i128, ok:(i128), x_bits: b128){
+    _260___rgo_6d617468__mul_i128: _256___rgo_6d617468__mul_i128(x_bits, ok)
+    @b128_from_i128(y, _260___rgo_6d617468__mul_i128)
+}
+
+__rgo_6d617468__mul_i128: (x: i128, y: i128, ok:(i128)){
+    _261___rgo_6d617468__mul_i128: _254___rgo_6d617468__mul_i128(y, ok)
+    @b128_from_i128(x, _261___rgo_6d617468__mul_i128)
+}
+_268___rgo_6d617468__mul_u128: (ok:(u128), result_bits: b128){
+    @u128_from_b128(result_bits, ok)
+}
+
+_266___rgo_6d617468__mul_u128: (x_bits: b128, ok:(u128), y_bits: b128){
+    _269___rgo_6d617468__mul_u128: _268___rgo_6d617468__mul_u128(ok)
+    @mul_b128(x_bits, y_bits, _269___rgo_6d617468__mul_u128)
+}
+
+_264___rgo_6d617468__mul_u128: (y: u128, ok:(u128), x_bits: b128){
+    _270___rgo_6d617468__mul_u128: _266___rgo_6d617468__mul_u128(x_bits, ok)
+    @b128_from_u128(y, _270___rgo_6d617468__mul_u128)
+}
+
+__rgo_6d617468__mul_u128: (x: u128, y: u128, ok:(u128)){
+    _271___rgo_6d617468__mul_u128: _264___rgo_6d617468__mul_u128(y, ok)
+    @b128_from_u128(x, _271___rgo_6d617468__mul_u128)
+}
+_278___rgo_6d617468__sub_i8: (ok:(i8), result_bits: b8){
+    @i8_from_b8(result_bits, ok)
+}
+
+_276___rgo_6d617468__sub_i8: (x_bits: b8, ok:(i8), y_bits: b8){
+    _279___rgo_6d617468__sub_i8: _278___rgo_6d617468__sub_i8(ok)
+    @sub_b8(x_bits, y_bits, _279___rgo_6d617468__sub_i8)
+}
+
+_274___rgo_6d617468__sub_i8: (y: i8, ok:(i8), x_bits: b8){
+    _280___rgo_6d617468__sub_i8: _276___rgo_6d617468__sub_i8(x_bits, ok)
+    @b8_from_i8(y, _280___rgo_6d617468__sub_i8)
+}
+
+__rgo_6d617468__sub_i8: (x: i8, y: i8, ok:(i8)){
+    _281___rgo_6d617468__sub_i8: _274___rgo_6d617468__sub_i8(y, ok)
+    @b8_from_i8(x, _281___rgo_6d617468__sub_i8)
+}
+_288___rgo_6d617468__sub_u8: (ok:(u8), result_bits: b8){
+    @u8_from_b8(result_bits, ok)
+}
+
+_286___rgo_6d617468__sub_u8: (x_bits: b8, ok:(u8), y_bits: b8){
+    _289___rgo_6d617468__sub_u8: _288___rgo_6d617468__sub_u8(ok)
+    @sub_b8(x_bits, y_bits, _289___rgo_6d617468__sub_u8)
+}
+
+_284___rgo_6d617468__sub_u8: (y: u8, ok:(u8), x_bits: b8){
+    _290___rgo_6d617468__sub_u8: _286___rgo_6d617468__sub_u8(x_bits, ok)
+    @b8_from_u8(y, _290___rgo_6d617468__sub_u8)
+}
+
+__rgo_6d617468__sub_u8: (x: u8, y: u8, ok:(u8)){
+    _291___rgo_6d617468__sub_u8: _284___rgo_6d617468__sub_u8(y, ok)
+    @b8_from_u8(x, _291___rgo_6d617468__sub_u8)
+}
+_298___rgo_6d617468__sub_i32: (ok:(i32), result_bits: b32){
+    @i32_from_b32(result_bits, ok)
+}
+
+_296___rgo_6d617468__sub_i32: (x_bits: b32, ok:(i32), y_bits: b32){
+    _299___rgo_6d617468__sub_i32: _298___rgo_6d617468__sub_i32(ok)
+    @sub_b32(x_bits, y_bits, _299___rgo_6d617468__sub_i32)
+}
+
+_294___rgo_6d617468__sub_i32: (y: i32, ok:(i32), x_bits: b32){
+    _300___rgo_6d617468__sub_i32: _296___rgo_6d617468__sub_i32(x_bits, ok)
+    @b32_from_i32(y, _300___rgo_6d617468__sub_i32)
+}
+
+__rgo_6d617468__sub_i32: (x: i32, y: i32, ok:(i32)){
+    _301___rgo_6d617468__sub_i32: _294___rgo_6d617468__sub_i32(y, ok)
+    @b32_from_i32(x, _301___rgo_6d617468__sub_i32)
+}
+_308___rgo_6d617468__sub_u32: (ok:(u32), result_bits: b32){
+    @u32_from_b32(result_bits, ok)
+}
+
+_306___rgo_6d617468__sub_u32: (x_bits: b32, ok:(u32), y_bits: b32){
+    _309___rgo_6d617468__sub_u32: _308___rgo_6d617468__sub_u32(ok)
+    @sub_b32(x_bits, y_bits, _309___rgo_6d617468__sub_u32)
+}
+
+_304___rgo_6d617468__sub_u32: (y: u32, ok:(u32), x_bits: b32){
+    _310___rgo_6d617468__sub_u32: _306___rgo_6d617468__sub_u32(x_bits, ok)
+    @b32_from_u32(y, _310___rgo_6d617468__sub_u32)
+}
+
+__rgo_6d617468__sub_u32: (x: u32, y: u32, ok:(u32)){
+    _311___rgo_6d617468__sub_u32: _304___rgo_6d617468__sub_u32(y, ok)
+    @b32_from_u32(x, _311___rgo_6d617468__sub_u32)
+}
+_318___rgo_6d617468__sub_i64: (ok:(i64), result_bits: b64){
+    @i64_from_b64(result_bits, ok)
+}
+
+_316___rgo_6d617468__sub_i64: (x_bits: b64, ok:(i64), y_bits: b64){
+    _319___rgo_6d617468__sub_i64: _318___rgo_6d617468__sub_i64(ok)
+    @sub_b64(x_bits, y_bits, _319___rgo_6d617468__sub_i64)
+}
+
+_314___rgo_6d617468__sub_i64: (y: i64, ok:(i64), x_bits: b64){
+    _320___rgo_6d617468__sub_i64: _316___rgo_6d617468__sub_i64(x_bits, ok)
+    @b64_from_i64(y, _320___rgo_6d617468__sub_i64)
+}
+
+__rgo_6d617468__sub_i64: (x: i64, y: i64, ok:(i64)){
+    _321___rgo_6d617468__sub_i64: _314___rgo_6d617468__sub_i64(y, ok)
+    @b64_from_i64(x, _321___rgo_6d617468__sub_i64)
+}
+_328___rgo_6d617468__sub_u64: (ok:(u64), result_bits: b64){
+    @u64_from_b64(result_bits, ok)
+}
+
+_326___rgo_6d617468__sub_u64: (x_bits: b64, ok:(u64), y_bits: b64){
+    _329___rgo_6d617468__sub_u64: _328___rgo_6d617468__sub_u64(ok)
+    @sub_b64(x_bits, y_bits, _329___rgo_6d617468__sub_u64)
+}
+
+_324___rgo_6d617468__sub_u64: (y: u64, ok:(u64), x_bits: b64){
+    _330___rgo_6d617468__sub_u64: _326___rgo_6d617468__sub_u64(x_bits, ok)
+    @b64_from_u64(y, _330___rgo_6d617468__sub_u64)
+}
+
+__rgo_6d617468__sub_u64: (x: u64, y: u64, ok:(u64)){
+    _331___rgo_6d617468__sub_u64: _324___rgo_6d617468__sub_u64(y, ok)
+    @b64_from_u64(x, _331___rgo_6d617468__sub_u64)
+}
+_338___rgo_6d617468__sub_i128: (ok:(i128), result_bits: b128){
+    @i128_from_b128(result_bits, ok)
+}
+
+_336___rgo_6d617468__sub_i128: (x_bits: b128, ok:(i128), y_bits: b128){
+    _339___rgo_6d617468__sub_i128: _338___rgo_6d617468__sub_i128(ok)
+    @sub_b128(x_bits, y_bits, _339___rgo_6d617468__sub_i128)
+}
+
+_334___rgo_6d617468__sub_i128: (y: i128, ok:(i128), x_bits: b128){
+    _340___rgo_6d617468__sub_i128: _336___rgo_6d617468__sub_i128(x_bits, ok)
+    @b128_from_i128(y, _340___rgo_6d617468__sub_i128)
+}
+
+__rgo_6d617468__sub_i128: (x: i128, y: i128, ok:(i128)){
+    _341___rgo_6d617468__sub_i128: _334___rgo_6d617468__sub_i128(y, ok)
+    @b128_from_i128(x, _341___rgo_6d617468__sub_i128)
+}
+_348___rgo_6d617468__sub_u128: (ok:(u128), result_bits: b128){
+    @u128_from_b128(result_bits, ok)
+}
+
+_346___rgo_6d617468__sub_u128: (x_bits: b128, ok:(u128), y_bits: b128){
+    _349___rgo_6d617468__sub_u128: _348___rgo_6d617468__sub_u128(ok)
+    @sub_b128(x_bits, y_bits, _349___rgo_6d617468__sub_u128)
+}
+
+_344___rgo_6d617468__sub_u128: (y: u128, ok:(u128), x_bits: b128){
+    _350___rgo_6d617468__sub_u128: _346___rgo_6d617468__sub_u128(x_bits, ok)
+    @b128_from_u128(y, _350___rgo_6d617468__sub_u128)
+}
+
+__rgo_6d617468__sub_u128: (x: u128, y: u128, ok:(u128)){
+    _351___rgo_6d617468__sub_u128: _344___rgo_6d617468__sub_u128(y, ok)
+    @b128_from_u128(x, _351___rgo_6d617468__sub_u128)
+}
+_354_expect_zero_i128: (unexpected: i128){
+    _355: 1
+    @exit(_355)
+}
+
+expect_zero_i128: (value: i128, ok:()){
+    _352: 1
+    __rgo_6d617468__div_i128(_352, value, ok, _354_expect_zero_i128)
+}
+_359_expect_zero_u128: (unexpected: u128){
+    _360: 1
+    @exit(_360)
+}
+
+expect_zero_u128: (value: u128, ok:()){
+    _357: 1
+    __rgo_6d617468__div_u128(_357, value, ok, _359_expect_zero_u128)
+}
+
+_363_expect_zero_128: (unsigned_value: u128, ok:()){
+    expect_zero_u128(unsigned_value, ok)
+}
+
+expect_zero_128: (signed_value: i128, unsigned_value: u128, ok:()){
+    _364_expect_zero_128: _363_expect_zero_128(unsigned_value, ok)
+    expect_zero_i128(signed_value, _364_expect_zero_128)
+}
+_412_test_add: (second: str, ok:()){
+    @write(second, ok)
+}
+
+_410_test_add: (first: str, second: str, ok:()){
+    _413_test_add: _412_test_add(second, ok)
+    @write(first, _413_test_add)
+}
+
+_408_test_add: (i128_difference: i128, u128_difference: u128, first: str, ok:(), second: str){
+    _414_test_add: _410_test_add(first, second, ok)
+    expect_zero_128(i128_difference, u128_difference, _414_test_add)
+}
+
+_405_test_add: (i64_result: i64, u64_result: u64, i128_difference: i128, u128_difference: u128, ok:(), first: str){
+    _406: "%d %u 128 ok\n"
+    _415_test_add: _408_test_add(i128_difference, u128_difference, first, ok)
+    @sprintf(_406, i64_result, u64_result, _415_test_add)
+}
+
+_402_test_add: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, i128_difference: i128, ok:(), u128_difference: u128){
+    _403: "add: %d %u %d %u "
+    _416_test_add: _405_test_add(i64_result, u64_result, i128_difference, u128_difference, ok)
+    @sprintf(_403, i8_result, u8_result, i32_result, u32_result, _416_test_add)
+}
+
+_399_test_add: (u128_result: u128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_difference: i128){
+    _400: 12000000000
+    _417_test_add: _402_test_add(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, i128_difference, ok)
+    __rgo_6d617468__sub_u128(u128_result, _400, _417_test_add)
+}
+
+_396_test_add: (i128_result: i128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), u128_result: u128){
+    _397: 10000000000
+    _418_test_add: _399_test_add(u128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_i128(i128_result, _397, _418_test_add)
+}
+
+_392_test_add: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_result: i128){
+    _393: 6000000000
+    _394: 6000000000
+    _419_test_add: _396_test_add(i128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__add_u128(_393, _394, _419_test_add)
+}
+
+_388_test_add: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, ok:(), u64_result: u64){
+    _389: 5000000000
+    _390: 5000000000
+    _420_test_add: _392_test_add(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__add_i128(_389, _390, _420_test_add)
+}
+
+_384_test_add: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, ok:(), i64_result: i64){
+    _385: 11
+    _386: 12
+    _421_test_add: _388_test_add(i8_result, u8_result, i32_result, u32_result, i64_result, ok)
+    __rgo_6d617468__add_u64(_385, _386, _421_test_add)
+}
+
+_380_test_add: (i8_result: i8, u8_result: u8, i32_result: i32, ok:(), u32_result: u32){
+    _381: 10
+    _382: 11
+    _422_test_add: _384_test_add(i8_result, u8_result, i32_result, u32_result, ok)
+    __rgo_6d617468__add_i64(_381, _382, _422_test_add)
+}
+
+_376_test_add: (i8_result: i8, u8_result: u8, ok:(), i32_result: i32){
+    _377: 4294967290
+    _378: 10
+    _423_test_add: _380_test_add(i8_result, u8_result, i32_result, ok)
+    __rgo_6d617468__add_u32(_377, _378, _423_test_add)
+}
+
+_372_test_add: (i8_result: i8, ok:(), u8_result: u8){
+    _373: 2147483640
+    _374: 10
+    _424_test_add: _376_test_add(i8_result, u8_result, ok)
+    __rgo_6d617468__add_i32(_373, _374, _424_test_add)
+}
+
+_368_test_add: (ok:(), i8_result: i8){
+    _369: 250
+    _370: 10
+    _425_test_add: _372_test_add(i8_result, ok)
+    __rgo_6d617468__add_u8(_369, _370, _425_test_add)
+}
+
+test_add: (ok:()){
+    _365: 120
+    _366: 20
+    _426_test_add: _368_test_add(ok)
+    __rgo_6d617468__add_i8(_365, _366, _426_test_add)
+}
+_477_test_sub: (second: str, ok:()){
+    @write(second, ok)
+}
+
+_475_test_sub: (first: str, second: str, ok:()){
+    _478_test_sub: _477_test_sub(second, ok)
+    @write(first, _478_test_sub)
+}
+
+_473_test_sub: (i128_difference: i128, u128_difference: u128, first: str, ok:(), second: str){
+    _479_test_sub: _475_test_sub(first, second, ok)
+    expect_zero_128(i128_difference, u128_difference, _479_test_sub)
+}
+
+_470_test_sub: (i64_result: i64, u64_result: u64, i128_difference: i128, u128_difference: u128, ok:(), first: str){
+    _471: "%d %u 128 ok\n"
+    _480_test_sub: _473_test_sub(i128_difference, u128_difference, first, ok)
+    @sprintf(_471, i64_result, u64_result, _480_test_sub)
+}
+
+_467_test_sub: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, i128_difference: i128, ok:(), u128_difference: u128){
+    _468: "sub: %d %u %d %u "
+    _481_test_sub: _470_test_sub(i64_result, u64_result, i128_difference, u128_difference, ok)
+    @sprintf(_468, i8_result, u8_result, i32_result, u32_result, _481_test_sub)
+}
+
+_464_test_sub: (u128_result: u128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_difference: i128){
+    _465: 1000000000
+    _482_test_sub: _467_test_sub(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, i128_difference, ok)
+    __rgo_6d617468__sub_u128(u128_result, _465, _482_test_sub)
+}
+
+_462_test_sub: (i128_result: i128, u128_result: u128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_expected: i128){
+    _483_test_sub: _464_test_sub(u128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_i128(i128_result, i128_expected, _483_test_sub)
+}
+
+_458_test_sub: (i128_result: i128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), u128_result: u128){
+    _459: 0
+    _460: 1000000000
+    _484_test_sub: _462_test_sub(i128_result, u128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_i128(_459, _460, _484_test_sub)
+}
+
+_454_test_sub: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_result: i128){
+    _455: 6000000000
+    _456: 5000000000
+    _485_test_sub: _458_test_sub(i128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_u128(_455, _456, _485_test_sub)
+}
+
+_450_test_sub: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, ok:(), u64_result: u64){
+    _451: 5000000000
+    _452: 6000000000
+    _486_test_sub: _454_test_sub(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_i128(_451, _452, _486_test_sub)
+}
+
+_446_test_sub: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, ok:(), i64_result: i64){
+    _447: 20
+    _448: 10
+    _487_test_sub: _450_test_sub(i8_result, u8_result, i32_result, u32_result, i64_result, ok)
+    __rgo_6d617468__sub_u64(_447, _448, _487_test_sub)
+}
+
+_442_test_sub: (i8_result: i8, u8_result: u8, i32_result: i32, ok:(), u32_result: u32){
+    _443: 20
+    _444: 10
+    _488_test_sub: _446_test_sub(i8_result, u8_result, i32_result, u32_result, ok)
+    __rgo_6d617468__sub_i64(_443, _444, _488_test_sub)
+}
+
+_438_test_sub: (i8_result: i8, u8_result: u8, ok:(), i32_result: i32){
+    _439: 10
+    _440: 20
+    _489_test_sub: _442_test_sub(i8_result, u8_result, i32_result, ok)
+    __rgo_6d617468__sub_u32(_439, _440, _489_test_sub)
+}
+
+_434_test_sub: (i8_result: i8, ok:(), u8_result: u8){
+    _435: 10
+    _436: 20
+    _490_test_sub: _438_test_sub(i8_result, u8_result, ok)
+    __rgo_6d617468__sub_i32(_435, _436, _490_test_sub)
+}
+
+_430_test_sub: (ok:(), i8_result: i8){
+    _431: 10
+    _432: 20
+    _491_test_sub: _434_test_sub(i8_result, ok)
+    __rgo_6d617468__sub_u8(_431, _432, _491_test_sub)
+}
+
+test_sub: (ok:()){
+    _427: 10
+    _428: 20
+    _492_test_sub: _430_test_sub(ok)
+    __rgo_6d617468__sub_i8(_427, _428, _492_test_sub)
+}
+_527_test_mul: (){
+    _528: 1
+    @exit(_528)
+}
+_534_test_mul: (){
+    _535: 1
+    @exit(_535)
+}
+_554_test_mul: (second: str, ok:()){
+    @write(second, ok)
+}
+
+_552_test_mul: (first: str, second: str, ok:()){
+    _555_test_mul: _554_test_mul(second, ok)
+    @write(first, _555_test_mul)
+}
+
+_550_test_mul: (i128_difference: i128, u128_difference: u128, first: str, ok:(), second: str){
+    _556_test_mul: _552_test_mul(first, second, ok)
+    expect_zero_128(i128_difference, u128_difference, _556_test_mul)
+}
+
+_547_test_mul: (i64_result: i64, u64_result: u64, i128_difference: i128, u128_difference: u128, ok:(), first: str){
+    _548: "%d %u 128 ok\n"
+    _557_test_mul: _550_test_mul(i128_difference, u128_difference, first, ok)
+    @sprintf(_548, i64_result, u64_result, _557_test_mul)
+}
+
+_544_test_mul: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, i128_difference: i128, ok:(), u128_difference: u128){
+    _545: "mul: %d %u %d %u "
+    _558_test_mul: _547_test_mul(i64_result, u64_result, i128_difference, u128_difference, ok)
+    @sprintf(_545, i8_result, u8_result, i32_result, u32_result, _558_test_mul)
+}
+
+_541_test_mul: (u128_factor: u128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_difference: i128){
+    _542: 6000000000
+    _559_test_mul: _544_test_mul(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, i128_difference, ok)
+    __rgo_6d617468__sub_u128(u128_factor, _542, _559_test_mul)
+}
+
+_538_test_mul: (i128_factor: i128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), u128_factor: u128){
+    _539: 5000000000
+    _560_test_mul: _541_test_mul(u128_factor, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_i128(i128_factor, _539, _560_test_mul)
+}
+
+_531_test_mul: (u128_result: u128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_factor: i128){
+    _532: 6000000000
+    _561_test_mul: _538_test_mul(i128_factor, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__div_u128(u128_result, _532, _534_test_mul, _561_test_mul)
+}
+
+_524_test_mul: (i128_result: i128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), u128_result: u128){
+    _525: 5000000000
+    _562_test_mul: _531_test_mul(u128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__div_i128(i128_result, _525, _527_test_mul, _562_test_mul)
+}
+
+_520_test_mul: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_result: i128){
+    _521: 6000000000
+    _522: 6000000000
+    _563_test_mul: _524_test_mul(i128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__mul_u128(_521, _522, _563_test_mul)
+}
+
+_516_test_mul: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, ok:(), u64_result: u64){
+    _517: 5000000000
+    _518: 5000000000
+    _564_test_mul: _520_test_mul(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__mul_i128(_517, _518, _564_test_mul)
+}
+
+_512_test_mul: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, ok:(), i64_result: i64){
+    _513: 11
+    _514: 12
+    _565_test_mul: _516_test_mul(i8_result, u8_result, i32_result, u32_result, i64_result, ok)
+    __rgo_6d617468__mul_u64(_513, _514, _565_test_mul)
+}
+
+_508_test_mul: (i8_result: i8, u8_result: u8, i32_result: i32, ok:(), u32_result: u32){
+    _509: 10
+    _510: 11
+    _566_test_mul: _512_test_mul(i8_result, u8_result, i32_result, u32_result, ok)
+    __rgo_6d617468__mul_i64(_509, _510, _566_test_mul)
+}
+
+_504_test_mul: (i8_result: i8, u8_result: u8, ok:(), i32_result: i32){
+    _505: 100000
+    _506: 100000
+    _567_test_mul: _508_test_mul(i8_result, u8_result, i32_result, ok)
+    __rgo_6d617468__mul_u32(_505, _506, _567_test_mul)
+}
+
+_500_test_mul: (i8_result: i8, ok:(), u8_result: u8){
+    _501: 50000
+    _502: 50000
+    _568_test_mul: _504_test_mul(i8_result, u8_result, ok)
+    __rgo_6d617468__mul_i32(_501, _502, _568_test_mul)
+}
+
+_496_test_mul: (ok:(), i8_result: i8){
+    _497: 20
+    _498: 20
+    _569_test_mul: _500_test_mul(i8_result, ok)
+    __rgo_6d617468__mul_u8(_497, _498, _569_test_mul)
+}
+
+test_mul: (ok:()){
+    _493: 20
+    _494: 10
+    _570_test_mul: _496_test_mul(ok)
+    __rgo_6d617468__mul_i8(_493, _494, _570_test_mul)
+}
+_573_division_error: (){
+    _574: 1
+    @exit(_574)
+}
+
+division_error: (){
+    _571: "unexpected division error\n"
+    @write(_571, _573_division_error)
+}
+_638_test_div: (second: str, ok:()){
+    @write(second, ok)
+}
+
+_636_test_div: (first: str, second: str, ok:()){
+    _639_test_div: _638_test_div(second, ok)
+    @write(first, _639_test_div)
+}
+
+_634_test_div: (i128_difference: i128, u128_difference: u128, first: str, ok:(), second: str){
+    _640_test_div: _636_test_div(first, second, ok)
+    expect_zero_128(i128_difference, u128_difference, _640_test_div)
+}
+
+_631_test_div: (i64_result: i64, u64_result: u64, i128_difference: i128, u128_difference: u128, ok:(), first: str){
+    _632: "%d %u 128 ok\n"
+    _641_test_div: _634_test_div(i128_difference, u128_difference, first, ok)
+    @sprintf(_632, i64_result, u64_result, _641_test_div)
+}
+
+_628_test_div: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, i128_difference: i128, ok:(), u128_difference: u128){
+    _629: "div: %d %u %d %u "
+    _642_test_div: _631_test_div(i64_result, u64_result, i128_difference, u128_difference, ok)
+    @sprintf(_629, i8_result, u8_result, i32_result, u32_result, _642_test_div)
+}
+
+_625_test_div: (u128_result: u128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_difference: i128){
+    _626: 6
+    _643_test_div: _628_test_div(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, i128_difference, ok)
+    __rgo_6d617468__sub_u128(u128_result, _626, _643_test_div)
+}
+
+_623_test_div: (i128_result: i128, u128_result: u128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_expected: i128){
+    _644_test_div: _625_test_div(u128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_i128(i128_result, i128_expected, _644_test_div)
+}
+
+_619_test_div: (i128_result: i128, i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), u128_result: u128){
+    _620: 0
+    _621: 5
+    _645_test_div: _623_test_div(i128_result, u128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_i128(_620, _621, _645_test_div)
+}
+
+_615_test_div: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_result: i128){
+    _616: 36000000000
+    _617: 6000000000
+    _646_test_div: _619_test_div(i128_result, i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__div_u128(_616, _617, division_error, _646_test_div)
+}
+
+_612_test_div: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, u64_result: u64, ok:(), i128_dividend: i128){
+    _613: 5000000000
+    _647_test_div: _615_test_div(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__div_i128(i128_dividend, _613, division_error, _647_test_div)
+}
+
+_608_test_div: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, i64_result: i64, ok:(), u64_result: u64){
+    _609: 0
+    _610: 25000000000
+    _648_test_div: _612_test_div(i8_result, u8_result, i32_result, u32_result, i64_result, u64_result, ok)
+    __rgo_6d617468__sub_i128(_609, _610, _648_test_div)
+}
+
+_604_test_div: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, ok:(), i64_result: i64){
+    _605: 6000000000
+    _606: 3
+    _649_test_div: _608_test_div(i8_result, u8_result, i32_result, u32_result, i64_result, ok)
+    __rgo_6d617468__div_u64(_605, _606, division_error, _649_test_div)
+}
+
+_601_test_div: (i8_result: i8, u8_result: u8, i32_result: i32, u32_result: u32, ok:(), i64_dividend: i64){
+    _602: 10
+    _650_test_div: _604_test_div(i8_result, u8_result, i32_result, u32_result, ok)
+    __rgo_6d617468__div_i64(i64_dividend, _602, division_error, _650_test_div)
+}
+
+_597_test_div: (i8_result: i8, u8_result: u8, i32_result: i32, ok:(), u32_result: u32){
+    _598: 0
+    _599: 10000000000
+    _651_test_div: _601_test_div(i8_result, u8_result, i32_result, u32_result, ok)
+    __rgo_6d617468__sub_i64(_598, _599, _651_test_div)
+}
+
+_593_test_div: (i8_result: i8, u8_result: u8, ok:(), i32_result: i32){
+    _594: 4000000000
+    _595: 10
+    _652_test_div: _597_test_div(i8_result, u8_result, i32_result, ok)
+    __rgo_6d617468__div_u32(_594, _595, division_error, _652_test_div)
+}
+
+_590_test_div: (i8_result: i8, u8_result: u8, ok:(), i32_dividend: i32){
+    _591: 10
+    _653_test_div: _593_test_div(i8_result, u8_result, ok)
+    __rgo_6d617468__div_i32(i32_dividend, _591, division_error, _653_test_div)
+}
+
+_586_test_div: (i8_result: i8, ok:(), u8_result: u8){
+    _587: 0
+    _588: 100000
+    _654_test_div: _590_test_div(i8_result, u8_result, ok)
+    __rgo_6d617468__sub_i32(_587, _588, _654_test_div)
+}
+
+_582_test_div: (ok:(), i8_result: i8){
+    _583: 200
+    _584: 3
+    _655_test_div: _586_test_div(i8_result, ok)
+    __rgo_6d617468__div_u8(_583, _584, division_error, _655_test_div)
+}
+
+_579_test_div: (ok:(), i8_dividend: i8){
+    _580: 3
+    _656_test_div: _582_test_div(ok)
+    __rgo_6d617468__div_i8(i8_dividend, _580, division_error, _656_test_div)
+}
+
+test_div: (ok:()){
+    _576: 0
+    _577: 100
+    _657_test_div: _579_test_div(ok)
+    __rgo_6d617468__sub_i8(_576, _577, _657_test_div)
+}
+_661_test_div_zero: (unexpected: u8){
+    _662: 1
+    @exit(_662)
+}
+
+test_div_zero: (ok:()){
+    _658: 1
+    _659: 0
+    __rgo_6d617468__div_u8(_658, _659, ok, _661_test_div_zero)
+}
+_673_main: (){
+    _674: 0
+    @exit(_674)
+}
+
+_671_main: (){
+    test_div_zero(_673_main)
+}
+
+_669_main: (){
+    test_div(_671_main)
+}
+
+_667_main: (){
+    test_mul(_669_main)
+}
+
+_665_main: (){
+    test_sub(_667_main)
+}
+
+main: (){
+    test_add(_665_main)
+}
+main()

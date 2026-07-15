@@ -1,17 +1,23 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+list: ((int, list), ())
+_14: 1
+_15: 2
+_16: 3
+_17: 4
+_18_cons: cons(_17, nil)
+_19_cons: cons(_16, _18_cons)
+_20_cons: cons(_15, _19_cons)
+_22___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _23___rgo_7374646f7574__printf: _22___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _23___rgo_7374646f7574__printf)
 }
-exit: @exit
-list: ((int, list), ())
+
 nil: (next:(int, ((int, list), ())), end:()){
     end()
 }
@@ -20,51 +26,40 @@ cons: (head: int, tail:((int, list), ()), next:(int, ((int, list), ())), end:())
     next(head, tail)
 }
 
-_14_iterate_iterate_inner: (iterate:((int, ()), ((int, ((int, list), ())), ()), ()), handler:(int, ()), end:(), head: int, tail:((int, list), ())){
+_30_iterate_iterate_inner: (iterate:((int, ()), ((int, ((int, list), ())), ()), ()), handler:(int, ()), end:(), head: int, tail:((int, list), ())){
     next_iterate: iterate(handler, tail, end)
     handler(head, next_iterate)
 }
 
 iterate: (handler:(int, ()), arr:((int, list), ()), end:()){
-    _15_iterate_inner: _14_iterate_iterate_inner(iterate, handler, end)
-    arr(_15_iterate_inner, end)
+    _31_iterate_inner: _30_iterate_iterate_inner(iterate, handler, end)
+    arr(_31_iterate_inner, end)
 }
-_16: 1
-_17: 2
-_18: 3
-_19: 4
-_20_cons: cons(_19, nil)
-_21_cons: cons(_18, _20_cons)
-_22_cons: cons(_17, _21_cons)
-@sprintf: @sprintf
-@write: @write
-_25_handler: (ok:(), s: str){
+_34_handler: (ok:(), s: str){
     @write(s, ok)
 }
 
 handler: (n: int, ok:()){
-    _23: "%d, "
-    _26_handler: _25_handler(ok)
-    @sprintf(_23, n, _26_handler)
+    _32: "%d, "
+    _35_handler: _34_handler(ok)
+    @sprintf(_32, n, _35_handler)
 }
-@sprintf: @sprintf
-@write: @write
-_31_end: (){
-    _32: 0
-    exit(_32)
+_40_end: (){
+    _41: 0
+    @exit(_41)
 }
 
-_29_end: (s: str){
-    @write(s, _31_end)
+_38_end: (s: str){
+    @write(s, _40_end)
 }
 
 end: (){
-    _27: "end\n"
-    @sprintf(_27, _29_end)
+    _36: "end\n"
+    @sprintf(_36, _38_end)
 }
 
-main: (mylist:((int, ((int, ((int, list), ())), ())), ())){
+main: (mylist:((int, ((int, ((int, ((int, list), ())), ())), ())), ())){
     iterate(handler, mylist, end)
 }
-mylist: cons(_16, _22_cons)
+mylist: cons(_14, _20_cons)
 main(mylist)

@@ -6,7 +6,7 @@ _48_main:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
-    mov rdi, 0 ; exit code
+    mov rdi, 0 ; operand literal
     call exit ; call libc exit to flush buffers
 global release_heap_ptr
 release_heap_ptr:
@@ -89,17 +89,8 @@ _46_main:
     mov rax, [rbp-8] ; load operand
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-_46_main_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je _46_main_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp _46_main_write_strlen_loop_0
-_46_main_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-16] ; load continuation env_end pointer
@@ -176,23 +167,27 @@ _43_main:
     mov rax, r12 ; copy _46_main closure env_end to rax
     mov [rbp-16], rax ; store value
     mov rax, [rbp-8] ; load operand
+    mov rax, [rax] ; string data pointer for libc
     push rax ; stack arg
     lea rax, [rel _44] ; point to string literal
+    mov rax, [rax] ; string data pointer for libc
     push rax ; stack arg
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 1024 ; length for allocation
+    mov rsi, 1040 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
     mov rbx, rax ; keep sprintf buffer pointer
+    lea r15, [rbx+1024] ; descriptor after sprintf buffer
     pop rdi ; restore arg into register
     pop rsi ; restore arg into register
     mov rdx, rsi ; shift sprintf args for buffer insertion
     mov rsi, rdi ; shift sprintf args for buffer insertion
     mov rdi, rbx ; destination buffer for sprintf
+    xor eax, eax ; no vector arguments for variadic sprintf
     push rbp ; helper prologue
     mov rbp, rsp
     push r12
@@ -204,7 +199,9 @@ _43_main:
     add rsp, r12
     pop r12
     pop rbp
-    mov rax, rbx ; return formatted string pointer
+    mov [r15], rbx ; store formatted data pointer
+    mov [r15+8], rax ; store formatted byte length
+    mov rax, r15 ; return formatted string descriptor
     mov r12, [rbp-16] ; load continuation env_end pointer
     mov [r12-8], rax ; store env field
     mov rax, [r12+0] ; load continuation entry point
@@ -254,7 +251,7 @@ _59_main:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
-    mov rdi, 0 ; exit code
+    mov rdi, 0 ; operand literal
     call exit ; call libc exit to flush buffers
 global _59_main_unwrapper
 _59_main_unwrapper:
@@ -321,17 +318,8 @@ _57_main:
     mov rax, [rbp-8] ; load operand
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-_57_main_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je _57_main_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp _57_main_write_strlen_loop_0
-_57_main_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-16] ; load continuation env_end pointer
@@ -407,19 +395,22 @@ _54_main:
     mov rax, r12 ; copy _57_main closure env_end to rax
     mov [rbp-8], rax ; store value
     lea rax, [rel _55] ; point to string literal
+    mov rax, [rax] ; string data pointer for libc
     push rax ; stack arg
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 1024 ; length for allocation
+    mov rsi, 1040 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
     mov rbx, rax ; keep sprintf buffer pointer
+    lea r15, [rbx+1024] ; descriptor after sprintf buffer
     pop rdi ; restore arg into register
     mov rsi, rdi ; shift sprintf args for buffer insertion
     mov rdi, rbx ; destination buffer for sprintf
+    xor eax, eax ; no vector arguments for variadic sprintf
     push rbp ; helper prologue
     mov rbp, rsp
     push r12
@@ -431,7 +422,9 @@ _54_main:
     add rsp, r12
     pop r12
     pop rbp
-    mov rax, rbx ; return formatted string pointer
+    mov [r15], rbx ; store formatted data pointer
+    mov [r15+8], rax ; store formatted byte length
+    mov rax, r15 ; return formatted string descriptor
     mov r12, [rbp-8] ; load continuation env_end pointer
     mov [r12-8], rax ; store env field
     mov rax, [r12+0] ; load continuation entry point
@@ -719,17 +712,8 @@ _38_main:
     mov rax, [rbp-16] ; load operand
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-_38_main_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je _38_main_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp _38_main_write_strlen_loop_0
-_38_main_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-24] ; load continuation env_end pointer
@@ -870,21 +854,24 @@ _35_main:
     mov rax, [rbp-8] ; load operand
     push rax ; stack arg
     lea rax, [rel _36] ; point to string literal
+    mov rax, [rax] ; string data pointer for libc
     push rax ; stack arg
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 1024 ; length for allocation
+    mov rsi, 1040 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
     mov rbx, rax ; keep sprintf buffer pointer
+    lea r15, [rbx+1024] ; descriptor after sprintf buffer
     pop rdi ; restore arg into register
     pop rsi ; restore arg into register
     mov rdx, rsi ; shift sprintf args for buffer insertion
     mov rsi, rdi ; shift sprintf args for buffer insertion
     mov rdi, rbx ; destination buffer for sprintf
+    xor eax, eax ; no vector arguments for variadic sprintf
     push rbp ; helper prologue
     mov rbp, rsp
     push r12
@@ -896,7 +883,9 @@ _35_main:
     add rsp, r12
     pop r12
     pop rbp
-    mov rax, rbx ; return formatted string pointer
+    mov [r15], rbx ; store formatted data pointer
+    mov [r15+8], rax ; store formatted byte length
+    mov rax, r15 ; return formatted string descriptor
     mov r12, [rbp-24] ; load continuation env_end pointer
     mov [r12-8], rax ; store env field
     mov rax, [r12+0] ; load continuation entry point
@@ -1280,8 +1269,8 @@ _21_array3:
     mov rax, [rbp-8] ; load operand
     mov rbx, 2 ; operand literal
     cmp rax, rbx
-    je eq__25_array3_true_0_0
-eq_none_false_0_0:
+    je eq_int__25_array3_true_0_0
+eq_int_none_false_0_0:
     mov rdi, [rbp-40] ; load _25_array3 closure env_end pointer
     call release_heap_ptr ; release _25_array3 closure environment
     mov rbx, [rbp-32] ; load none closure env_end pointer
@@ -1289,7 +1278,7 @@ eq_none_false_0_0:
     mov rax, [rdi+0] ; load closure unwrapper entry point
     leave ; unwind before jumping
     jmp rax ; tail call into closure
-eq__25_array3_true_0_0:
+eq_int__25_array3_true_0_0:
     mov rdi, [rbp-32] ; load none closure env_end pointer
     call release_heap_ptr ; release none closure environment
     mov rbx, [rbp-40] ; load _25_array3 closure env_end pointer
@@ -1558,8 +1547,8 @@ _15_array3:
     mov rax, [rbp-8] ; load operand
     mov rbx, 1 ; operand literal
     cmp rax, rbx
-    je eq__19_array3_true_0_0
-eq__26_array3_false_0_0:
+    je eq_int__19_array3_true_0_0
+eq_int__26_array3_false_0_0:
     mov rdi, [rbp-48] ; load _19_array3 closure env_end pointer
     call release_heap_ptr ; release _19_array3 closure environment
     mov rbx, [rbp-56] ; load _26_array3 closure env_end pointer
@@ -1567,7 +1556,7 @@ eq__26_array3_false_0_0:
     mov rax, [rdi+0] ; load closure unwrapper entry point
     leave ; unwind before jumping
     jmp rax ; tail call into closure
-eq__19_array3_true_0_0:
+eq_int__19_array3_true_0_0:
     mov rdi, [rbp-56] ; load _26_array3 closure env_end pointer
     call release_heap_ptr ; release _26_array3 closure environment
     mov rbx, [rbp-48] ; load _19_array3 closure env_end pointer
@@ -1844,8 +1833,8 @@ _9_array3:
     mov rax, [rbp-32] ; load operand
     mov rbx, 0 ; operand literal
     cmp rax, rbx
-    je eq__13_array3_true_0_0
-eq__27_array3_false_0_0:
+    je eq_int__13_array3_true_0_0
+eq_int__27_array3_false_0_0:
     mov rdi, [rbp-56] ; load _13_array3 closure env_end pointer
     call release_heap_ptr ; release _13_array3 closure environment
     mov rbx, [rbp-64] ; load _27_array3 closure env_end pointer
@@ -1853,7 +1842,7 @@ eq__27_array3_false_0_0:
     mov rax, [rdi+0] ; load closure unwrapper entry point
     leave ; unwind before jumping
     jmp rax ; tail call into closure
-eq__13_array3_true_0_0:
+eq_int__13_array3_true_0_0:
     mov rdi, [rbp-64] ; load _27_array3 closure env_end pointer
     call release_heap_ptr ; release _27_array3 closure environment
     mov rbx, [rbp-56] ; load _13_array3 closure env_end pointer
@@ -2177,14 +2166,26 @@ extern sprintf
 extern write
 section .rodata
 _44:
+    dq _44_data, 25 ; string data pointer and byte length
+_44_data:
     db "element at index 1 is %s", 10, 0
 _55:
+    dq _55_data, 20 ; string data pointer and byte length
+_55_data:
     db "index out of bounds", 10, 0
 _36:
+    dq _36_data, 22 ; string data pointer and byte length
+_36_data:
     db "array has %d elements", 10, 0
 _29:
+    dq _29_data, 5 ; string data pointer and byte length
+_29_data:
     db "alice", 0
 _30:
+    dq _30_data, 3 ; string data pointer and byte length
+_30_data:
     db "bob", 0
 _31:
+    dq _31_data, 7 ; string data pointer and byte length
+_31_data:
     db "charlie", 0

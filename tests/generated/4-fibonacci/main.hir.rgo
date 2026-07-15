@@ -1,68 +1,60 @@
+__rgo_7374646f7574__str: @str
 str: @str
-exit: @exit
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_3___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _4___rgo_7374646f7574__printf: _3___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _4___rgo_7374646f7574__printf)
 }
-eqi: @eq
-sub: @sub
-add: @add
-_7_fib_iter: (k:(int), a: int){
+_8_fib_iter: (k:(int), a: int){
     k(a)
 }
-
-_15_fib_iter: (fib_iter:(int, int, int, (int)), n1: int, b: int, k:(int), ab: int){
+_16_fib_iter: (fib_iter:(int, int, int, (int)), n1: int, b: int, k:(int), ab: int){
     fib_iter(n1, b, ab, k)
 }
 
-_13_fib_iter: (a: int, b: int, fib_iter:(int, int, int, (int)), k:(int), n1: int){
-    _16_fib_iter: _15_fib_iter(fib_iter, n1, b, k)
-    add(a, b, _16_fib_iter)
+_14_fib_iter: (a: int, b: int, fib_iter:(int, int, int, (int)), k:(int), n1: int){
+    _17_fib_iter: _16_fib_iter(fib_iter, n1, b, k)
+    @add(a, b, _17_fib_iter)
 }
 
-_10_fib_iter: (n: int, a: int, b: int, fib_iter:(int, int, int, (int)), k:(int)){
-    _11: 1
-    _17_fib_iter: _13_fib_iter(a, b, fib_iter, k)
-    sub(n, _11, _17_fib_iter)
+_11_fib_iter: (n: int, a: int, b: int, fib_iter:(int, int, int, (int)), k:(int)){
+    _12: 1
+    _18_fib_iter: _14_fib_iter(a, b, fib_iter, k)
+    @sub(n, _12, _18_fib_iter)
 }
 
 fib_iter: (n: int, a: int, b: int, k:(int)){
-    _5: 0
-    _8_fib_iter: _7_fib_iter(k, a)
-    _18_fib_iter: _10_fib_iter(n, a, b, fib_iter, k)
-    eqi(n, _5, _8_fib_iter, _18_fib_iter)
+    _6: 0
+    _9_fib_iter: _8_fib_iter(k, a)
+    _19_fib_iter: _11_fib_iter(n, a, b, fib_iter, k)
+    @eq_int(n, _6, _9_fib_iter, _19_fib_iter)
 }
 
 fib: (n: int, k:(int)){
-    _20: 0
-    _21: 1
-    fib_iter(n, _20, _21, k)
+    _21: 0
+    _22: 1
+    fib_iter(n, _21, _22, k)
 }
-@sprintf: @sprintf
-@write: @write
-_29_main: (){
-    _30: 0
-    exit(_30)
+_30_main: (){
+    _31: 0
+    @exit(_31)
 }
 
-_27_main: (s: str){
-    @write(s, _29_main)
+_28_main: (s: str){
+    @write(s, _30_main)
 }
 
-_24_main: (result: int){
-    _25: "fib(7) = %d\n"
-    @sprintf(_25, result, _27_main)
+_25_main: (result: int){
+    _26: "fib(7) = %d\n"
+    @sprintf(_26, result, _28_main)
 }
 
 main: (){
-    _22: 7
-    fib(_22, _24_main)
+    _23: 7
+    fib(_23, _25_main)
 }
 main()

@@ -1,20 +1,17 @@
-int: @int
 str: @str
-sprintf: @sprintf
-write: @write
-exit: @exit
+int: @int
 _5_main: (){
     _6: 0
-    exit(_6)
+    @exit(_6)
 }
 
 _3_main: (s: str){
-    write(s, _5_main)
+    @write(s, _5_main)
 }
 
 main: (){
     _0: "result: %d"
     _1: 3
-    sprintf(_0, _1, _3_main)
+    @sprintf(_0, _1, _3_main)
 }
 main()

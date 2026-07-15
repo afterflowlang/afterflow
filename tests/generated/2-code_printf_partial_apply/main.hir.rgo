@@ -1,27 +1,22 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_2___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _3___rgo_7374646f7574__printf: _2___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _3___rgo_7374646f7574__printf)
 }
-write: @write
-exit: @exit
 _6_foo: (){
     _7: 0
-    exit(_7)
+    @exit(_7)
 }
 
 foo: (ok:(())){
     ok(_6_foo)
 }
-@sprintf: @sprintf
-@write: @write
 _14_main: (_4_foo:(), s: str){
     @write(s, _4_foo)
 }

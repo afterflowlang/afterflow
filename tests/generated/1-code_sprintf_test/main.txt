@@ -1,14 +1,5 @@
 [
     IdentDef {
-        name: "int",
-        ident: Ident {
-            name: "@int",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
         name: "str",
         ident: Ident {
             name: "@str",
@@ -18,27 +9,9 @@
         span: ,
     },
     IdentDef {
-        name: "sprintf",
+        name: "int",
         ident: Ident {
-            name: "@sprintf",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
-        name: "write",
-        ident: Ident {
-            name: "@write",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
-        name: "exit",
-        ident: Ident {
-            name: "@exit",
+            name: "@int",
             args: [],
             span: ,
         },
@@ -56,7 +29,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "sprintf",
+                            name: "@sprintf",
                             args: [
                                 Arg {
                                     name: None,
@@ -96,7 +69,7 @@
                                                                 span: ,
                                                             },
                                                         ),
-                                                        has_bang: false,
+                                                        is_comptime: false,
                                                         span: ,
                                                     },
                                                 ],
@@ -107,7 +80,7 @@
                                                 items: [
                                                     Ident(
                                                         Ident {
-                                                            name: "write",
+                                                            name: "@write",
                                                             args: [
                                                                 Arg {
                                                                     name: None,
@@ -124,7 +97,7 @@
                                                                     name: None,
                                                                     term: Ident(
                                                                         Ident {
-                                                                            name: "exit",
+                                                                            name: "@exit",
                                                                             args: [
                                                                                 Arg {
                                                                                     name: None,

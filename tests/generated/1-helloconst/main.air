@@ -28,7 +28,7 @@ main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $x = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(main, $x: str!)
+    @jumpargs(main, $x: str)
 
 
 main_deep_release($env_end: int):
@@ -43,5 +43,5 @@ main_deepcopy($env_end: int):
 
 
 _start():
-    @jumpargs(main, $x: str! = "Hello world!\n")
+    @jumpargs(main, $x: str = "Hello world!\n")
 

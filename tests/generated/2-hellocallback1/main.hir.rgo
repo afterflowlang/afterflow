@@ -1,21 +1,18 @@
 str: @str
-write: @write
-exit: @exit
 msg: "hello world"
 foo: (input: str, ok:()){
-    write(input, ok)
+    @write(input, ok)
 }
 
 bar: (msg: str!, cb:(str, ()), ok:()){
     cb(msg, ok)
 }
-
-_3_main: (){
-    _4: 0
-    exit(_4)
+_5_main: (){
+    _6: 0
+    @exit(_6)
 }
 
 main: (msg: str!){
-    bar(msg, foo, _3_main)
+    bar(msg, foo, _5_main)
 }
 main(msg)

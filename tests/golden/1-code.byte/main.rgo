@@ -1,16 +1,13 @@
-byte: @byte
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
+byte: @byte
 
 print_byte: (value: byte, ok:()) {
-    printf("byte %d\n", value, ok)
+    stdout.printf("byte %d\n", value, ok)
 }
 
 main: () {
-    print_byte(255, exit(0))
+    print_byte(255, @exit(0))
 }

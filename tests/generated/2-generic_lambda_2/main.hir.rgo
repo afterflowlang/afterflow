@@ -1,38 +1,35 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_3___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _4___rgo_7374646f7574__printf: _3___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _4___rgo_7374646f7574__printf)
 }
-exit: @exit
+
 foo: (x: T, y: U, ok:(T, U)){
     ok(x, y)
 }
-@sprintf: @sprintf
-@write: @write
-_10_done: (){
-    _11: 0
-    exit(_11)
+_11_done: (){
+    _12: 0
+    @exit(_12)
 }
 
-_8_done: (s: str){
-    @write(s, _10_done)
+_9_done: (s: str){
+    @write(s, _11_done)
 }
 
 done: (a: int, b: str){
-    _6: "a=%d b=%s\n"
-    @sprintf(_6, a, b, _8_done)
+    _7: "a=%d b=%s\n"
+    @sprintf(_7, a, b, _9_done)
 }
 
 main: (){
-    _14: 41
-    _15: "hi"
-    foo(_14, _15, done)
+    _15: 41
+    _16: "hi"
+    foo(_15, _16, done)
 }
 main()

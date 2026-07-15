@@ -1,14 +1,12 @@
 str: @str
 int: @int
-write: @write
-exit: @exit
 
 foo: (x:str, ok:()){
 	w: (s: str){
-		write(s, ok)
+		@write(s, ok)
 	}
 	w(x)
 }
 main: () {
-    foo("hello world", exit(0))
+    foo("hello world", @exit(0))
 }

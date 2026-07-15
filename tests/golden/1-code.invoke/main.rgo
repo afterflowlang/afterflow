@@ -1,9 +1,6 @@
-write: @write
-exit: @exit
-
 foo: () {
     (){
-        write("foo,", exit(0))
+        @write("foo,", @exit(0))
     }
 }
 main: () {

@@ -1,0 +1,11 @@
+stdout: /stdout
+
+str: @str
+
+error: (msg: str) {
+    stdout.printf("Error: %s\n", msg, @exit(1))
+}
+main: () {
+    (contents: str) = @readfile("tests/golden/2-readfile/data.txt", error("cannot read file"))
+    @write(contents, @exit(0))
+}

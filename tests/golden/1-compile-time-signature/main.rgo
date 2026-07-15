@@ -1,0 +1,7 @@
+str: @str
+
+format: (template: str!, ok: ())
+
+main: () {
+    @exit(0)
+}

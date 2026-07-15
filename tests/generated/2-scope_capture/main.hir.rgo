@@ -1,42 +1,36 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-add: @add
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_10_print_sum: (ok:(), s: str){
+_9_print_sum: (ok:(), s: str){
     @write(s, ok)
 }
 
-_7_print_sum: (ok:(), total: int){
-    _8: "sum is %d\n"
-    _11_print_sum: _10_print_sum(ok)
-    @sprintf(_8, total, _11_print_sum)
+_6_print_sum: (ok:(), total: int){
+    _7: "sum is %d\n"
+    _10_print_sum: _9_print_sum(ok)
+    @sprintf(_7, total, _10_print_sum)
 }
 
 print_sum: (ok:()){
-    _4: 3
-    _5: 4
-    _12_print_sum: _7_print_sum(ok)
-    add(_4, _5, _12_print_sum)
+    _3: 3
+    _4: 4
+    _11_print_sum: _6_print_sum(ok)
+    @add(_3, _4, _11_print_sum)
 }
-
-_14_main: (){
-    _15: 0
-    exit(_15)
+_13_main: (){
+    _14: 0
+    @exit(_14)
 }
 
 main: (){
-    print_sum(_14_main)
+    print_sum(_13_main)
 }
 main()

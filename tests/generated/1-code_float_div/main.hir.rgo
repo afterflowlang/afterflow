@@ -1,37 +1,32 @@
+__rgo_7374646f7574__str: @str
 str: @str
 float: @f64
-div: @divf64
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+x: 1.5
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-exit: @exit
-x: 1.5
-@sprintf: @sprintf
-@write: @write
-_11_main: (){
-    _12: 0
-    exit(_12)
+_10_main: (){
+    _11: 0
+    @exit(_11)
 }
 
-_9_main: (s: str){
-    @write(s, _11_main)
+_8_main: (s: str){
+    @write(s, _10_main)
 }
 
-_6_main: (x: f64, y: f64){
-    _7: "result: %f"
-    @sprintf(_7, x, _9_main)
+_5_main: (x: f64, y: f64){
+    _6: "result: %f"
+    @sprintf(_6, x, _8_main)
 }
 
 main: (x: f64){
-    _4: 2
-    _15_main: _6_main(x)
-    div(x, _4, _15_main)
+    _3: 2
+    _14_main: _5_main(x)
+    @div_f64(x, _3, _14_main)
 }
 main(x)

@@ -28,7 +28,7 @@ foo_unwrapper($env_end: int):
     $x = @field($__env_end, -2)
     $ok = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(foo, $x: str!, $ok: ())
+    @jumpargs(foo, $x: str, $ok: ())
 
 
 foo_deep_release($env_end: int):
@@ -53,14 +53,14 @@ foo_deepcopy_skip_1:
 
 main($x: str!):
     $_1_main = @newclosure<>(_1_main)
-    @jumpargs(foo, $x: str!, $_1_main: ())
+    @jumpargs(foo, $x: str, $_1_main: ())
 
 
 main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $x = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(main, $x: str!)
+    @jumpargs(main, $x: str)
 
 
 main_deep_release($env_end: int):
@@ -75,5 +75,5 @@ main_deepcopy($env_end: int):
 
 
 _start():
-    @jumpargs(main, $x: str! = "Hello world!\n")
+    @jumpargs(main, $x: str = "Hello world!\n")
 

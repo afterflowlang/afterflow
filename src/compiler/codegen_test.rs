@@ -30,7 +30,7 @@ fn codegen_test() {
         &asm,
         expected,
         "codegen_test",
-        "codegen should lower the printf-based sample program",
+        "codegen should lower the formatted-output sample program",
     );
 }
 

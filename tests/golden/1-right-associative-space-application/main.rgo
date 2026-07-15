@@ -1,0 +1,7 @@
+main: (){
+    @write(
+        "a",
+        @write("b\n")
+        @exit(0)
+    )
+}

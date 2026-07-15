@@ -1,36 +1,31 @@
-byte: @byte
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+byte: @byte
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_6_print_byte: (ok:(), s: str){
+_5_print_byte: (ok:(), s: str){
     @write(s, ok)
 }
 
 print_byte: (value: byte, ok:()){
-    _4: "byte %d\n"
-    _7_print_byte: _6_print_byte(ok)
-    @sprintf(_4, value, _7_print_byte)
+    _3: "byte %d\n"
+    _6_print_byte: _5_print_byte(ok)
+    @sprintf(_3, value, _6_print_byte)
 }
-
-_10_main: (){
-    _11: 0
-    exit(_11)
+_9_main: (){
+    _10: 0
+    @exit(_10)
 }
 
 main: (){
-    _8: 255
-    print_byte(_8, _10_main)
+    _7: 255
+    print_byte(_7, _9_main)
 }
 main()

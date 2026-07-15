@@ -30,23 +30,23 @@ foo_deepcopy_skip_1:
     @return()
 
 
-_3_main():
-    @exit($_4: int = 0)
+_5_main():
+    @exit($_6: int = 0)
 
 
-_3_main_unwrapper($env_end: int):
+_5_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_3_main)
+    @jumpargs(_5_main)
 
 
-_3_main_deep_release($env_end: int):
+_5_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_3_main_deepcopy($env_end: int):
+_5_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
@@ -61,7 +61,7 @@ bar_unwrapper($env_end: int):
     $cb = @field($__env_end, -2)
     $ok = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(bar, $msg: str!, $cb: (), $ok: ())
+    @jumpargs(bar, $msg: str, $cb: (), $ok: ())
 
 
 bar_deep_release($env_end: int):
@@ -93,15 +93,15 @@ bar_deepcopy_skip_2:
 
 main($msg: str!):
     $foo = @newclosure<str, ()>(foo)
-    $_3_main = @newclosure<>(_3_main)
-    @jumpargs(bar, $msg: str!, $foo: (), $_3_main: ())
+    $_5_main = @newclosure<>(_5_main)
+    @jumpargs(bar, $msg: str, $foo: (), $_5_main: ())
 
 
 main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $msg = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(main, $msg: str!)
+    @jumpargs(main, $msg: str)
 
 
 main_deep_release($env_end: int):
@@ -116,5 +116,5 @@ main_deepcopy($env_end: int):
 
 
 _start():
-    @jumpargs(main, $msg: str! = "hello world")
+    @jumpargs(main, $msg: str = "hello world")
 

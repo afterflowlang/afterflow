@@ -1,0 +1,11 @@
+str: @str
+
+puts: (s: str, ok:()) {
+    @write(s, () {
+        @write("\n", ok)
+    })
+}
+
+hello: () {
+    puts("hello", @exit(0))
+}

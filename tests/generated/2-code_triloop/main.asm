@@ -10,17 +10,8 @@ baz:
     lea rax, [rel _1] ; point to string literal
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-baz_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je baz_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp baz_write_strlen_loop_0
-baz_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-8] ; load continuation env_end pointer
@@ -170,17 +161,8 @@ bar:
     lea rax, [rel _0] ; point to string literal
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-bar_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je bar_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp bar_write_strlen_loop_0
-bar_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-8] ; load continuation env_end pointer
@@ -394,17 +376,8 @@ foo:
     lea rax, [rel _2] ; point to string literal
     push rax ; stack arg
     pop rdi ; restore arg into register
-    mov r8, rdi ; keep string pointer
-    xor rcx, rcx ; reset length counter
-foo_write_strlen_loop_0:
-    mov dl, byte [r8+rcx] ; load current character
-    cmp dl, 0 ; stop at terminator
-    je foo_write_strlen_done_0
-    inc rcx ; advance char counter
-    jmp foo_write_strlen_loop_0
-foo_write_strlen_done_0:
-    mov rdx, rcx ; length to write
-    mov rsi, r8 ; buffer start
+    mov rsi, [rdi] ; string data pointer
+    mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
     call write ; invoke libc write
     mov r12, [rbp-24] ; load continuation env_end pointer
@@ -493,8 +466,14 @@ _start:
 extern write
 section .rodata
 _1:
+    dq _1_data, 4 ; string data pointer and byte length
+_1_data:
     db "baz,", 0
 _0:
+    dq _0_data, 4 ; string data pointer and byte length
+_0_data:
     db "bar,", 0
 _2:
+    dq _2_data, 4 ; string data pointer and byte length
+_2_data:
     db "foo,", 0

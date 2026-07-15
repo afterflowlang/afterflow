@@ -1,15 +1,11 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-add: @add
-exit: @exit
 
 foo: (){
-    (x: int) = (ok:(int)){ add(1, 2, ok) }
-    printf("result: %d", x, exit(0))
+    (x: int) = (ok:(int)){ @add(1, 2, ok) }
+    stdout.printf("result: %d", x, @exit(0))
 }
 main: () {
     foo()

@@ -1,29 +1,25 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_1___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _2___rgo_7374646f7574__printf: _1___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _2___rgo_7374646f7574__printf)
 }
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_7_not_const_msg: (){
-    _8: 0
-    exit(_8)
+_6_not_const_msg: (){
+    _7: 0
+    @exit(_7)
 }
 
-_5_not_const_msg: (s: str){
-    @write(s, _7_not_const_msg)
+_4_not_const_msg: (s: str){
+    @write(s, _6_not_const_msg)
 }
 
 not_const_msg: (fmt: str!, value: int!){
-    @sprintf(fmt, value, _5_not_const_msg)
+    @sprintf(fmt, value, _4_not_const_msg)
 }
 
 const_msg: (fmt: str!, value: int!){
@@ -31,8 +27,8 @@ const_msg: (fmt: str!, value: int!){
 }
 
 main: (){
-    _11: "compile-time value %d\n"
-    _12: 7
-    const_msg(_11, _12)
+    _10: "compile-time value %d\n"
+    _11: 7
+    const_msg(_10, _11)
 }
 main()

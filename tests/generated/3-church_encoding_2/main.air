@@ -1,66 +1,89 @@
-_14_main($x: int, $ok: ()):
-    @add($x: int, $_15: int = 10, $ok)
+_17_main($x: int, $ok: ()):
+    @add($x: int, $_18: int = 10, $ok)
 
 
-_14_main_unwrapper($env_end: int):
+_17_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $x = @field($__env_end, -2)
     $ok = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_14_main, $x: int, $ok: ())
+    @jumpargs(_17_main, $x: int, $ok: ())
 
 
-_14_main_deep_release($env_end: int):
+_17_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_14_main_release_skip_1, $__num_remaining, 0)
-    $_14_main_release_field_1 = @field($__env_end, -1)
-    @callptr($_14_main_release_field_1)
-_14_main_release_skip_1:
+    @gt(_17_main_release_skip_1, $__num_remaining, 0)
+    $_17_main_release_field_1 = @field($__env_end, -1)
+    @callptr($_17_main_release_field_1)
+_17_main_release_skip_1:
     @release($__env_end)
     @return()
 
 
-_14_main_deepcopy($env_end: int):
+_17_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_14_main_deepcopy_skip_1, $num_remaining, 0)
-    @deepcopy($_14_main_deepcopy_field_1, $__env_end, -1)
-_14_main_deepcopy_skip_1:
+    @gt(_17_main_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($_17_main_deepcopy_field_1, $__env_end, -1)
+_17_main_deepcopy_skip_1:
     @return()
 
 
-_24_main():
-    @exit($_25: int = 0)
+_27_main():
+    @exit($_28: int = 0)
 
 
-_24_main_unwrapper($env_end: int):
+_27_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_24_main)
+    @jumpargs(_27_main)
 
 
-_24_main_deep_release($env_end: int):
+_27_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_24_main_deepcopy($env_end: int):
+_27_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
-_22_main($s: str):
-    $_24_main = @newclosure<>(_24_main)
-    @write($s: str, $_24_main)
+_25_main($s: str):
+    $_27_main = @newclosure<>(_27_main)
+    @write($s: str, $_27_main)
+
+
+_25_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $s = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_25_main, $s: str)
+
+
+_25_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_25_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_22_main($x: int):
+    $_25_main = @newclosure<str>(_25_main)
+    @sprintf($_23: str = "result: %d", $x: int, $_25_main)
 
 
 _22_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
-    $s = @field($__env_end, -1)
+    $x = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_22_main, $s: str)
+    @jumpargs(_22_main, $x: int)
 
 
 _22_main_deep_release($env_end: int):
@@ -74,72 +97,49 @@ _22_main_deepcopy($env_end: int):
     @return()
 
 
-_19_main($x: int):
-    $_22_main = @newclosure<str>(_22_main)
-    @sprintf($_20: str! = "result: %d", $x: int, $_22_main)
-
-
-_19_main_unwrapper($env_end: int):
-    $__env_end = @pin($env_end)
-    $x = @field($__env_end, -1)
-    @release($__env_end)
-    @jumpargs(_19_main, $x: int)
-
-
-_19_main_deep_release($env_end: int):
-    $__env_end = @pin($env_end)
-    @release($__env_end)
-    @return()
-
-
-_19_main_deepcopy($env_end: int):
-    $__env_end = @pin($env_end)
-    @return()
-
-
-_9_two($f: (), $ok: (), $y: int):
+_12_two($f: (), $ok: (), $y: int):
     @jumpclosure($f, $y: int, $ok: int)
 
 
-_9_two_unwrapper($env_end: int):
+_12_two_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $f = @field($__env_end, -3)
     $ok = @field($__env_end, -2)
     $y = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_9_two, $f: (), $ok: (), $y: int)
+    @jumpargs(_12_two, $f: (), $ok: (), $y: int)
 
 
-_9_two_deep_release($env_end: int):
+_12_two_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_9_two_release_skip_0, $__num_remaining, 2)
-    $_9_two_release_field_0 = @field($__env_end, -3)
-    @callptr($_9_two_release_field_0)
-_9_two_release_skip_0:
-    @gt(_9_two_release_skip_1, $__num_remaining, 1)
-    $_9_two_release_field_1 = @field($__env_end, -2)
-    @callptr($_9_two_release_field_1)
-_9_two_release_skip_1:
+    @gt(_12_two_release_skip_0, $__num_remaining, 2)
+    $_12_two_release_field_0 = @field($__env_end, -3)
+    @callptr($_12_two_release_field_0)
+_12_two_release_skip_0:
+    @gt(_12_two_release_skip_1, $__num_remaining, 1)
+    $_12_two_release_field_1 = @field($__env_end, -2)
+    @callptr($_12_two_release_field_1)
+_12_two_release_skip_1:
     @release($__env_end)
     @return()
 
 
-_9_two_deepcopy($env_end: int):
+_12_two_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_9_two_deepcopy_skip_0, $num_remaining, 2)
-    @deepcopy($_9_two_deepcopy_field_0, $__env_end, -3)
-_9_two_deepcopy_skip_0:
-    @gt(_9_two_deepcopy_skip_1, $num_remaining, 1)
-    @deepcopy($_9_two_deepcopy_field_1, $__env_end, -2)
-_9_two_deepcopy_skip_1:
+    @gt(_12_two_deepcopy_skip_0, $num_remaining, 2)
+    @deepcopy($_12_two_deepcopy_field_0, $__env_end, -3)
+_12_two_deepcopy_skip_0:
+    @gt(_12_two_deepcopy_skip_1, $num_remaining, 1)
+    @deepcopy($_12_two_deepcopy_field_1, $__env_end, -2)
+_12_two_deepcopy_skip_1:
     @return()
 
 
 two($f: (), $x: int, $ok: ()):
-    $_10_two = @newclosure<($_4_two: int, $_5_two: ()), ($_7_two: int), int>(_9_two, $f: (), $ok: ())
-    @jumpclosure($f, $x: int, $_10_two: int)
+    $_13_two = @newclosure<($_7_two: int, $_8_two: ()), ($_10_two: int), int>(_12_two, $f: (), $ok: ())
+    @jumpclosure($f, $x: int, $_13_two: int)
 
 
 two_unwrapper($env_end: int):
@@ -179,9 +179,9 @@ two_deepcopy_skip_2:
 
 
 main():
-    $_14_main = @newclosure<int, ($_13_main: int)>(_14_main)
-    $_19_main = @newclosure<int>(_19_main)
-    @jumpargs(two, $_14_main: (), $_17: int = 0, $_19_main: ())
+    $_17_main = @newclosure<int, ($_16_main: int)>(_17_main)
+    $_22_main = @newclosure<int>(_22_main)
+    @jumpargs(two, $_17_main: (), $_20: int = 0, $_22_main: ())
 
 
 main_unwrapper($env_end: int):

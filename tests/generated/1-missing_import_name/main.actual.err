@@ -1,1 +1,1 @@
-[lex] builtin imports use @name, not @/name or @owner/name at 1:6
+[parse] source package '/foo-bar' must be bound as 'name: /foo-bar' at 1:1

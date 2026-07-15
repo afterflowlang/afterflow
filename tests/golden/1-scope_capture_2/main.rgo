@@ -1,12 +1,9 @@
+stdout: /stdout
+
 str: @str
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-add: @add
-exit: @exit
+
 main: () {
-    () = printf("hello world")
-    exit(0)
+    () = stdout.printf("hello world")
+    @exit(0)
 }

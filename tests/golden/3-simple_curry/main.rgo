@@ -1,18 +1,16 @@
+stdout: /stdout
+
 str: @str
 int: @int
-exit: @exit
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
+
 new_point: (x:int, y:int, ok: (int, int)){
     ok(x, y)
 }
 ok_exit: (){
-    exit(0)
+    @exit(0)
 }
 p_handle: (x: int, y: int){
-    printf("got: %d, %d\n", x, y, ok_exit)
+    stdout.printf("got: %d, %d\n", x, y, ok_exit)
 }
 foo: (p:((int, int))){
     p(p_handle)

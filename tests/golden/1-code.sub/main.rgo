@@ -1,14 +1,10 @@
+stdout: /stdout
+
 str: @str
-sub: @sub
 int: @int
-printf: (fmt: str!, args: ..., ok:()) {
-    (s: str) = @sprintf(fmt, args)
-    @write(s, ok)
-}
-exit: @exit
 
 main: () {
-    sub(9, 4, (n: int) {
-        printf("sub: %d", n, exit(0))
+    @sub(9, 4, (n: int) {
+        stdout.printf("sub: %d", n, @exit(0))
     })
 }

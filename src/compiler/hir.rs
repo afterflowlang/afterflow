@@ -32,9 +32,32 @@ impl Lowerer {
         self.ready.pop_front()
     }
 
+    pub fn register_package_functions(&mut self, items: &[ast::BlockItem]) {
+        for item in items {
+            if let ast::BlockItem::FunctionDef { name, lambda, .. } = item {
+                if lambda.params.is_variadic() {
+                    self.variadic_functions.insert(name.clone(), lambda.clone());
+                }
+            }
+        }
+    }
+
     pub fn consume(&mut self, ctx: &mut ctx::Context, block: ast::BlockItem) -> Result<(), Error> {
+        let span = block.span();
+        self.consume_block(ctx, block)
+            .map_err(|error| error.with_span(span))
+    }
+
+    fn consume_block(
+        &mut self,
+        ctx: &mut ctx::Context,
+        block: ast::BlockItem,
+    ) -> Result<(), Error> {
         match block {
             ast::BlockItem::Import { label, path, .. } => {
+                if path == "std" {
+                    return Ok(());
+                }
                 let item = BlockItem::Import {
                     label: label.clone(),
                     path: path.clone(),
@@ -84,7 +107,7 @@ fn lower_function(
     let lambda_params = signature::ast_signature_to_hir(lambda.params.clone());
     let mut signature_ctx = outer_ctx.enter(&name, display_name.as_deref(), is_root_def);
     register_generic_placeholders(&mut signature_ctx, &lambda_params.generics)?;
-    let signature = signature::resolve_signature(&lambda_params, &mut signature_ctx);
+    let signature = signature::resolve_signature(&lambda_params, &mut signature_ctx)?;
     let new_name = outer_ctx.new_name_for_fn(display_name.as_deref());
     outer_ctx.add_sig(&name, &new_name, signature.clone(), span, false)?;
 
@@ -93,7 +116,13 @@ fn lower_function(
     let mut ctx = outer_ctx.enter(&name, display_name.as_deref(), is_root_def);
     register_generic_placeholders(&mut ctx, &lambda_params.generics)?;
     for item in &params {
-        ctx.add_param(&item.name, item.kind.clone(), Span::unknown(), false)?;
+        ctx.add_param(
+            &item.name,
+            item.kind.clone(),
+            item.is_comptime,
+            Span::unknown(),
+            false,
+        )?;
     }
     let mut lowered_items: Vec<BlockItem> = Vec::with_capacity(lambda.body.items.len());
 
@@ -187,7 +216,7 @@ fn maybe_capture_name(ctx: &mut ctx::Context, name: &str) -> Result<(), Error> {
     }
     let span = entry.span;
     let normalized_ty = signature::normalize_sig_kind(&entry.kind, ctx);
-    ctx.add_param(&entry.name, normalized_ty, span, true)?; // Prevent infinite recursion, it's been turned into a local param.
+    ctx.add_param(&entry.name, normalized_ty, entry.is_comptime, span, true)?; // Prevent infinite recursion, it's been turned into a local param.
     Ok(())
 }
 
@@ -237,6 +266,17 @@ fn lower_block_item(
     hoisted: &mut VecDeque<BlockItem>,
     variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<Vec<BlockItem>, Error> {
+    let span = item.span();
+    lower_block_item_inner(ctx, item, hoisted, variadic_functions)
+        .map_err(|error| error.with_span(span))
+}
+
+fn lower_block_item_inner(
+    ctx: &mut ctx::Context,
+    item: ast::BlockItem,
+    hoisted: &mut VecDeque<BlockItem>,
+    variadic_functions: &HashMap<String, ast::Lambda>,
+) -> Result<Vec<BlockItem>, Error> {
     let lowered_items = match item {
         ast::BlockItem::ScopeCapture {
             params,
@@ -263,8 +303,8 @@ fn lower_block_item(
         ast::BlockItem::LitDef { name, literal, .. } => {
             let literal = lower_lit(literal.value);
             let kind = match &literal {
-                Lit::Str(_) => SigKind::CompileTimeStr,
-                Lit::Int(_) => SigKind::CompileTimeInt,
+                Lit::Str(_) => SigKind::Str,
+                Lit::Int(_) => SigKind::Int,
                 Lit::F64(_) => SigKind::F64,
             };
             ctx.add_literal(&name, kind)?;
@@ -282,7 +322,7 @@ fn lower_block_item(
                 false,
             )?;
             let sig = signature::ast_signature_to_hir(sig);
-            let hir_sig = signature::resolve_signature(&sig, ctx);
+            let hir_sig = signature::resolve_signature(&sig, ctx)?;
             let normalized_sig = signature::normalize_signature(&hir_sig, ctx);
             if let Some(entry) = ctx.get_mut(&name) {
                 entry.kind = SigKind::Sig(normalized_sig.clone());
@@ -305,7 +345,9 @@ fn lower_block_item(
             }
             if ident.args.is_empty() {
                 if let Some(target) = ctx.get(&ident.name) {
-                    ctx.add(&name, target.clone())?;
+                    let mut target = target.clone();
+                    target.is_predeclared = false;
+                    ctx.add(&name, target)?;
                     Ok(Vec::new())
                 } else {
                     Err(error::new(
@@ -615,7 +657,7 @@ fn lower_exec(
         }
         other => unreachable!("expected exec term, got {:?}", other),
     };
-    // Builtins like printf, sprintf, and write rely on the AIR-level FFI bridge
+    // Builtins like sprintf and write rely on the AIR-level FFI bridge
     // so continuations and variadic arguments are resolved consistently later.
     lowered_items.push(BlockItem::Exec(exec));
     Ok(lowered_items)
@@ -707,6 +749,29 @@ fn lower_arg(
     lowered_items: &mut Vec<BlockItem>,
     variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<String, Error> {
+    let span = term.span();
+    lower_arg_inner(
+        ctx,
+        term,
+        type_ctx,
+        hoisted,
+        lowered_items,
+        variadic_functions,
+    )
+    .map_err(|error| error.with_span(span))
+}
+
+fn lower_arg_inner(
+    ctx: &mut ctx::Context,
+    term: ast::Term,
+    type_ctx: LowerArgTypeContext,
+    hoisted: &mut VecDeque<BlockItem>,
+    lowered_items: &mut Vec<BlockItem>,
+    variadic_functions: &HashMap<String, ast::Lambda>,
+) -> Result<String, Error> {
+    if let ast::Term::Ident(ident) = &term {
+        ensure_builtin_reference(ctx, &ident.name, hoisted)?;
+    }
     let term = maybe_wrap_builtin(ctx, term, type_ctx.expected_param)?;
     validate_input_type(
         ctx,
@@ -819,6 +884,11 @@ fn resolve_target(
             )
         })?;
 
+    let extra_arg_span = ast_args
+        .get(signature.items.len())
+        .or_else(|| ast_args.last())
+        .map(|arg| arg.span)
+        .unwrap_or(target.span);
     let resolved = resolve_call_arguments(ctx, &target, signature, ast_args, hoisted)?;
     let mut args: Vec<String> = Vec::with_capacity(resolved.target.captures.len());
     for cap in &resolved.target.captures {
@@ -859,7 +929,7 @@ fn resolve_target(
                 total_param_count,
                 args.len()
             ),
-            Span::unknown(),
+            extra_arg_span,
         ));
     }
     Ok((resolved.target, args))
@@ -902,6 +972,7 @@ fn resolve_call_arguments(
     let mut resolved_terms = Vec::with_capacity(ast_args.len());
 
     for call_arg in ast_args {
+        let span = call_arg.span;
         let param_index = if let Some(arg_name) = call_arg.name {
             params
                 .iter()
@@ -913,7 +984,7 @@ fn resolve_call_arguments(
                             "function '{}' has no parameter named '{}'",
                             target.name, arg_name
                         ),
-                        Span::unknown(),
+                        span,
                     )
                 })?
         } else {
@@ -926,7 +997,7 @@ fn resolve_call_arguments(
                         target.captures.len() + params.len(),
                         target.captures.len() + resolved_indices.len() + 1
                     ),
-                    Span::unknown(),
+                    span,
                 )
             })?
         };
@@ -943,7 +1014,7 @@ fn resolve_call_arguments(
                     "function '{}' argument '{}' was provided more than once",
                     target.name, dup_name
                 ),
-                Span::unknown(),
+                span,
             ));
         }
 
@@ -1014,7 +1085,7 @@ fn create_named_arg_wrapper(
         reordered_params.push(SigItem {
             name: param_name,
             kind: item.kind.clone(),
-            has_bang: item.has_bang,
+            is_comptime: item.is_comptime,
         });
     }
 
@@ -1033,7 +1104,7 @@ fn create_named_arg_wrapper(
         wrapper_captures.push(SigItem {
             name: target.name.clone(),
             kind: target.kind.clone(),
-            has_bang: false,
+            is_comptime: false,
         });
     }
     for capture in &target.captures {
@@ -1223,7 +1294,7 @@ fn ensure_param_names(ctx: &mut ctx::Context, expected_sig: &Signature) -> ast::
         items.push(SigItem {
             name: param_name,
             kind: item.kind.clone(),
-            has_bang: item.has_bang,
+            is_comptime: item.is_comptime,
         });
     }
     signature::hir_signature_to_ast(Signature {
@@ -1249,44 +1320,53 @@ fn validate_input_type(
     let normalized_expected = signature::normalize_sig_kind(&expected.kind, ctx);
     ensure_sig_kind_exists(ctx, &normalized_expected, active_generics)?;
 
-    let expected_is_compile_time = matches!(
-        normalized_expected,
-        SigKind::CompileTimeInt | SigKind::CompileTimeStr
-    );
     let expected_is_unit_sig = if let SigKind::Sig(sig) = &normalized_expected {
         sig.items.is_empty()
     } else {
         false
     };
-    let allow_idents = expected_is_compile_time
+    let allow_idents = expected.is_comptime
         || expected_is_unit_sig
         || has_generic_kind(&normalized_expected, active_generics);
 
-    let Some(actual_kind) = term_sig_kind(ctx, term, allow_idents) else {
+    let Some(mut actual) = term_type(ctx, term, allow_idents)? else {
         return Ok(());
     };
 
-    validate_byte_literal(term, &normalized_expected)?;
+    validate_integer_literal(term, &normalized_expected)?;
+    if matches!(normalized_expected, SigKind::UInt)
+        && matches!(
+            term,
+            ast::Term::Lit(ast::Literal {
+                value: ast::Lit::Int(_),
+                ..
+            })
+        )
+    {
+        actual.kind = SigKind::UInt;
+    }
 
-    let actual_is_compile_time_int = matches!(actual_kind, SigKind::CompileTimeInt);
-    let normalized_actual = signature::normalize_sig_kind(&actual_kind, ctx);
+    let normalized_actual = signature::normalize_sig_kind(&actual.kind, ctx);
 
-    if kind_matches(
-        &normalized_actual,
-        &normalized_expected,
-        actual_is_compile_time_int,
-        active_generics,
-        generic_bindings,
-    ) {
+    if (!expected.is_comptime || actual.is_comptime)
+        && kind_matches(
+            &normalized_actual,
+            &normalized_expected,
+            actual.is_integer_literal,
+            active_generics,
+            generic_bindings,
+        )
+    {
         return Ok(());
     }
 
+    let expected_kind = format_kind_with_comptime(&normalized_expected, expected.is_comptime);
     Err(error::new(
         Code::HIR,
         format!(
             "expected {}, found {}",
-            format_hir::format_sig_kind(&normalized_expected),
-            format_hir::format_sig_kind(&normalized_actual)
+            expected_kind,
+            format_kind_with_comptime(&normalized_actual, actual.is_comptime)
         ),
         Span::unknown(),
     ))
@@ -1332,23 +1412,49 @@ fn ensure_sig_kind_exists(
     Ok(())
 }
 
-fn term_sig_kind(ctx: &mut ctx::Context, term: &ast::Term, allow_idents: bool) -> Option<SigKind> {
-    match term {
+struct TermType {
+    kind: SigKind,
+    is_comptime: bool,
+    is_integer_literal: bool,
+}
+
+fn term_type(
+    ctx: &mut ctx::Context,
+    term: &ast::Term,
+    allow_idents: bool,
+) -> Result<Option<TermType>, Error> {
+    Ok(match term {
         ast::Term::Lit(ast::Literal {
             value: ast::Lit::Int(_),
             ..
-        }) => Some(SigKind::CompileTimeInt),
+        }) => Some(TermType {
+            kind: SigKind::Int,
+            is_comptime: true,
+            is_integer_literal: true,
+        }),
         ast::Term::Lit(ast::Literal {
             value: ast::Lit::Str(_),
             ..
-        }) => Some(SigKind::CompileTimeStr),
+        }) => Some(TermType {
+            kind: SigKind::Str,
+            is_comptime: true,
+            is_integer_literal: false,
+        }),
         ast::Term::Lit(ast::Literal {
             value: ast::Lit::F64(_),
             ..
-        }) => Some(SigKind::F64),
+        }) => Some(TermType {
+            kind: SigKind::F64,
+            is_comptime: false,
+            is_integer_literal: false,
+        }),
         ast::Term::Ident(ast_ident) => {
             if allow_idents && ast_ident.args.is_empty() {
-                ctx.get(&ast_ident.name).map(|entry| entry.kind.clone())
+                ctx.get(&ast_ident.name).map(|entry| TermType {
+                    kind: entry.kind.clone(),
+                    is_comptime: entry.is_comptime,
+                    is_integer_literal: false,
+                })
             } else {
                 None
             }
@@ -1357,12 +1463,16 @@ fn term_sig_kind(ctx: &mut ctx::Context, term: &ast::Term, allow_idents: bool) -
             let mut signature = signature::resolve_signature(
                 &signature::ast_signature_to_hir(lambda.params.clone()),
                 ctx,
-            );
+            )?;
             let drop_count = lambda.args.len().min(signature.items.len());
             signature.items.drain(0..drop_count);
-            Some(SigKind::Sig(signature))
+            Some(TermType {
+                kind: SigKind::Sig(signature),
+                is_comptime: true,
+                is_integer_literal: false,
+            })
         }
-    }
+    })
 }
 
 fn lower_lit(lit: ast::Lit) -> Lit {
@@ -1376,7 +1486,7 @@ fn lower_lit(lit: ast::Lit) -> Lit {
 fn kind_matches(
     actual: &SigKind,
     expected: &SigKind,
-    actual_is_compile_time_int: bool,
+    actual_is_integer_literal: bool,
     active_generics: &BTreeSet<String>,
     generic_bindings: &mut HashMap<String, SigKind>,
 ) -> bool {
@@ -1385,31 +1495,17 @@ fn kind_matches(
     }
 
     if let SigKind::Generic(name) = expected {
-        return match_generic_kind(
-            name,
-            actual,
-            actual_is_compile_time_int,
-            active_generics,
-            generic_bindings,
-        );
+        return match_generic_kind(name, actual, active_generics, generic_bindings);
     }
     if let SigKind::Ident(ident) = expected {
         if active_generics.contains(&ident.name) {
-            return match_generic_kind(
-                &ident.name,
-                actual,
-                actual_is_compile_time_int,
-                active_generics,
-                generic_bindings,
-            );
+            return match_generic_kind(&ident.name, actual, active_generics, generic_bindings);
         }
     }
 
     match expected {
-        SigKind::Byte if actual_is_compile_time_int => true,
-        SigKind::CompileTimeInt => actual == &SigKind::CompileTimeInt,
-        SigKind::CompileTimeStr => actual == &SigKind::CompileTimeStr,
-        SigKind::F64 if actual_is_compile_time_int => true,
+        SigKind::Byte | SigKind::UInt | SigKind::FixedInt(_) if actual_is_integer_literal => true,
+        SigKind::F64 if actual_is_integer_literal => true,
         SigKind::Sig(expected_sig) => {
             let SigKind::Sig(actual_sig) = actual else {
                 return false;
@@ -1426,7 +1522,8 @@ fn kind_matches(
                     false,
                     active_generics,
                     generic_bindings,
-                ) {
+                ) || !comptime_matches(actual_item.is_comptime, expected_item.is_comptime)
+                {
                     return false;
                 }
             }
@@ -1459,7 +1556,7 @@ fn kind_matches(
             }
             true
         }
-        _ => canonicalize_kind(actual) == canonicalize_kind(expected),
+        _ => false,
     }
 }
 
@@ -1481,7 +1578,6 @@ fn has_generic_kind(kind: &SigKind, active_generics: &BTreeSet<String>) -> bool 
 fn match_generic_kind(
     name: &str,
     actual: &SigKind,
-    actual_is_compile_time_int: bool,
     active_generics: &BTreeSet<String>,
     generic_bindings: &mut HashMap<String, SigKind>,
 ) -> bool {
@@ -1494,47 +1590,28 @@ fn match_generic_kind(
         return actual_name == name;
     }
 
-    let canonical_actual = if actual_is_compile_time_int {
-        SigKind::Int
-    } else {
-        canonicalize_kind(actual)
-    };
     if let Some(bound) = generic_bindings.get(name) {
-        return canonicalize_kind(bound) == canonical_actual;
+        return bound == actual;
     }
-    generic_bindings.insert(name.to_string(), canonical_actual);
+    generic_bindings.insert(name.to_string(), actual.clone());
     true
 }
 
-fn canonicalize_kind(kind: &SigKind) -> SigKind {
-    match kind {
-        SigKind::CompileTimeInt => SigKind::Int,
-        SigKind::CompileTimeStr => SigKind::Str,
-        SigKind::Sig(signature) => SigKind::Sig(Signature {
-            items: signature
-                .items
-                .iter()
-                .map(|item| SigItem {
-                    name: item.name.clone(),
-                    kind: canonicalize_kind(&item.kind),
-                    has_bang: item.has_bang,
-                })
-                .collect(),
-            generics: signature.generics.clone(),
-        }),
-        SigKind::GenericInst { name, args } => SigKind::GenericInst {
-            name: name.clone(),
-            args: args.iter().map(canonicalize_kind).collect(),
-        },
-        other => other.clone(),
+fn comptime_matches(actual: bool, expected: bool) -> bool {
+    !expected || actual
+}
+
+fn format_kind_with_comptime(kind: &SigKind, is_comptime: bool) -> String {
+    let supports_comptime = kind.supports_comptime();
+    let kind = format_hir::format_sig_kind(kind);
+    if is_comptime && supports_comptime {
+        format!("{kind}!")
+    } else {
+        kind
     }
 }
 
-fn validate_byte_literal(term: &ast::Term, expected: &SigKind) -> Result<(), Error> {
-    if !matches!(expected, SigKind::Byte) {
-        return Ok(());
-    }
-
+fn validate_integer_literal(term: &ast::Term, expected: &SigKind) -> Result<(), Error> {
     let ast::Term::Lit(ast::Literal {
         value: ast::Lit::Int(value),
         ..
@@ -1543,13 +1620,41 @@ fn validate_byte_literal(term: &ast::Term, expected: &SigKind) -> Result<(), Err
         return Ok(());
     };
 
-    if (0..=255).contains(value) {
+    let (name, min, max) = match expected {
+        SigKind::Byte => ("byte".to_string(), 0_i128, 255_i128),
+        SigKind::UInt => ("uint".to_string(), 0_i128, u64::MAX as i128),
+        SigKind::FixedInt(kind) => {
+            let bit_width = kind.bit_width;
+            let (min, max) = match kind.interpretation {
+                FixedIntInterpretation::Signed => {
+                    if bit_width == 128 {
+                        (i128::MIN, i128::MAX)
+                    } else {
+                        let bound = 1_i128 << (bit_width - 1);
+                        (-bound, bound - 1)
+                    }
+                }
+                FixedIntInterpretation::Bits | FixedIntInterpretation::Unsigned => {
+                    let max = if bit_width == 128 {
+                        i128::MAX
+                    } else {
+                        (1_i128 << bit_width) - 1
+                    };
+                    (0, max)
+                }
+            };
+            (kind.name(), min, max)
+        }
+        _ => return Ok(()),
+    };
+    let value = *value as i128;
+    if (min..=max).contains(&value) {
         return Ok(());
     }
 
     Err(error::new(
         Code::HIR,
-        format!("byte literal must be between 0 and 255, found {}", value),
+        format!("{name} literal must be between {min} and {max}, found {value}"),
         Span::unknown(),
     ))
 }

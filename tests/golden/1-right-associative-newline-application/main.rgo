@@ -1,0 +1,17 @@
+str: @str
+
+produce: (value: @int, ok: (@int)){
+    ok(value)
+}
+
+finish: (prefix: str, value: @int){
+    (message: str) = @sprintf("%s %d\n", prefix, value)
+    @write(message, @exit(0))
+}
+
+main: (){
+    @write("start ")
+    prefix: "value"
+    produce(42)
+    finish(prefix)
+}

@@ -1,1 +1,4 @@
-[hir] function 'foo' expected 2 arguments but got 3 at 0:0
+[hir] function 'foo' expected 2 arguments but got 3
+tests/failing/1-too_many_args/main.rgo:7
+    foo(1, 2, 3)
+              ^

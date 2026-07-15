@@ -1,19 +1,16 @@
 str: @str
 int: @int
-sprintf: @sprintf
-exit: @exit
 itoa: (n: int, ok:(str)){
-    _1: "%d"
-    sprintf(_1, n, ok)
+    _2: "%d"
+    @sprintf(_2, n, ok)
 }
-
-_4_main: (s: str){
-    _5: 0
-    exit(_5)
+_5_main: (s: str){
+    _6: 0
+    @exit(_6)
 }
 
 main: (){
-    _2: 1
-    itoa(_2, _4_main)
+    _3: 1
+    itoa(_3, _5_main)
 }
 main()

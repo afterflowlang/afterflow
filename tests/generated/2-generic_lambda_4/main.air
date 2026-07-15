@@ -44,7 +44,7 @@ _7_bar_deepcopy($env_end: int):
 
 bar($x: int):
     $_7_bar = @newclosure<str>(_7_bar)
-    @sprintf($_5: str! = "%d", $x: int, $_7_bar)
+    @sprintf($_5: str = "%d", $x: int, $_7_bar)
 
 
 bar_unwrapper($env_end: int):

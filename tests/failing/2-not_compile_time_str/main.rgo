@@ -1,11 +1,11 @@
 str: @str
-exit: @exit
+
 printf: (fmt: str!, args: ..., ok:()) {
     (s: str) = @sprintf(fmt, args)
     @write(s, ok)
 }
 bar: (fmt: str!) {
-    printf(fmt, exit(0))
+    printf(fmt, @exit(0))
 }
 foo: (fmt: str) {
     bar(fmt)

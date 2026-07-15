@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io::{BufRead, Write};
+use std::path::Path;
 
 pub mod air;
 pub mod air_ast;
@@ -16,6 +17,7 @@ pub mod lexer;
 pub mod parser;
 pub mod runtime;
 pub mod signature;
+pub mod source;
 pub mod span;
 pub mod symbol;
 pub mod token;
@@ -38,8 +40,39 @@ use symbol::SymbolRegistry;
 pub fn compile<R: BufRead, W: Write>(input: R, target: &str, out: &mut W) -> Result<(), Error> {
     let lexer = Lexer::new(input);
     let mut parser = Parser::new(lexer);
+    let mut items = Vec::new();
+    while let Some(item) = parser.next_block_item()? {
+        reject_root_execution(&item)?;
+        items.push(item);
+    }
+    compile_items(items, target, hir::Context::new(), false, out)
+}
+
+pub fn compile_path<W: Write>(input: &Path, target: &str, out: &mut W) -> Result<(), Error> {
+    if !input.is_file() {
+        return Err(CompilerError::new(
+            Code::Io,
+            format!("entry source '{}' is not a file", input.display()),
+            Span::unknown(),
+        ));
+    }
+    let project = source::load(input, target)?;
+    let sources = project.sources;
+    let mut ctx = hir::Context::new();
+    predeclare_package(&mut ctx, &project.items)
+        .map_err(|error| source::attach_source(error, &sources))?;
+    compile_items(project.items, &project.target, ctx, true, out)
+        .map_err(|error| source::attach_source(error, &sources))
+}
+
+fn compile_items<W: Write>(
+    items: Vec<ast::BlockItem>,
+    target: &str,
+    mut hir_ctx: hir::Context,
+    has_package: bool,
+    out: &mut W,
+) -> Result<(), Error> {
     let mut symbols = SymbolRegistry::new();
-    let mut hir_ctx = hir::Context::new();
     let mut air_functions: Vec<air::AirFunction> = Vec::new();
     let mut hir_functions: HashMap<String, hir::Function> = HashMap::new();
 
@@ -47,10 +80,12 @@ pub fn compile<R: BufRead, W: Write>(input: R, target: &str, out: &mut W) -> Res
     codegen::write_preamble(out)?;
 
     let mut lowerer = Lowerer::new();
+    if has_package {
+        lowerer.register_package_functions(&items);
+    }
     let mut entry_items: Vec<hir::BlockItem> = Vec::new();
 
-    while let Some(item) = parser.next_block_item()? {
-        reject_root_execution(&item)?;
+    for item in items {
         lowerer.consume(&mut hir_ctx, item)?; // consume one function/item
 
         // produce many functions/types etc (hoisted)
@@ -105,6 +140,103 @@ pub fn compile<R: BufRead, W: Write>(input: R, target: &str, out: &mut W) -> Res
     }
     codegen::emit_externs(&artifacts.externs, out)?;
     codegen::emit_data(artifacts.string_literals(), out)?;
+    Ok(())
+}
+
+pub(crate) fn predeclare_package(
+    ctx: &mut hir::Context,
+    items: &[ast::BlockItem],
+) -> Result<(), Error> {
+    for item in items {
+        match item {
+            ast::BlockItem::FunctionDef { name, span, .. }
+            | ast::BlockItem::SigDef { name, span, .. } => ctx.predeclare(
+                name,
+                hir::SigKind::Ident(hir::SigIdent { name: name.clone() }),
+                false,
+                *span,
+            )?,
+            ast::BlockItem::LitDef {
+                name,
+                literal,
+                span,
+            } => {
+                let (kind, is_comptime) = match &literal.value {
+                    ast::Lit::Str(_) => (hir::SigKind::Str, true),
+                    ast::Lit::Int(_) => (hir::SigKind::Int, true),
+                    ast::Lit::F64(_) => (hir::SigKind::F64, false),
+                };
+                ctx.predeclare(name, kind, is_comptime, *span)?;
+            }
+            ast::BlockItem::IdentDef { name, ident, span }
+                if ident.args.is_empty() && ident.name.starts_with('@') =>
+            {
+                let builtin = ident.name.trim_start_matches('@');
+                hir_context::register_import(ctx, name, builtin, *span)?;
+                ctx.mark_predeclared(name);
+            }
+            ast::BlockItem::IdentDef { name, ident, span } => ctx.predeclare(
+                name,
+                hir::SigKind::Ident(hir::SigIdent {
+                    name: ident.name.clone(),
+                }),
+                false,
+                *span,
+            )?,
+            ast::BlockItem::Import { .. }
+            | ast::BlockItem::Ident(_)
+            | ast::BlockItem::Lambda(_)
+            | ast::BlockItem::ScopeCapture { .. } => {}
+        }
+    }
+
+    for item in items {
+        if let ast::BlockItem::SigDef { name, sig, span } = item {
+            let sig = signature::ast_signature_to_hir(sig.clone());
+            let resolved =
+                signature::resolve_signature(&sig, ctx).map_err(|error| error.with_span(*span))?;
+            let normalized = signature::normalize_signature(&resolved, ctx);
+            if let Some(entry) = ctx.get_mut(name) {
+                entry.kind = hir::SigKind::Sig(normalized);
+            }
+        }
+    }
+    for item in items {
+        if let ast::BlockItem::FunctionDef { name, lambda, span } = item {
+            let sig = signature::ast_signature_to_hir(lambda.params.clone());
+            let mut signature_ctx = ctx.enter(name, Some(name), true);
+            let resolved = signature::resolve_signature(&sig, &mut signature_ctx)
+                .map_err(|error| error.with_span(*span))?;
+            let normalized = signature::normalize_signature(&resolved, &signature_ctx);
+            if let Some(entry) = ctx.get_mut(name) {
+                entry.kind = hir::SigKind::Sig(normalized);
+            }
+        }
+    }
+    for _ in 0..items.len() {
+        for item in items {
+            if let ast::BlockItem::IdentDef { name, ident, .. } = item {
+                if ident.args.is_empty() {
+                    if let Some(target) = ctx.get(&ident.name).cloned() {
+                        if let Some(entry) = ctx.get_mut(name) {
+                            entry.name = target.name;
+                            entry.kind = target.kind;
+                            entry.is_builtin = target.is_builtin;
+                        }
+                    }
+                } else if let Some(signature) =
+                    signature::resolve_target_signature(&ident.name, ctx)
+                {
+                    if let Some(entry) = ctx.get_mut(name) {
+                        entry.kind = hir::SigKind::Sig(hir::Signature {
+                            items: signature.items.into_iter().skip(ident.args.len()).collect(),
+                            generics: signature.generics,
+                        });
+                    }
+                }
+            }
+        }
+    }
     Ok(())
 }
 

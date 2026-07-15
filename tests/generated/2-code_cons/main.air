@@ -1,5 +1,5 @@
 main():
-    @exit($_8: int = 0)
+    @exit($_11: int = 0)
 
 
 main_unwrapper($env_end: int):

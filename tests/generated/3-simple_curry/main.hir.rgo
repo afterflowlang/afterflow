@@ -1,43 +1,39 @@
+__rgo_7374646f7574__str: @str
 str: @str
 int: @int
-exit: @exit
-@sprintf: @sprintf
-@write: @write
-_2_printf: (ok:(), s: str){
+_5: 1
+_6: 2
+_8___rgo_7374646f7574__printf: (ok:(), s: str){
     @write(s, ok)
 }
 
-_0_printf: (fmt: str!, args: ..., ok:()){
-    _3_printf: _2_printf(ok)
-    @sprintf(fmt, args, _3_printf)
+__rgo_7374646f7574__printf: (fmt: str!, args: ..., ok:()){
+    _9___rgo_7374646f7574__printf: _8___rgo_7374646f7574__printf(ok)
+    @sprintf(fmt, args, _9___rgo_7374646f7574__printf)
 }
 
 new_point: (x: int, y: int, ok:(int, int)){
     ok(x, y)
 }
-
 ok_exit: (){
-    _6: 0
-    exit(_6)
+    _12: 0
+    @exit(_12)
 }
-@sprintf: @sprintf
-@write: @write
-_9_p_handle: (s: str){
+_15_p_handle: (s: str){
     @write(s, ok_exit)
 }
 
 p_handle: (x: int, y: int){
-    _7: "got: %d, %d\n"
-    @sprintf(_7, x, y, _9_p_handle)
+    _13: "got: %d, %d\n"
+    @sprintf(_13, x, y, _15_p_handle)
 }
 
 foo: (p:((int, int))){
     p(p_handle)
 }
-_14: 1
-_15: 2
+
 main: (p:((int, int))){
     foo(p)
 }
-p: new_point(_14, _15)
+p: new_point(_5, _6)
 main(p)

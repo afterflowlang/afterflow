@@ -1,4 +1,9 @@
 [
+    Import {
+        label: "stdout",
+        path: "/stdout",
+        span: ,
+    },
     IdentDef {
         name: "str",
         ident: Ident {
@@ -17,148 +22,6 @@
         },
         span: ,
     },
-    IdentDef {
-        name: "exit",
-        ident: Ident {
-            name: "@exit",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    FunctionDef {
-        name: "printf",
-        lambda: Lambda {
-            params: Signature {
-                items: [
-                    SigItem {
-                        name: "fmt",
-                        kind: Ident(
-                            SigIdent {
-                                name: "str",
-                                span: ,
-                            },
-                        ),
-                        has_bang: true,
-                        span: ,
-                    },
-                    SigItem {
-                        name: "args",
-                        kind: Variadic,
-                        has_bang: false,
-                        span: ,
-                    },
-                    SigItem {
-                        name: "ok",
-                        kind: Sig(
-                            Signature {
-                                items: [],
-                                span: ,
-                                generics: {},
-                            },
-                        ),
-                        has_bang: false,
-                        span: ,
-                    },
-                ],
-                span: ,
-                generics: {},
-            },
-            body: Block {
-                items: [
-                    ScopeCapture {
-                        params: Signature {
-                            items: [
-                                SigItem {
-                                    name: "s",
-                                    kind: Ident(
-                                        SigIdent {
-                                            name: "str",
-                                            span: ,
-                                        },
-                                    ),
-                                    has_bang: false,
-                                    span: ,
-                                },
-                            ],
-                            span: ,
-                            generics: {},
-                        },
-                        continuation: Block {
-                            items: [
-                                Ident(
-                                    Ident {
-                                        name: "@write",
-                                        args: [
-                                            Arg {
-                                                name: None,
-                                                term: Ident(
-                                                    Ident {
-                                                        name: "s",
-                                                        args: [],
-                                                        span: ,
-                                                    },
-                                                ),
-                                                span: ,
-                                            },
-                                            Arg {
-                                                name: None,
-                                                term: Ident(
-                                                    Ident {
-                                                        name: "ok",
-                                                        args: [],
-                                                        span: ,
-                                                    },
-                                                ),
-                                                span: ,
-                                            },
-                                        ],
-                                        span: ,
-                                    },
-                                ),
-                            ],
-                            span: ,
-                        },
-                        term: Ident(
-                            Ident {
-                                name: "@sprintf",
-                                args: [
-                                    Arg {
-                                        name: None,
-                                        term: Ident(
-                                            Ident {
-                                                name: "fmt",
-                                                args: [],
-                                                span: ,
-                                            },
-                                        ),
-                                        span: ,
-                                    },
-                                    Arg {
-                                        name: None,
-                                        term: Ident(
-                                            Ident {
-                                                name: "args",
-                                                args: [],
-                                                span: ,
-                                            },
-                                        ),
-                                        span: ,
-                                    },
-                                ],
-                                span: ,
-                            },
-                        ),
-                        span: ,
-                    },
-                ],
-                span: ,
-            },
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
     FunctionDef {
         name: "new_point",
         lambda: Lambda {
@@ -172,7 +35,7 @@
                                 span: ,
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                     SigItem {
@@ -183,7 +46,7 @@
                                 span: ,
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                     SigItem {
@@ -199,7 +62,7 @@
                                                 span: ,
                                             },
                                         ),
-                                        has_bang: false,
+                                        is_comptime: false,
                                         span: ,
                                     },
                                     SigItem {
@@ -210,7 +73,7 @@
                                                 span: ,
                                             },
                                         ),
-                                        has_bang: false,
+                                        is_comptime: false,
                                         span: ,
                                     },
                                 ],
@@ -218,7 +81,7 @@
                                 generics: {},
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],
@@ -277,7 +140,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "exit",
+                            name: "@exit",
                             args: [
                                 Arg {
                                     name: None,
@@ -316,7 +179,7 @@
                                 span: ,
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                     SigItem {
@@ -327,7 +190,7 @@
                                 span: ,
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],
@@ -338,7 +201,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "printf",
+                            name: "stdout.printf",
                             args: [
                                 Arg {
                                     name: None,
@@ -420,7 +283,7 @@
                                                                 span: ,
                                                             },
                                                         ),
-                                                        has_bang: false,
+                                                        is_comptime: false,
                                                         span: ,
                                                     },
                                                     SigItem {
@@ -431,7 +294,7 @@
                                                                 span: ,
                                                             },
                                                         ),
-                                                        has_bang: false,
+                                                        is_comptime: false,
                                                         span: ,
                                                     },
                                                 ],
@@ -439,7 +302,7 @@
                                                 generics: {},
                                             },
                                         ),
-                                        has_bang: false,
+                                        is_comptime: false,
                                         span: ,
                                     },
                                 ],
@@ -447,7 +310,7 @@
                                 generics: {},
                             },
                         ),
-                        has_bang: false,
+                        is_comptime: false,
                         span: ,
                     },
                 ],

@@ -1,15 +1,12 @@
 str: @str
 int: @int
-write: @write
-exit: @exit
 x: "Hello world!\n"
 foo: (x: str!, ok:()){
-    write(x, ok)
+    @write(x, ok)
 }
-
 _1_main: (){
     _2: 0
-    exit(_2)
+    @exit(_2)
 }
 
 main: (x: str!){

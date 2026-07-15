@@ -60,7 +60,7 @@ foo_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $msg = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(foo, $msg: str!)
+    @jumpargs(foo, $msg: str)
 
 
 foo_deep_release($env_end: int):
@@ -75,14 +75,14 @@ foo_deepcopy($env_end: int):
 
 
 main($msg: str!):
-    @jumpargs(foo, $msg: str!)
+    @jumpargs(foo, $msg: str)
 
 
 main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $msg = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(main, $msg: str!)
+    @jumpargs(main, $msg: str)
 
 
 main_deep_release($env_end: int):
@@ -97,5 +97,5 @@ main_deepcopy($env_end: int):
 
 
 _start():
-    @jumpargs(main, $msg: str! = "hi")
+    @jumpargs(main, $msg: str = "hi")
 

@@ -1,9 +1,9 @@
-use std::collections::{BTreeSet, VecDeque};
+use std::collections::{BTreeSet, HashSet, VecDeque};
 use std::io::BufRead;
 
 use crate::compiler::ast;
 use crate::compiler::ast::{
-    Block, BlockItem, Ident, Lambda, Literal, SigIdent, SigItem, SigKind, Signature, Term,
+    Block, BlockItem, Ident, Lambda, Literal, SigIdent, SigKind, Signature, Term,
 };
 use crate::compiler::builtins;
 use crate::compiler::error::{Code, Error};
@@ -14,7 +14,8 @@ use crate::compiler::token::{Token, TokenKind};
 pub struct Parser<R: BufRead> {
     lexer: Lexer<R>,
     peeked: VecDeque<Token>,
-    allow_top_imports: bool,
+    source_namespaces: HashSet<String>,
+    block_depth: usize,
     generic_param_stack: Vec<BTreeSet<String>>,
 }
 
@@ -29,7 +30,8 @@ impl<R: BufRead> Parser<R> {
         Self {
             lexer,
             peeked: VecDeque::new(),
-            allow_top_imports: true,
+            source_namespaces: HashSet::new(),
+            block_depth: 0,
             generic_param_stack: Vec::new(),
         }
     }
@@ -53,9 +55,6 @@ impl<R: BufRead> Parser<R> {
             TokenKind::Eof => Ok(None),
             _ => {
                 let item = self.parse_block_item()?;
-                if !matches!(&item, BlockItem::Import { .. }) {
-                    self.allow_top_imports = false;
-                }
                 self.consume_block_item_separators()?;
                 Ok(Some(item))
             }
@@ -75,34 +74,24 @@ impl<R: BufRead> Parser<R> {
         let token = self.peek_token()?.clone();
         let span: Span = token.span;
         match token.kind {
+            TokenKind::SourcePath(path) => {
+                return Err(Error::new(
+                    Code::Parse,
+                    format!("source package '{path}' must be bound as 'name: {path}'"),
+                    token.span,
+                ));
+            }
             TokenKind::Ident(name) => {
                 let ident = self.bump()?; // Might be the name
                 if matches!(self.peek_token()?.kind, TokenKind::Colon) {
                     self.bump()?; // consume colon
-                    let next = self.peek_token()?.clone();
-                    if let TokenKind::Import(path) = next.kind {
-                        self.bump()?; // consume import token
-                        return Ok(BlockItem::IdentDef {
-                            name,
-                            ident: Ident {
-                                name: format!("@{path}"),
-                                args: Vec::new(),
-                                span: next.span,
-                            },
-                            span,
-                        });
-                    }
-                    // name: ... → declaration
                     return self.parse_bind(name, span);
                 }
 
                 // Must be an exec
                 self.peeked.push_front(ident); // restore token to attempt exec parse
             }
-            TokenKind::Import(_) => {
-                let ident = self.bump()?;
-                self.peeked.push_front(ident);
-            }
+            TokenKind::Builtin(_) => {}
             TokenKind::LParen => {
                 return self.parse_lambda_or_scope_capture();
             }
@@ -110,7 +99,7 @@ impl<R: BufRead> Parser<R> {
             _ => return Err(Error::new(Code::Parse, "expected a top-level item", span)),
         }
 
-        let term = self.parse_term()?;
+        let term = self.parse_value(None)?;
         match term {
             Term::Lit(literal) => Err(Error::new(
                 Code::Parse,
@@ -123,9 +112,19 @@ impl<R: BufRead> Parser<R> {
     }
 
     fn parse_bind(&mut self, name: String, name_span: Span) -> Result<BlockItem, Error> {
+        if let TokenKind::SourcePath(path) = self.peek_token()?.kind.clone() {
+            self.require_root_source_import(name_span)?;
+            self.add_source_namespace(&name, name_span)?;
+            self.bump()?;
+            return Ok(BlockItem::Import {
+                label: name,
+                path,
+                span: name_span,
+            });
+        }
+
         let generics = self.parse_generic_params()?;
         let next_token = self.peek_token()?.clone();
-        let params_span = next_token.span;
         let has_head = matches!(next_token.kind, TokenKind::LParen);
         let has_brace = matches!(next_token.kind, TokenKind::LBrace);
 
@@ -163,18 +162,19 @@ impl<R: BufRead> Parser<R> {
                 });
             }
 
-            let param_types = Self::collect_param_kinds(&params.items)?;
-            let mut target = Signature::from_kinds(param_types, params_span);
-            target.generics = generics.clone();
+            for item in &mut params.items {
+                item.name.clear();
+            }
+            params.generics = generics.clone();
             return Ok(BlockItem::SigDef {
                 name,
-                sig: target,
+                sig: params,
                 span: name_span,
             });
         }
 
         // Case 2: alias or literal (no params or body block)
-        let term = self.parse_term()?;
+        let term = self.parse_value(Some(name_span.column))?;
         let term_span = term.span();
         match term {
             Term::Lit(literal) => Ok(BlockItem::LitDef {
@@ -264,6 +264,91 @@ impl<R: BufRead> Parser<R> {
         Ok(term)
     }
 
+    fn parse_value(&mut self, newline_boundary: Option<usize>) -> Result<Term, Error> {
+        let mut term = self.parse_term()?;
+        if self.consume_value_whitespace(newline_boundary)? {
+            let argument = self.parse_value(newline_boundary)?;
+            let span = argument.span();
+            let arg = ast::Arg {
+                name: None,
+                term: argument,
+                span,
+            };
+            match &mut term {
+                Term::Ident(ident) => ident.args.push(arg),
+                Term::Lambda(lambda) => lambda.args.push(arg),
+                Term::Lit(_) => {
+                    return Err(Error::new(
+                        Code::Parse,
+                        "expected identifier or lambda before whitespace application",
+                        term.span(),
+                    ));
+                }
+            }
+        }
+        Ok(term)
+    }
+
+    fn consume_value_whitespace(&mut self, newline_boundary: Option<usize>) -> Result<bool, Error> {
+        if !matches!(self.peek_token()?.kind, TokenKind::Newline) {
+            return Ok(self.peek_token()?.has_leading_whitespace && self.is_value_head(0)?);
+        }
+
+        let mut newline_count = 0;
+        while matches!(self.peek_nth(newline_count)?.kind, TokenKind::Newline) {
+            newline_count += 1;
+        }
+        let next = self.peek_nth(newline_count)?.clone();
+        if newline_boundary.is_some_and(|column| next.span.column <= column)
+            || !self.is_value_head(newline_count)?
+        {
+            return Ok(false);
+        }
+        for _ in 0..newline_count {
+            self.bump()?;
+        }
+        Ok(true)
+    }
+
+    fn is_value_head(&mut self, offset: usize) -> Result<bool, Error> {
+        let token = self.peek_nth(offset)?.clone();
+        if matches!(token.kind, TokenKind::Ident(_))
+            && matches!(self.peek_nth(offset + 1)?.kind, TokenKind::Colon)
+        {
+            return Ok(false);
+        }
+        if matches!(token.kind, TokenKind::LParen) {
+            return self.is_lambda_head(offset);
+        }
+        Ok(matches!(
+            token.kind,
+            TokenKind::Ident(_)
+                | TokenKind::Builtin(_)
+                | TokenKind::IntLiteral(_)
+                | TokenKind::FloatLiteral(_)
+                | TokenKind::StringLiteral(_)
+        ))
+    }
+
+    fn is_lambda_head(&mut self, offset: usize) -> Result<bool, Error> {
+        let mut depth = 0;
+        let mut index = offset;
+        loop {
+            match self.peek_nth(index)?.kind {
+                TokenKind::LParen => depth += 1,
+                TokenKind::RParen => {
+                    depth -= 1;
+                    if depth == 0 {
+                        return Ok(matches!(self.peek_nth(index + 1)?.kind, TokenKind::LBrace));
+                    }
+                }
+                TokenKind::Eof => return Ok(false),
+                _ => {}
+            }
+            index += 1;
+        }
+    }
+
     // parse_head parses primary terms: literals, variables, and lambdas before any curried args.
     fn parse_head(&mut self) -> Result<Term, Error> {
         self.skip_newlines()?;
@@ -282,15 +367,20 @@ impl<R: BufRead> Parser<R> {
                 span: token.span,
             })),
             TokenKind::Ident(name) => Ok(Term::Ident(Ident {
-                name,
+                name: self.parse_qualified_name(name)?,
                 args: Vec::new(),
                 span: token.span,
             })),
-            TokenKind::Import(name) => Ok(Term::Ident(Ident {
-                name: format!("@{name}"),
+            TokenKind::Builtin(name) => Ok(Term::Ident(Ident {
+                name: self.parse_builtin_name(name, token.span)?,
                 args: Vec::new(),
                 span: token.span,
             })),
+            TokenKind::SourcePath(_) => Err(Error::new(
+                Code::Parse,
+                "source packages are only valid as file-root namespace bindings",
+                token.span,
+            )),
             TokenKind::LParen => {
                 // ( ... ) { ... } → lambda with params
                 self.peeked.push_front(token.clone());
@@ -344,7 +434,7 @@ impl<R: BufRead> Parser<R> {
             if matches!(second.kind, TokenKind::Colon) {
                 let span = self.bump()?.span;
                 self.expect_token(":", |kind| matches!(kind, TokenKind::Colon))?;
-                let term = self.parse_term()?;
+                let term = self.parse_value(None)?;
                 return Ok(ast::Arg {
                     name: Some(name),
                     term,
@@ -352,7 +442,7 @@ impl<R: BufRead> Parser<R> {
                 });
             }
         }
-        let term = self.parse_term()?;
+        let term = self.parse_value(None)?;
         let span = term.span();
         Ok(ast::Arg {
             name: None,
@@ -392,14 +482,14 @@ impl<R: BufRead> Parser<R> {
             (None, self.parse_type_kind()?)
         };
 
-        let has_bang = self
+        let is_comptime = self
             .consume_if(|kind| matches!(kind, TokenKind::Bang))?
             .is_some();
 
         Ok(ast::SigItem {
             name: name.unwrap_or_default(),
             kind: ty,
-            has_bang,
+            is_comptime,
             span: item_span,
         })
     }
@@ -454,10 +544,6 @@ impl<R: BufRead> Parser<R> {
             .any(|scope| scope.contains(name))
     }
 
-    fn collect_param_kinds(params: &[SigItem]) -> Result<Vec<ast::SigKind>, Error> {
-        Ok(params.iter().map(|param| param.kind.clone()).collect())
-    }
-
     fn parse_type_arguments(&mut self) -> Result<Vec<ast::SigKind>, Error> {
         self.expect_token("<", |kind| matches!(kind, TokenKind::AngleOpen))?;
         let mut args = Vec::new();
@@ -502,6 +588,7 @@ impl<R: BufRead> Parser<R> {
                 Ok(kind)
             }
             TokenKind::Ident(name) => {
+                let name = self.parse_qualified_name(name)?;
                 if self.is_generic_param(&name) {
                     return Ok(SigKind::Generic(name));
                 }
@@ -556,22 +643,15 @@ impl<R: BufRead> Parser<R> {
                 // return Err(CompileError::new(CompileErrorCode::Parse, format!("unknown type '{}'", name), span).into());
                 Ok(SigKind::Ident(SigIdent { name, span }))
             }
-            TokenKind::Import(name) => match builtins::get_spec(&name) {
-                Some(builtins::BuiltinSpec::Type(_)) => Ok(SigKind::Ident(SigIdent {
-                    name: format!("@{name}"),
-                    span,
-                })),
-                Some(builtins::BuiltinSpec::Function(_)) => Err(Error::new(
-                    Code::Parse,
-                    format!("@{name} is a builtin function, not a type"),
-                    span,
-                )),
-                None => Err(Error::new(
-                    Code::Parse,
-                    format!("unknown builtin type '@{name}'"),
-                    span,
-                )),
-            },
+            TokenKind::Builtin(name) => Ok(SigKind::Ident(SigIdent {
+                name: self.parse_builtin_name(name, span)?,
+                span,
+            })),
+            TokenKind::SourcePath(_) => Err(Error::new(
+                Code::Parse,
+                "source packages are only valid as file-root namespace bindings",
+                span,
+            )),
             TokenKind::Ellipsis => Ok(SigKind::Variadic),
             _ => Err(Error::new(Code::Parse, "expected a type", span)),
         }
@@ -614,6 +694,51 @@ impl<R: BufRead> Parser<R> {
                 token.span,
             )),
         }
+    }
+
+    fn parse_qualified_name(&mut self, mut name: String) -> Result<String, Error> {
+        while self
+            .consume_if(|kind| matches!(kind, TokenKind::Dot))?
+            .is_some()
+        {
+            let (member, _) = self.parse_identifier("identifier after '.'")?;
+            name.push('.');
+            name.push_str(&member);
+        }
+        Ok(name)
+    }
+
+    fn parse_builtin_name(&self, name: String, span: Span) -> Result<String, Error> {
+        if builtins::get_spec(&name).is_none() {
+            return Err(Error::new(
+                Code::Parse,
+                format!("unknown builtin '@{name}'"),
+                span,
+            ));
+        }
+        Ok(format!("@{name}"))
+    }
+
+    fn require_root_source_import(&self, span: Span) -> Result<(), Error> {
+        if self.block_depth != 0 {
+            return Err(Error::new(
+                Code::Parse,
+                "source package bindings are only allowed at the file root",
+                span,
+            ));
+        }
+        Ok(())
+    }
+
+    fn add_source_namespace(&mut self, namespace: &str, span: Span) -> Result<(), Error> {
+        if !self.source_namespaces.insert(namespace.to_string()) {
+            return Err(Error::new(
+                Code::Parse,
+                format!("duplicate import namespace '{namespace}'"),
+                span,
+            ));
+        }
+        Ok(())
     }
 
     fn expect_token<F>(&mut self, expected: &str, predicate: F) -> Result<Token, Error>
@@ -667,6 +792,7 @@ impl<R: BufRead> Parser<R> {
     }
 
     fn parse_body(&mut self, start_span: Span) -> Result<Block, Error> {
+        self.block_depth += 1;
         let mut items = Vec::new();
         loop {
             self.consume_block_item_separators()?;
@@ -679,6 +805,7 @@ impl<R: BufRead> Parser<R> {
                 }
             }
         }
+        self.block_depth -= 1;
 
         if items.is_empty() {
             let token = self.peek_token()?.clone();
@@ -690,7 +817,7 @@ impl<R: BufRead> Parser<R> {
         }
 
         Ok(Block {
-            items,
+            items: desugar_block_sequence(items),
             span: start_span,
         })
     }
@@ -702,6 +829,42 @@ impl<R: BufRead> Parser<R> {
         {}
         Ok(())
     }
+}
+
+fn desugar_block_sequence(items: Vec<BlockItem>) -> Vec<BlockItem> {
+    let mut continuation = Vec::new();
+
+    for item in items.into_iter().rev() {
+        if continuation.is_empty() {
+            continuation.push(item);
+            continue;
+        }
+
+        let term = match item {
+            BlockItem::Ident(ident) => Term::Ident(ident),
+            BlockItem::Lambda(lambda) => Term::Lambda(lambda),
+            item => {
+                continuation.insert(0, item);
+                continue;
+            }
+        };
+        let span = term.span();
+        continuation = vec![BlockItem::ScopeCapture {
+            params: Signature {
+                items: Vec::new(),
+                span,
+                generics: BTreeSet::new(),
+            },
+            continuation: Block {
+                items: continuation,
+                span,
+            },
+            term,
+            span,
+        }];
+    }
+
+    continuation
 }
 
 #[cfg(test)]
@@ -752,5 +915,123 @@ mod tests {
             err.to_string().contains("unexpected token: LBrace"),
             "unexpected error: {err}"
         );
+    }
+
+    #[test]
+    fn space_application_is_right_associative_in_definition_values() {
+        let mut parser = Parser::new(Lexer::new(Cursor::new("chain: a b c")));
+        let item = parser
+            .next_block_item()
+            .expect("definition should parse")
+            .expect("definition should exist");
+        let BlockItem::IdentDef { ident, .. } = item else {
+            panic!("expected identifier definition");
+        };
+        assert_eq!(ident.name, "a");
+        let Term::Ident(b) = &ident.args[0].term else {
+            panic!("expected b application");
+        };
+        assert_eq!(b.name, "b");
+        let Term::Ident(c) = &b.args[0].term else {
+            panic!("expected c application");
+        };
+        assert_eq!(c.name, "c");
+        assert!(c.args.is_empty());
+    }
+
+    #[test]
+    fn indented_space_application_stays_inside_definition_value() {
+        let source = "chain:\n    a\n    b\n    c\nnext: d";
+        let mut parser = Parser::new(Lexer::new(Cursor::new(source)));
+        let first = parser
+            .next_block_item()
+            .expect("chain should parse")
+            .expect("chain should exist");
+        let BlockItem::IdentDef { ident, .. } = first else {
+            panic!("expected identifier definition");
+        };
+        let Term::Ident(b) = &ident.args[0].term else {
+            panic!("expected b application");
+        };
+        let Term::Ident(c) = &b.args[0].term else {
+            panic!("expected c application");
+        };
+        assert_eq!(c.name, "c");
+
+        let second = parser
+            .next_block_item()
+            .expect("next should parse")
+            .expect("next should exist");
+        let BlockItem::IdentDef { name, .. } = second else {
+            panic!("expected following definition");
+        };
+        assert_eq!(name, "next");
+    }
+
+    #[test]
+    fn block_application_is_right_associative_across_newlines() {
+        let source = "main: (){\n    a\n    b\n    c\n}";
+        let mut parser = Parser::new(Lexer::new(Cursor::new(source)));
+        let item = parser
+            .next_block_item()
+            .expect("function should parse")
+            .expect("function should exist");
+        let BlockItem::FunctionDef { lambda, .. } = item else {
+            panic!("expected function definition");
+        };
+        assert_eq!(lambda.body.items.len(), 1);
+        let BlockItem::Ident(a) = &lambda.body.items[0] else {
+            panic!("expected right-associated application");
+        };
+        assert_eq!(a.name, "a");
+        let Term::Ident(b) = &a.args[0].term else {
+            panic!("expected b application");
+        };
+        assert_eq!(b.name, "b");
+        let Term::Ident(c) = &b.args[0].term else {
+            panic!("expected c application");
+        };
+        assert_eq!(c.name, "c");
+        assert!(c.args.is_empty());
+    }
+
+    #[test]
+    fn block_execution_captures_a_following_definition() {
+        let source = "main: (){\n    a\n    value: b\n    c(value)\n}";
+        let mut parser = Parser::new(Lexer::new(Cursor::new(source)));
+        let item = parser
+            .next_block_item()
+            .expect("function should parse")
+            .expect("function should exist");
+        let BlockItem::FunctionDef { lambda, .. } = item else {
+            panic!("expected function definition");
+        };
+        let BlockItem::ScopeCapture {
+            params,
+            continuation,
+            term,
+            ..
+        } = &lambda.body.items[0]
+        else {
+            panic!("expected implicit unit scope capture");
+        };
+        assert!(params.items.is_empty());
+        let Term::Ident(a) = term else {
+            panic!("expected a invocation");
+        };
+        assert_eq!(a.name, "a");
+        let BlockItem::IdentDef { name, ident, .. } = &continuation.items[0] else {
+            panic!("expected value definition");
+        };
+        assert_eq!(name, "value");
+        assert_eq!(ident.name, "b");
+        let BlockItem::Ident(c) = &continuation.items[1] else {
+            panic!("expected c invocation");
+        };
+        assert_eq!(c.name, "c");
+        let Term::Ident(value) = &c.args[0].term else {
+            panic!("expected value argument");
+        };
+        assert_eq!(value.name, "value");
     }
 }
