@@ -1,10 +1,19 @@
 # --- Structure ---
-Program <- _ Imports? _ BlockItems? _ EOF
+Program <- _ FileItems? _ EOF
 
-Imports <- Import (_ Import)*
+FileItems <- FileItem (_ FileItem)*
 
-Import
-    <- "@" Identifier
+FileItem
+    <- SourceBinding / BlockItem
+
+SourceBinding
+    <- Label _ SourcePath ImportEnd
+
+SourcePath
+    <- "/" [^\n\r;]*
+
+ImportEnd
+    <- ";" / &[\n\r] / EOF
 
 Block
     <- "{" _ BlockItems? _ "}"
@@ -16,15 +25,11 @@ BlockItems
 BlockItem
     <- (   &SignatureAndEquals  ScopeCapture     # 1. Lookahead: `(a:t) = b` (rest of body is the last closure arg jump)
          / &Label               Declaration      # 2. Lookahead: `x: value` or `x: type`
-         / &ApplyHead           Apply            # 3. Lookahead: `x(...)` (0 or more arg jump)
-         / Reference                             # 4. Fallback: `x` (The 0-arg jump)
+         / ExecutableSentence                    # 3. Right-associated application sentence
        )
 
 SignatureAndEquals      # Lookahead helper (No semantic effect)
     <- "(" _ SigItems? _ ")" _ "="
-
-ApplyHead               # Lookahead helper (No semantic effect)
-    <- Identifier _ "("
 
 # --- Declarations & Types ---
 Declaration
@@ -32,7 +37,7 @@ Declaration
 
 Target
     <- Signature !(_ Value)      # Structure Check: "(...)"
-     / Value                     # Everything else
+     / ContinuationSentence      # Everything else
 
 Signature
     <- "(" _ SigItems? _ ")" _
@@ -46,7 +51,8 @@ SigItem
 
 TypeRef
     <- Signature        # Nested: "(int, int)" or "(a: int)"
-     / Identifier       # Basic type: "int", "str"
+     / Builtin
+     / QualifiedIdentifier # User type or imported type: "item", "math.number"
 
 # --- Values ---
 
@@ -54,7 +60,8 @@ Value
     <- Lambda
      / Apply
      / Literal
-     / Identifier       # e.g., "x" bound to a value
+     / Builtin
+     / QualifiedIdentifier # e.g., "x" or "math.add"
 
 # --- Application ---
 
@@ -63,10 +70,23 @@ Apply
 
 Head
     <- Lambda
-     / Identifier
+     / Builtin
+     / QualifiedIdentifier
 
 ArgumentItems
-    <- Value ("," _ Value)*
+    <- ContinuationSentence ("," _ ContinuationSentence)*
+
+ContinuationSentence
+    <- Value (__ ContinuationSentence)?
+
+ExecutableSentence
+    <- Executable (__ ContinuationSentence)?
+
+Executable
+    <- Lambda
+     / Apply
+     / Builtin
+     / QualifiedIdentifier
 
 # --- Scope & Lambda ---
 
@@ -75,18 +95,23 @@ ScopeCapture
 
 Lambda
     <- Signature _ Block      # Signature used as Parameters
-     / Block
 
 # --- Primitives ---
 
 Label
     <- Identifier ":"
 
-Reference
-    <- Identifier _
+Builtin
+    <- "@" Identifier
+
+QualifiedIdentifier
+    <- Identifier ("." Identifier)?
 
 Identifier
-    <- [a-zA-Z_][a-zA-Z0-9_]*
+    <- [a-zA-Z_] IdentifierContinue*
+
+IdentifierContinue
+    <- [a-zA-Z0-9_]
 
 Literal
     <- IntegerLiteral / StringLiteral
@@ -100,6 +125,9 @@ StringLiteral
 # --- Whitespace ---
 _
     <- ( [ \t\n\r] / Comment )*
+
+__
+    <- ( [ \t\n\r] / Comment )+
 
 Comment
     <- "//" [^\n]*       # "//..."
