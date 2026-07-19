@@ -1,0 +1,7 @@
+complete_item: (value: calculation, ready: (calculation), binding, tail: arg) {
+    complete(value, tail, ready)
+}
+
+complete_done: (value: calculation, ready: (calculation)) {
+    ready(value)
+}

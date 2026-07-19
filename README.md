@@ -1,40 +1,62 @@
 # Afterflow compile-direct compiler
 
-This is a small experimental programming language focused on simplicity, predictability, and explicit semantics. The compile-direct compiler is written in Rust and lowers Afterflow programs directly to NASM AMD64 assembly, producing ELF binaries that run on any AMD64 Linux system with hooks to standard libc (no LLVM, no JIT, and no garbage collector but with automatic garbage collection).
+This is a small experimental programming language focused on simplicity,
+predictability, and explicit semantics. The compile-direct compiler is written in Rust and
+lowers Afterflow programs directly to NASM AMD64 assembly, producing ELF binaries
+that run on AMD64 Linux using direct system calls without LLVM or a JIT.
 
-It is statically typed, compiled, single static assignment, explicit continuation passing, declaration before use, automatically memory managed using linear types (No garbage collector) and with no runtime errors.
+It is statically typed, compiled, single static assignment, explicit
+continuation passing, declaration before use, and has no manual memory
+management operations in Afterflow source. Memory management is a compiler choice.
+The current compile-direct compiler uses compiler-tracked ownership without a tracing
+garbage collector, while another compiler may retain allocations or use a
+different strategy.
 
 The grammar file lives in: [grammar.peg](./grammar.peg)
+
+## compile-direct purpose
+
+compile-direct is intentionally unoptimized. It is a *what you write is what you get*
+compiler: it directly lowers the program's explicit control flow and data flow
+instead of rewriting it for speed or size. The generated assembly necessarily
+includes CPS, closure, and memory-management machinery, but compile-direct does not apply
+peephole optimization, register allocation, inlining, or dead-code
+elimination.
 
 ## Highlights
 
 - **Continuation-Passing Style (CPS)**: Every label ends with a tail transfer to its continuation, enabling predictable control flow, no stack frames.
-- **Deterministic memory model**: Closure environments and other allocations use mmap/munmap. The compiler manages lifetimes, so no tracing GC or manual free is required.
+- **compile-direct deterministic memory management**: compile-direct closure environments and other
+  dynamic allocations use `mmap`/`munmap` with compiler-tracked lifetimes.
 - **Strictly typed**: All interfaces, closure shapes, and continuation types are explicit and checked at compile time.
 - **Punctuation-driven syntax**: A minimal surface language that stays readable while keeping the parser and backend fast.
 - **No keywords**: There are no built-ins like `let`, `fn`, `if`, or `struct`, every semantic construct arises from punctuation and continuation form.
 - **First-class functions**: Every value is passed explicitly, closures are automatically curried and lowered to environment structures.
-- **Unicode-aware strings**: UTF-8 string literals work as expected; identifiers use an intentionally ASCII-only grammar.
+- **Signature-owned staged execution**: `!` parameters are consumed by the typed HIR interpreter, while unmarked continuation parameters define where ordinary runtime execution resumes.
+- **Unicode-aware frontend**: UTF-8 literals and identifiers work as expected while the grammar stays ASCII-friendly.
 - **Direct compile-to-assembly backend**: Deterministic performance, tiny runtime footprint, full control over calling conventions and memory layout.
 
 # Example
 ```
+fmt: /std/fmt
+
 str: @str
 
 name: "Alice"
-printf: (fmt: str!, args: ..., ok:()) {
-   (s: str) = @sprintf(fmt, args)
-   @write(s, ok)
-}
 hello: (){
-   printf("hello %s", name, @exit(0))
+   fmt.new(
+       "hello %",
+       @compile_error("invalid format", @exit(1)),
+       fmt.str(name) fmt.end,
+       @write(ok: @exit(0))
+   )
 }
 ```
 
 `@name` addresses the compiler-provided types and operations that every Afterflow
-implementation must support. It is separate from user labels; keyword-like
+implementation must support. It is separate from user labels. Keyword-like
 types are usually given short aliases. Source packages use explicit namespace
-bindings such as `math: /math`.
+bindings such as `math: /std/math`.
 
 ## Execution Model & Core Semantics
 
@@ -50,30 +72,36 @@ There are no expressions, operators or return values, all computation is a seque
 
 A definition introduces a name for a value inside the current scope:
 ```
+fmt: /std/fmt
+
 str: @str
 
 name: "Bob"
-printf: (fmt: str!, args: ..., ok:()) {
-   (s: str) = @sprintf(fmt, args)
-   @write(s, ok)
-}
 foo: (ok:()){
-   printf("hello %s", name, ok)
+   fmt.new(
+       "hello %",
+       @exit(1),
+       fmt.str(name) fmt.end,
+       @write(ok: ok)
+   )
 }
 ```
 
 ### Execution
 
 ```
+fmt: /std/fmt
+
 str: @str
 
 name: "Bob"
-printf: (fmt: str!, args: ..., ok:()) {
-   (s: str) = @sprintf(fmt, args)
-   @write(s, ok)
-}
 foo: (ok:()){
-   printf("hello %s", name, ok)
+   fmt.new(
+       "hello %",
+       @exit(1),
+       fmt.str(name) fmt.end,
+       @write(ok: ok)
+   )
 }
 end: @exit(0)
 foo(end)
@@ -92,6 +120,29 @@ i.e. `foo(x)` with a name or as an argument produces a closure (an executable va
 When application appears as a standalone action in a block .e.g `foo(end)`
 it is compiled as a tail jump to `foo`. Control transfers directly to `foo`
 and never returns to the current location.
+
+Compile-time execution is owned by the callable's signature. Executing a
+function with at least one `!` parameter enters the HIR interpreter. There is
+no call-level bang. Marked arguments remain available to that interpreter,
+including known recursive closure structure such as a formatter argument
+chain. Unmarked data is opaque to the interpreter even when the caller supplied
+a literal, while an unmarked callable parameter is the residual boundary: the
+compiler emits the transfer leading into that continuation for normal runtime
+execution. Any input that staged code must inspect before that boundary must
+therefore be marked `!`.
+
+Partial application preserves this property. A labelled closure rooted in a
+function with marked parameters is staged when it is eventually executed:
+
+```af
+q: build(2)
+q(@exit)
+```
+
+Runtime payloads may remain captured inside compile-time-known closures. They
+cannot be inspected before the continuation boundary. This lets `fmt.new` and
+`calc.new` validate static DSL input during compilation while leaving string
+construction, arithmetic, I/O, and the rest of the program to runtime.
 
 ## Avoiding Deeply Nested Control Flow
 Languages that rely on embedding functions inside functions often produce deeply
@@ -138,7 +189,8 @@ What if we adopt a fully operational view of [lambda calculus](https://en.wikipe
 Under this interpretation, the lambda calculus effectively becomes:
 - a **minimal machine** model much closer to assembly than to high-level mathematics
 - a **control-flow graph** where substitution acts as a jump with an extended environment
-- a **small-step abstract machine** (CEK, Krivine, etc.) but with memory management without a garbage collector.
+- a **small-step abstract machine** (CEK, Krivine, etc.) whose resource
+  management strategy is chosen by the compiler.
 - a **rewriting interpreter** whose only instruction is β-reduction (providing arguments to functions).
 
 The idea was to make this operational structure explicit and statically checked, while presenting it using a familiar C-family surface syntax (inspired by JavaScript, TypeScript, Go, Rust).
@@ -179,6 +231,12 @@ Run the sample program with:
 make run hello
 ```
 
+Run an example program with:
+
+```sh
+make example comptime_format
+```
+
 ## Quick start (Using Docker)
 
 ```sh
@@ -195,7 +253,9 @@ This is what happens inside the container (or on your linux machine)
 apt-get install -y nasm gcc make
 cargo run -- code/main.af hello hello.asm
 nasm -felf64 hello.asm -o bin/hello.o
-ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc bin/hello.o -o bin/hello
+cargo build -p freestanding-format --release
+cargo build -p freestanding-math --release
+ld --gc-sections --strip-debug bin/hello.o target/release/libfreestanding_format.a target/release/libfreestanding_math.a -o bin/hello
 ./bin/hello
 ```
 
@@ -231,17 +291,19 @@ For compile-direct, the input file locates the project root: its containing fold
 root package, and every `.af` file directly in that folder is compiled into
 the same package. A source binding such as `lib: /lib` loads every direct
 `.af` file from the `lib` folder beneath that project root.
-The root package itself cannot be imported; declarations shared with imported
+The root package itself cannot be imported. Declarations shared with imported
 packages belong in a named package that each consumer imports.
 
 The compilation process flows as follows:
 1. `Lexer`: Transforms source text into a stream of `Token`s.
 2. `Parser`: Consumes tokens to produce an Abstract Syntax Tree (AST).
 3. `HIR`: AST is desugared and type checked.
-4. `AIR`: Control flow analysis and memory management.
-5. `Codegen`: Optimization and assembly output.
-6. `Assembler`: Converts assembly text into machine object files.
-7. TODO: `Linker`: Combines object files and libraries into the final executable.
+4. `Comptime`: Calls rooted in signatures with `!` parameters are interpreted
+   and residualized at their unmarked continuation parameters.
+5. `AIR`: Control flow analysis and memory management.
+6. `Codegen`: Assembly output.
+7. `Assembler`: Converts assembly text into machine object files.
+8. TODO: `Linker`: Combines object files and libraries into the final executable.
 
 ## Current Limitations & Roadmap Notes
 
@@ -249,16 +311,33 @@ This language is still in an early experimental phase, and several subsystems ar
 
 - No optimizations  
 The backend currently emits straightforward CPS-lowered NASM without peephole passes, register allocation strategies, inlining, or dead-code elimination. Output is correct but not optimized.
-- Limited floating-point support
-`f64` literals and the `@add_f64`, `@mul_f64`, and `@div_f64` builtins are available. Broader numeric facilities and platform math-library bindings are not yet implemented.
-- No math library  
-Functions such as sin, cos, sqrt, and friends are not yet exposed. Interfacing to libm and defining a typed surface for it are planned but currently absent.
+- Floating-point support is binary64-only
+The type system, backend, and bundled `/std/math` package expose the common
+binary64 trigonometric, hyperbolic, exponential, logarithmic, power, root,
+rounding, remainder, and floating utility functions. A distinct `@f32` type and
+surface do not yet exist.
 - No arrays or slices  
 Aggregate data structures are not yet supported. There is no syntax or type-level encoding for contiguous memory layouts, indexing, or bounds semantics.
 - Minimal runtime surface  
-The compiler-provided runtime surface consists of the builtins documented in [SEMANTICS.md](SEMANTICS.md), including `@write`, `@readfile`, and `@sprintf`.
+At present, the backend surface includes `@write`, byte-oriented `@file_read`,
+executable string and byte inspection, checked UTF-8 conversion, safe immutable
+byte materialization, and arbitrary native NASM instructions. The bundled
+`/std/fmt` package implements append, concatenation, integer rendering, and
+placeholder parsing in ordinary Afterflow source.
 
 Despite that, functionality is slowly expanding, and the compiler architecture is structured so these features can be added piece by piece while keeping the language’s core goals (simplicity, explicitness, and predictability) intact.
+
+## Planned structure
+```
+afterflowlang/
+  ├── afterflow/                # core monorepo: compilers, languag server, formatter...
+  ├── afterflow-vscode/         # VS Code extension
+  ├── afterflow-zed/            # Zed extension
+  ├── afterflow.nvim/           # Neovim integration
+  ├── registry/                 # hosted package-registry service
+  ├── website/                  # optional deployed website
+  └── .github/                  # organization profile and shared workflows
+```
 
 ## License
 

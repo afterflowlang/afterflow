@@ -1,0 +1,81 @@
+eq_byte: (a: @u8, b: @u8, yes: (), no: ()) {
+    (a_bits: @b8) = @b8_from_u8(a)
+    (b_bits: @b8) = @b8_from_u8(b)
+    @eq_b8(a_bits, b_bits, yes, no)
+}
+
+raw_nth: (value: @bytes, idx: @uint, empty: (), one: (@u8)) {
+    @bytes_nth(value, idx, empty, one)
+}
+
+contains_byte: (l: @uint, nth_value: nth, idx: @uint, expected: @u8, found: (), missing: ()) {
+    @lt_uint(idx, l, () {
+        (value: @u8) = nth_value(idx, missing)
+        eq_byte(value, expected, found, () {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            contains_byte(l, nth_value, next_idx, expected, found, missing)
+        })
+    }, missing)
+}
+
+is_identifier_byte: (value: @u8, yes: (), no: ()) {
+    letters_value: "abcdefghijklmnopqrstuvwxyz"
+    (letters: @bytes) = @bytes_from_str(letters_value)
+    (letters_l: @uint) = @bytes_descriptor_len(letters)
+    contains_byte(letters_l, raw_nth(letters), 0, value, yes, no)
+}
+
+is_identifier_tail_byte: (value: @u8, yes: (), no: ()) {
+    is_identifier_byte(value, yes, digit(value, no, (@f64) {
+        yes
+    }))
+}
+
+identifier_end: (source_l: @uint, source_nth: nth, idx: @uint, ok: (@uint)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, ok(idx))
+        is_identifier_tail_byte(value, () {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            identifier_end(source_l, source_nth, next_idx, ok)
+        }, ok(idx))
+    }, ok(idx))
+}
+
+validate_identifier_bytes: (name_l: @uint, name_nth: nth, idx: @uint, invalid: (), ok: ()) {
+    @lt_uint(idx, name_l, () {
+        (value: @u8) = name_nth(idx, invalid)
+        is_identifier_byte(value, () {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            validate_identifier_bytes(name_l, name_nth, next_idx, invalid, ok)
+        }, invalid)
+    }, ok)
+}
+
+valid_placeholder_name: (name: @str, invalid: (), ok: ()) {
+    (name_bytes: @bytes) = @bytes_from_str(name)
+    (name_l: @uint) = @bytes_descriptor_len(name_bytes)
+    @lt_uint(0, name_l, () {
+        validate_identifier_bytes(name_l, raw_nth(name_bytes), 0, invalid, () {
+            reserved_name(raw_nth(name_bytes), 0, name_l, invalid, ok)
+        })
+    }, invalid)
+}
+
+range_equals_loop: (source_nth: nth, start: @uint, name_nth: nth, idx: @uint, l: @uint, equal: (), different: ()) {
+    @lt_uint(idx, l, () {
+        (source_idx: @uint) = @add_uint(start, idx)
+        (source_value: @u8) = source_nth(source_idx, different)
+        (name_value: @u8) = name_nth(idx, different)
+        eq_byte(source_value, name_value, () {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            range_equals_loop(source_nth, start, name_nth, next_idx, l, equal, different)
+        }, different)
+    }, equal)
+}
+
+range_equals_name: (source_nth: nth, start: @uint, end: @uint, name: @str, equal: (), different: ()) {
+    (source_l: @uint) = @sub_uint(end, start)
+    (name_bytes: @bytes) = @bytes_from_str(name)
+    (name_l: @uint) = @bytes_descriptor_len(name_bytes)
+    @eq_uint(source_l, name_l, range_equals_loop(source_nth, start, raw_nth(name_bytes), 0, source_l, equal, different), different)
+}

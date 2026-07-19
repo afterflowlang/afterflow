@@ -9,8 +9,13 @@ RUN apt-get update && \
 # Copy compiler source
 COPY . .
 
-# Build + install compiler binary (named `compiler`)
-RUN cargo install --path .
+# Build and install the compiler and its freestanding runtime archives.
+RUN cargo install --path . --bin compiler && \
+    cargo build -p freestanding-format --release && \
+    cargo build -p freestanding-math --release && \
+    mkdir -p /usr/local/lib/afterflow && \
+    cp target/release/libfreestanding_format.a /usr/local/lib/afterflow/ && \
+    cp target/release/libfreestanding_math.a /usr/local/lib/afterflow/
 ENV PATH="/usr/local/cargo/bin:${PATH}"
 
 # Install wrapper

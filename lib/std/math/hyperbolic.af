@@ -1,0 +1,23 @@
+sinh: (value: @f64, ok: (@f64)) {
+    @sinh_f64(value, ok)
+}
+
+cosh: (value: @f64, ok: (@f64)) {
+    @cosh_f64(value, ok)
+}
+
+tanh: (value: @f64, ok: (@f64)) {
+    @tanh_f64(value, ok)
+}
+
+asinh: (value: @f64, ok: (@f64)) {
+    @asinh_f64(value, ok)
+}
+
+acosh: (value: @f64, ok: (@f64)) {
+    @acosh_f64(value, ok)
+}
+
+atanh: (value: @f64, ok: (@f64)) {
+    @atanh_f64(value, ok)
+}

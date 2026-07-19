@@ -1,0 +1,3 @@
+pow: (base: @f64, exponent: @f64, ok: (@f64)) {
+    @pow_f64(base, exponent, ok)
+}

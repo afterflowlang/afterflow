@@ -14,9 +14,8 @@ semantic structure before AIR lowering.
 Functions without a source name are assigned generated HIR names that start
 with `_<digit>_`.
 
-HIR wraps builtins in lambdas so builtins are executed instead of curried. This
-keeps variadic lowering simpler because HIR can replace the source AST with a
-wrapper shape.
+HIR wraps builtins in lambdas so builtins passed as values execute with the
+expected structural signature instead of remaining curried aliases.
 
 AIR expresses semantic effects and control transfers only. Intermediate values
 that exist solely to implement an effect should not appear in AIR.
@@ -75,7 +74,8 @@ Payload flow:
   - write metadata after the payload
 - curry closure
   - locate payload from `env_end`
-  - write supplied arguments into remaining slots
+  - move the allocation when the source has no later use, otherwise deep-clone it
+  - write supplied arguments into the selected allocation's remaining slots
   - update metadata describing remaining arguments
 - execute closure
   - load the closure unwrapper from metadata
@@ -112,6 +112,24 @@ env_base
 heap_end
 ```
 
+## String and Byte Descriptor Representation
+
+Runtime `str` and `bytes` values are one-word pointers to immutable
+descriptors. Dynamic descriptors own the mapping containing their data,
+terminating NUL, and descriptor. Literal descriptors use zero ownership
+metadata, so cloning and release are no-ops for static data.
+
+```txt
++  0: data pointer
++  8: byte length
++ 16: owned mapping base, or zero for static data
++ 24: owned mapping size, or zero for static data
+```
+
+An affine descriptor move reuses the pointer. A repeated use clones the data
+and descriptor into an independent mapping. Descriptor release reads the exact
+mapping base and size from the final two words and calls `munmap`.
+
 ## Process Memory Model
 
 The compile-direct runtime model assumes code/data, heap, free space, and stack in the
@@ -137,127 +155,42 @@ process address space:
 MAX MEM (high address)
 ```
 
-Closure environments and variadic payloads are allocated with `mmap` and
+Closure environments and dynamic descriptors are allocated with `mmap` and
 released with `munmap`.
 
 Because functions tail-jump and do not return, a function can know when a
-closure parameter is no longer needed. Before an invocation, if a closure
-parameter is not passed onward and is not the invocation target, compile-direct releases
-that closure environment.
+heap-owned parameter is no longer needed. Before an invocation, compile-direct moves the
+selected target and arguments to the next function and releases every owned
+value that is not transferred.
 
 Release decision flow:
 
 - before lowering an invocation
-  - start with closure parameters that are still owned by the current function
-  - remove the invocation target if it is one of those closures
-  - remove every closure passed as an argument
-  - for each closure still left
-    - emit `ReleaseHeap`
-    - lower codegen to `release_heap_ptr`
-    - compute allocation base and size from metadata
-    - call `munmap`
+  - start with closure, dynamic `str`, and dynamic `bytes` values still owned by
+    the current function
+  - move the invocation target and arguments out of that set
+  - recursively release every value still left
+    - closure release recursively releases filled owned fields, then its
+      environment
+    - descriptor release unmaps its owned mapping
+  - conditional builtins release the unchosen continuation before entering the
+    selected continuation
 
-## Variadic Lowering
-
-The semantic variadic value is implemented as a closure over a packed payload.
-
-At each exec site, AIR slices supplied arguments into:
-
-- prefix arguments
-- variadic arguments
-- suffix arguments
-
-The variadic slice becomes a hidden invocation of the builtin
-`internal_array_str` closure. The call behaves as if the user had invoked
-`foo(items)`, where `items` captures the variadic payload.
-
-The packer allocates a heap block for captured values. Each element is written
-sequentially, followed by an 8-byte length field. Word-sized elements, such as
-`str`, use one slot. Closure elements are stored as their single `env_end`
-pointer.
-
-The allocation reserves extra space for a scratch invocation frame and appends:
-
-- array env size
-- total heap size
-- scratch size needed when calling the consumer
-
-The closure metadata unwrapper slot points at `internal_array_str`.
-
-`internal_array_str` calls the user continuation with:
-
-1. `len: int`
-2. `nth: (idx:int, one:(str), none:())`
-
-`internal_array_str_nth` reads metadata to bounds-check the requested index,
-then jumps to `one` with the element or to `none`.
-
-The generated source-level shape is effectively:
-
-```af
-items: internal_array_str
-```
-
-where the environment points at the packed variadic payload.
-
-Variadic payload shape:
-
-```txt
-env_base
-  |
-  v
-+------------------------------+
-| element 0                    |
-+------------------------------+
-| element 1                    |
-+------------------------------+
-| ...                          |
-+------------------------------+
-| len                          |
-+------------------------------+
-| scratch invocation frame     |
-+------------------------------+ <- env_end
-| metadata: array env size     |
-| metadata: total heap size    |
-| metadata: scratch size       |
-+------------------------------+
-```
-
-Variadic lowering flow:
-
-- inspect callee signature
-  - find the single `...` parameter
-  - split arguments into prefix, variadic slice, and suffix
-- build packed payload
-  - write each variadic element
-    - if it is word-sized, write one slot
-    - if it is a closure, write its `env_end` pointer
-  - write the element count
-  - reserve scratch space for later callback invocation
-  - write metadata needed by array helpers and release helpers
-- rewrite call
-  - replace the variadic slice with `items`
-  - set the packed payload's unwrapper metadata to `internal_array_str`
-  - represent `items` by the payload's `env_end` pointer
-- when `items` executes
-  - call the user continuation with `len` and `nth`
-  - when `nth` executes
-    - read index
-    - if index is in bounds
-      - load element
-      - jump to `one(element)`
-    - otherwise
-      - jump to `none()`
+This rule is independent of the shape of the control-flow graph. A tail cycle
+such as `a -> b -> c -> a` transfers the current ownership set around the cycle
+and does not retain ownership sets from previous iterations.
 
 ## Closure Affinity Lowering
 
-compile-direct implements closure affinity with mutable heap closure objects plus
-conservative deep cloning.
+compile-direct implements closure affinity with mutable heap closure objects, ownership
+moves, and deep cloning only at divergent uses.
 
 Each closure-typed runtime value is the `env_end` pointer of a mutable heap
-object. Currying a local closure always deep-clones that closure, writes the
-arguments into the clone, and yields the clone's `env_end` pointer. It does not
-reuse the source closure when that curry is its sole use.
+object. The full payload, including every argument slot, is allocated when the
+closure is created. Currying fills those reserved slots. If the curry is the
+source's last use, the source allocation moves to the result. If the source has
+another live use, it is deep-cloned before any slot is written, so an earlier
+curry cannot be corrupted by a later, different curry.
 
 A closure value is counted as used when its pointer is read by a CPS step:
 
@@ -271,7 +204,8 @@ Pure renaming without duplication does not count as a new use.
 Lowering responsibilities:
 
 - track remaining uses of each closure value
-- deep-clone a local closure before every curry
+- move a local closure on its last curry and deep-clone it before an earlier
+  divergent curry
 - when storing a closure argument into that clone, use its remaining-use count
   to decide whether the argument also needs a deep clone
 - decrement remaining-use counts as uses are consumed
@@ -282,7 +216,7 @@ clones curried inner closures, and preserves the `num_remaining` state.
 
 Closure currying flow:
 
-- lower `dst: src(args...)`
+- lower a curried definition such as `dst: src(a, b)`
   - count this use of `src`
   - count each argument use
   - if `src` is a known function
@@ -290,8 +224,11 @@ Closure currying flow:
     - store supplied arguments
     - record the remaining signature
   - if `src` is a local closure with remaining parameters
-    - deep-clone `src` into `dst`
-    - write supplied arguments into the cloned payload
+    - if `src` has another live use
+      - deep-clone `src` into `dst`
+    - otherwise
+      - move `src` to `dst`
+    - write supplied arguments into `dst`'s payload
     - for each closure argument
       - if that argument has another live use
         - deep-clone the argument before storing it
@@ -318,8 +255,7 @@ foo: (p0: int, p1: closure) {
 }
 ```
 
-`bar` receives a deep clone of `p1` even though `p1` has no later independent
-use.
+Ownership of `p1` moves to `bar`, so no allocation or clone is needed.
 
 Example 2:
 
@@ -331,13 +267,14 @@ foo: (p0: int, p1: closure) {
 }
 ```
 
-Both currying paths deep-clone `p1`, so `bar` and `baz` do not overwrite the
-same closure state.
+The first curry deep-clones `p1` for `bar` because the source remains live. The
+last curry moves the source to `baz`. The two results cannot overwrite the same
+closure state.
 
 Example 3:
 
 ```af
-qux: (p0: int){...}
+qux: (p0: int){}
 foo: (p0: int, p1: closure) {
      bar: p1(1, 2)
      baz: qux(3, 4)
@@ -345,12 +282,12 @@ foo: (p0: int, p1: closure) {
 }
 ```
 
-`bar` deep-clones `p1`; `baz` allocates a new closure for `qux`.
+`bar` takes ownership of `p1`, and `baz` allocates a new closure for `qux`.
 
 Example 4:
 
 ```af
-qux: (p0: int){...}
+qux: (p0: int){}
 foo: (p0: int, p1: closure) {
      baz: qux(1, 2)
      k(baz, baz)

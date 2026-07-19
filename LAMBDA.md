@@ -190,13 +190,18 @@ The current compile-direct language is the next step in this progression:
 The final example from the previous step becomes valid compile-direct Afterflow as follows:
 
 ```af
+fmt: /std/fmt
+
 int: @int
-str: @str
 
 printdouble: (z: int){
     (d: int) = @mul(2, z)
-    (s: str) = @sprintf("%d\n", d)
-    @write(s, @exit(0))
+    fmt.new(
+        "%\n",
+        @exit(1),
+        fmt.int(d) fmt.end,
+        @write(ok: @exit(0))
+    )
 }
 
 calculate: (f: (int)){

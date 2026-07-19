@@ -1,0 +1,22 @@
+parse_sum_tail: (source_l: @uint, source_nth: nth, idx: @uint, args: arg, a: calculation, invalid: (), ok: (@uint, calculation)) {
+    (next_idx: @uint) = skip_whitespace(source_l, source_nth, idx)
+    @lt_uint(next_idx, source_l, () {
+        (operator: @u8) = source_nth(next_idx, invalid)
+        eq_byte(operator, 43, () {
+            (operand_idx: @uint) = @add_uint(next_idx, 1)
+            (following_idx: @uint, b: calculation) = parse_product(source_l, source_nth, operand_idx, args, invalid)
+            parse_sum_tail(source_l, source_nth, following_idx, args, add(a, b), invalid, ok)
+        }, () {
+            eq_byte(operator, 45, () {
+                (operand_idx: @uint) = @add_uint(next_idx, 1)
+                (following_idx: @uint, b: calculation) = parse_product(source_l, source_nth, operand_idx, args, invalid)
+                parse_sum_tail(source_l, source_nth, following_idx, args, subtract(a, b), invalid, ok)
+            }, ok(next_idx, a))
+        })
+    }, ok(next_idx, a))
+}
+
+parse_expression: (source_l: @uint, source_nth: nth, idx: @uint, args: arg, invalid: (), ok: (@uint, calculation)) {
+    (next_idx: @uint, value: calculation) = parse_product(source_l, source_nth, idx, args, invalid)
+    parse_sum_tail(source_l, source_nth, next_idx, args, value, invalid, ok)
+}

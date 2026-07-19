@@ -1,0 +1,3 @@
+ln: (value: @f64, ok: (@f64)) {
+    @log_f64(value, ok)
+}

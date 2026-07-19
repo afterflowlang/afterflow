@@ -1,0 +1,81 @@
+parse_group: (source_l: @uint, source_nth: nth, idx: @uint, args: arg, invalid: (), ok: (@uint, calculation)) {
+    (following_idx: @uint, value: calculation) = parse_expression(source_l, source_nth, idx, args, invalid)
+    @lt_uint(following_idx, source_l, () {
+        (closing: @u8) = source_nth(following_idx, invalid)
+        eq_byte(closing, 41, () {
+            (next_idx: @uint) = @add_uint(following_idx, 1)
+            ok(next_idx, value)
+        }, invalid)
+    }, invalid)
+}
+
+parse_function_tail: (source_l: @uint, source_nth: nth, start: @uint, end: @uint, idx: @uint, args: arg, a: calculation, invalid: (), ok: (@uint, calculation)) {
+    (next_idx: @uint) = skip_whitespace(source_l, source_nth, idx)
+    @lt_uint(next_idx, source_l, () {
+        (value: @u8) = source_nth(next_idx, invalid)
+        eq_byte(value, 41, () {
+            (following_idx: @uint) = @add_uint(next_idx, 1)
+            (result: calculation) = apply_unary_function(source_nth, start, end, a, invalid)
+            ok(following_idx, result)
+        }, () {
+            eq_byte(value, 44, () {
+                (operand_idx: @uint) = @add_uint(next_idx, 1)
+                (following_idx: @uint, b: calculation) = parse_expression(source_l, source_nth, operand_idx, args, invalid)
+                (closing_idx: @uint) = skip_whitespace(source_l, source_nth, following_idx)
+                @lt_uint(closing_idx, source_l, () {
+                    (closing: @u8) = source_nth(closing_idx, invalid)
+                    eq_byte(closing, 41, () {
+                        (result_idx: @uint) = @add_uint(closing_idx, 1)
+                        (result: calculation) = apply_binary_function(source_nth, start, end, a, b, invalid)
+                        ok(result_idx, result)
+                    }, invalid)
+                }, invalid)
+            }, invalid)
+        })
+    }, invalid)
+}
+
+parse_function: (source_l: @uint, source_nth: nth, start: @uint, end: @uint, idx: @uint, args: arg, invalid: (), ok: (@uint, calculation)) {
+    (next_idx: @uint, value: calculation) = parse_expression(source_l, source_nth, idx, args, invalid)
+    parse_function_tail(source_l, source_nth, start, end, next_idx, args, value, invalid, ok)
+}
+
+parse_constant_or_placeholder: (source_nth: nth, start: @uint, end: @uint, args: arg, invalid: (), ok: (calculation)) {
+    range_equals_name(source_nth, start, end, "e", ok(constant(2.718281828459045)), () {
+        range_equals_name(source_nth, start, end, "i", invalid, () {
+            range_equals_name(source_nth, start, end, "pi", ok(constant(3.141592653589793)), () {
+                range_equals_name(source_nth, start, end, "tau", ok(constant(6.283185307179586)), () {
+                    (value: calculation) = lookup(args, source_nth, start, end, invalid)
+                    ok(value)
+                })
+            })
+        })
+    })
+}
+
+parse_identifier: (source_l: @uint, source_nth: nth, idx: @uint, args: arg, invalid: (), ok: (@uint, calculation)) {
+    (end: @uint) = identifier_end(source_l, source_nth, idx)
+    (next_idx: @uint) = skip_whitespace(source_l, source_nth, end)
+    @lt_uint(next_idx, source_l, () {
+        (following: @u8) = source_nth(next_idx, invalid)
+        eq_byte(following, 40, () {
+            (argument_idx: @uint) = @add_uint(next_idx, 1)
+            parse_function(source_l, source_nth, idx, end, argument_idx, args, invalid, ok)
+        }, parse_constant_or_placeholder(source_nth, idx, end, args, invalid, ok(end)))
+    }, parse_constant_or_placeholder(source_nth, idx, end, args, invalid, ok(end)))
+}
+
+parse_primary: (source_l: @uint, source_nth: nth, idx: @uint, args: arg, invalid: (), ok: (@uint, calculation)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, invalid)
+        digit(value, () {
+            eq_byte(value, 40, () {
+                (next_idx: @uint) = @add_uint(idx, 1)
+                parse_group(source_l, source_nth, next_idx, args, invalid, ok)
+            }, is_identifier_byte(value, parse_identifier(source_l, source_nth, idx, args, invalid, ok), invalid))
+        }, (first_digit: @f64) {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            parse_number(source_l, source_nth, next_idx, first_digit, invalid, ok)
+        })
+    }, invalid)
+}

@@ -1,0 +1,6 @@
+new: (source: @str!, invalid: ()!, args: arg!, ok: (@f64)) {
+    (source_bytes: @bytes) = @bytes_from_str(source)
+    (source_l: @uint) = @bytes_descriptor_len(source_bytes)
+    (value: calculation) = calculate(source_l, raw_nth(source_bytes), args, invalid)
+    value(ok)
+}

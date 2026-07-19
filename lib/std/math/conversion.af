@@ -1,0 +1,7 @@
+to_degrees: (radians: @f64, ok: (@f64)) {
+    @mul_f64(radians, 57.29577951308232, ok)
+}
+
+to_radians: (degrees: @f64, ok: (@f64)) {
+    @mul_f64(degrees, 0.017453292519943295, ok)
+}

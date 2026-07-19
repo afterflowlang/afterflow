@@ -1,0 +1,64 @@
+positive_exponent: (mantissa: calculation, exponent: calculation, ok: (calculation)) {
+    ok(multiply(mantissa, power(constant(10.0), exponent)))
+}
+
+negative_exponent: (mantissa: calculation, exponent: calculation, ok: (calculation)) {
+    ok(multiply(mantissa, power(constant(10.0), negate(exponent))))
+}
+
+parse_exponent_digits: (source_l: @uint, source_nth: nth, idx: @uint, mantissa: calculation, exponent: calculation, finish: (calculation, calculation, (calculation)), invalid: (), ok: (@uint, calculation)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, invalid)
+        digit(value, () {
+            (result: calculation) = finish(mantissa, exponent)
+            ok(idx, result)
+        }, (digit_value: @f64) {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            next_exponent: append_digit(exponent, digit_value)
+            parse_exponent_digits(source_l, source_nth, next_idx, mantissa, next_exponent, finish, invalid, ok)
+        })
+    }, () {
+        (result: calculation) = finish(mantissa, exponent)
+        ok(idx, result)
+    })
+}
+
+parse_exponent_value: (source_l: @uint, source_nth: nth, idx: @uint, mantissa: calculation, finish: (calculation, calculation, (calculation)), invalid: (), ok: (@uint, calculation)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, invalid)
+        digit(value, invalid, (digit_value: @f64) {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            parse_exponent_digits(source_l, source_nth, next_idx, mantissa, constant(digit_value), finish, invalid, ok)
+        })
+    }, invalid)
+}
+
+parse_exponent_sign: (source_l: @uint, source_nth: nth, idx: @uint, mantissa: calculation, invalid: (), ok: (@uint, calculation)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, invalid)
+        eq_byte(value, 43, () {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            parse_exponent_value(source_l, source_nth, next_idx, mantissa, positive_exponent, invalid, ok)
+        }, () {
+            eq_byte(value, 45, () {
+                (next_idx: @uint) = @add_uint(idx, 1)
+                parse_exponent_value(source_l, source_nth, next_idx, mantissa, negative_exponent, invalid, ok)
+            }, parse_exponent_value(source_l, source_nth, idx, mantissa, positive_exponent, invalid, ok))
+        })
+    }, invalid)
+}
+
+parse_exponent: (source_l: @uint, source_nth: nth, idx: @uint, mantissa: calculation, invalid: (), ok: (@uint, calculation)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, invalid)
+        eq_byte(value, 101, () {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            parse_exponent_sign(source_l, source_nth, next_idx, mantissa, invalid, ok)
+        }, () {
+            eq_byte(value, 69, () {
+                (next_idx: @uint) = @add_uint(idx, 1)
+                parse_exponent_sign(source_l, source_nth, next_idx, mantissa, invalid, ok)
+            }, ok(idx, mantissa))
+        })
+    }, ok(idx, mantissa))
+}

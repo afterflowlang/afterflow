@@ -1,0 +1,12 @@
+[package]
+name = "freestanding-format"
+version = "0.1.0"
+edition = "2021"
+description = "Freestanding value formatting for statically linked programs"
+license = "Apache-2.0"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+freestanding-runtime = { path = "../runtime" }

@@ -29,7 +29,10 @@ base="${file%.af}"
 nasm -felf64 "$base.asm" -o "$base.o"
 
 # Link
-ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc "$base.o" -o "$base"
+ld --gc-sections --strip-debug "$base.o" \
+    /usr/local/lib/afterflow/libfreestanding_format.a \
+    /usr/local/lib/afterflow/libfreestanding_math.a \
+    -o "$base"
 
 chmod +x "$base"
 ./"$base"

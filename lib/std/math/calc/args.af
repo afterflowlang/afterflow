@@ -1,0 +1,10 @@
+std: /std
+
+var: (name: @str!, value: @f64, tail: arg!, next: (binding, arg)!, ()!) {
+    next(as_var(name, value))
+    tail
+}
+
+end: (value: (binding, arg), done_case: ()) {
+    std.end(value, done_case)
+}

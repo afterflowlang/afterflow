@@ -1,0 +1,38 @@
+digit: (value: @int, invalid: (), ok: (source)) {
+    (value_u8: @u8) = @u8_from_int(value, invalid)
+    (value_bits: @b8) = @b8_from_u8(value_u8)
+    (zero_bits: @b8) = @b8_from_u8(48)
+    (ascii_bits: @b8) = @add_b8(value_bits, zero_bits)
+    (ascii: @u8) = @u8_from_b8(ascii_bits)
+    ok(single(ascii))
+}
+
+positive_digits: (value: @int, invalid: (), ok: (source)) {
+    (quotient: @int) = @div(value, 10, invalid)
+    (magnitude: @int) = @mul(quotient, 10)
+    (remainder: @int) = @sub(value, magnitude)
+    (suffix: source) = digit(remainder, invalid)
+    @eq_int(quotient, 0, ok(suffix))
+    (prefix: source) = positive_digits(quotient, invalid)
+    ok(concat(prefix, suffix))
+}
+
+negative_digits: (value: @int, invalid: (), ok: (source)) {
+    (quotient: @int) = @div(value, 10, invalid)
+    (magnitude: @int) = @mul(quotient, 10)
+    (negative_remainder: @int) = @sub(value, magnitude)
+    (remainder: @int) = @sub(0, negative_remainder)
+    (suffix: source) = digit(remainder, invalid)
+    @eq_int(quotient, 0, ok(suffix))
+    (prefix: source) = negative_digits(quotient, invalid)
+    ok(concat(prefix, suffix))
+}
+
+from_int: (value: @int, invalid: (), ok: (source)) {
+    @lt(value, 0, () {
+        (magnitude: source) = negative_digits(value, invalid)
+        ok(concat(single(45), magnitude))
+    }, () {
+        positive_digits(value, invalid, ok)
+    })
+}

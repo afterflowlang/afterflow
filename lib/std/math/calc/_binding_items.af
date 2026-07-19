@@ -1,0 +1,35 @@
+contains_name_done: (missing: ()) {
+    missing
+}
+
+contains_name_item: (name: @str, found: (), missing: (), item: binding, tail: arg) {
+    item((candidate: @str, @f64) {
+        @eq_str(candidate, name, found, contains_name(tail, name, found, missing))
+    })
+}
+
+validate_done: (ok: ()) {
+    ok
+}
+
+validate_item: (source_l: @uint, source_nth: nth, invalid: (), ok: (), item: binding, tail: arg) {
+    item((name: @str, @f64) {
+        valid_placeholder_name(name, invalid, () {
+            contains_name(tail, name, invalid, () {
+                source_contains(source_l, source_nth, 0, name, invalid, () {
+                    validate_args(source_l, source_nth, tail, invalid, ok)
+                }, invalid)
+            })
+        })
+    })
+}
+
+lookup_done: (invalid: ()) {
+    invalid
+}
+
+lookup_item: (source_nth: nth, start: @uint, end: @uint, invalid: (), ok: (calculation), item: binding, tail: arg) {
+    item((candidate: @str, value: @f64) {
+        range_equals_name(source_nth, start, end, candidate, ok(constant(value)), lookup(tail, source_nth, start, end, invalid, ok))
+    })
+}

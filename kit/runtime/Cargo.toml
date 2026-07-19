@@ -1,0 +1,6 @@
+[package]
+name = "freestanding-runtime"
+version = "0.1.0"
+edition = "2021"
+description = "Shared runtime support for freestanding Rust static archives"
+license = "Apache-2.0"

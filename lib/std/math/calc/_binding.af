@@ -1,0 +1,28 @@
+as_var: (name: @str, value: @f64, placeholder_case: (@str, @f64)) {
+    placeholder_case(name, value)
+}
+
+contains_name: (args: arg, name: @str, found: (), missing: ()) {
+    args(contains_name_item(name, found, missing), contains_name_done(missing))
+}
+
+source_contains: (source_l: @uint, source_nth: nth, idx: @uint, name: @str, invalid: (), found: (), missing: ()) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, missing)
+        is_identifier_byte(value, () {
+            (end: @uint) = identifier_end(source_l, source_nth, idx)
+            range_equals_name(source_nth, idx, end, name, found, source_contains(source_l, source_nth, end, name, invalid, found, missing))
+        }, () {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            source_contains(source_l, source_nth, next_idx, name, invalid, found, missing)
+        })
+    }, missing)
+}
+
+validate_args: (source_l: @uint, source_nth: nth, args: arg, invalid: (), ok: ()) {
+    args(validate_item(source_l, source_nth, invalid, ok), validate_done(ok))
+}
+
+lookup: (args: arg, source_nth: nth, start: @uint, end: @uint, invalid: (), ok: (calculation)) {
+    args(lookup_item(source_nth, start, end, invalid, ok), lookup_done(invalid))
+}

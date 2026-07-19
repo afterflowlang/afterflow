@@ -1,0 +1,16 @@
+parse_unary: (source_l: @uint, source_nth: nth, idx: @uint, args: arg, invalid: (), ok: (@uint, calculation)) {
+    (next_idx: @uint) = skip_whitespace(source_l, source_nth, idx)
+    @lt_uint(next_idx, source_l, () {
+        (value: @u8) = source_nth(next_idx, invalid)
+        eq_byte(value, 45, () {
+            (operand_idx: @uint) = @add_uint(next_idx, 1)
+            (following_idx: @uint, operand: calculation) = parse_unary(source_l, source_nth, operand_idx, args, invalid)
+            ok(following_idx, negate(operand))
+        }, () {
+            eq_byte(value, 43, () {
+                (operand_idx: @uint) = @add_uint(next_idx, 1)
+                parse_unary(source_l, source_nth, operand_idx, args, invalid, ok)
+            }, parse_power(source_l, source_nth, next_idx, args, invalid, ok))
+        })
+    }, invalid)
+}

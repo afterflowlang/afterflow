@@ -1,0 +1,88 @@
+reserved_function_name: (name_nth: nth, start: @uint, end: @uint, reserved: (), available: ()) {
+    range_equals_name(name_nth, start, end, "abs", reserved, () {
+        range_equals_name(name_nth, start, end, "acos", reserved, () {
+            range_equals_name(name_nth, start, end, "acosh", reserved, () {
+                range_equals_name(name_nth, start, end, "asin", reserved, () {
+                    range_equals_name(name_nth, start, end, "asinh", reserved, () {
+                        range_equals_name(name_nth, start, end, "atan", reserved, () {
+                            range_equals_name(name_nth, start, end, "atan2", reserved, () {
+                                range_equals_name(name_nth, start, end, "atanh", reserved, () {
+                                    range_equals_name(name_nth, start, end, "cbrt", reserved, () {
+                                        range_equals_name(name_nth, start, end, "ceil", reserved, () {
+                                            range_equals_name(name_nth, start, end, "cos", reserved, () {
+                                                range_equals_name(name_nth, start, end, "cosh", reserved, () {
+                                                    range_equals_name(name_nth, start, end, "deg", reserved, () {
+                                                        range_equals_name(name_nth, start, end, "exp", reserved, () {
+                                                            range_equals_name(name_nth, start, end, "exp2", reserved, () {
+                                                                range_equals_name(name_nth, start, end, "expm1", reserved, () {
+                                                                    range_equals_name(name_nth, start, end, "floor", reserved, () {
+                                                                        range_equals_name(name_nth, start, end, "hypot", reserved, () {
+                                                                            range_equals_name(name_nth, start, end, "ln", reserved, () {
+                                                                                range_equals_name(name_nth, start, end, "ln1p", reserved, () {
+                                                                                    range_equals_name(name_nth, start, end, "log", reserved, () {
+                                                                                        range_equals_name(name_nth, start, end, "log10", reserved, () {
+                                                                                            range_equals_name(name_nth, start, end, "log2", reserved, () {
+                                                                                                range_equals_name(name_nth, start, end, "max", reserved, () {
+                                                                                                    range_equals_name(name_nth, start, end, "min", reserved, () {
+                                                                                                        range_equals_name(name_nth, start, end, "mod", reserved, () {
+                                                                                                            range_equals_name(name_nth, start, end, "pow", reserved, () {
+                                                                                                                range_equals_name(name_nth, start, end, "rad", reserved, () {
+                                                                                                                    range_equals_name(name_nth, start, end, "remainder", reserved, () {
+                                                                                                                        range_equals_name(name_nth, start, end, "round", reserved, () {
+                                                                                                                            range_equals_name(name_nth, start, end, "sin", reserved, () {
+                                                                                                                                range_equals_name(name_nth, start, end, "sinh", reserved, () {
+                                                                                                                                    range_equals_name(name_nth, start, end, "sqrt", reserved, () {
+                                                                                                                                        range_equals_name(name_nth, start, end, "tan", reserved, () {
+                                                                                                                                            range_equals_name(name_nth, start, end, "tanh", reserved, () {
+                                                                                                                                                range_equals_name(name_nth, start, end, "trunc", reserved, available)
+                                                                                                                                            })
+                                                                                                                                        })
+                                                                                                                                    })
+                                                                                                                                })
+                                                                                                                            })
+                                                                                                                        })
+                                                                                                                    })
+                                                                                                                })
+                                                                                                            })
+                                                                                                        })
+                                                                                                    })
+                                                                                                })
+                                                                                            })
+                                                                                        })
+                                                                                    })
+                                                                                })
+                                                                            })
+                                                                        })
+                                                                    })
+                                                                })
+                                                            })
+                                                        })
+                                                    })
+                                                })
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    })
+}
+
+reserved_name: (name_nth: nth, start: @uint, end: @uint, reserved: (), available: ()) {
+    reserved_constant: @compile_error("calc.var name conflicts with a calculation constant", reserved)
+    reserved_future: @compile_error("calc.var name is reserved for future calculation syntax", reserved)
+    reserved_function: @compile_error("calc.var name conflicts with a calculation function", reserved)
+    range_equals_name(name_nth, start, end, "e", reserved_constant, () {
+        range_equals_name(name_nth, start, end, "i", reserved_future, () {
+            range_equals_name(name_nth, start, end, "pi", reserved_constant, () {
+                range_equals_name(name_nth, start, end, "tau", reserved_constant, () {
+                    reserved_function_name(name_nth, start, end, reserved_function, available)
+                })
+            })
+        })
+    })
+}

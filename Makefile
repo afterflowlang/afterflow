@@ -5,8 +5,11 @@ NASM_VERSION := 3.01
 NASM_URL := https://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)/nasm-$(NASM_VERSION).tar.gz
 INPUT ?= code/main.af
 TARGET := $(word 2,$(MAKECMDGOALS))
+FORMAT_ARCHIVE := target/release/libfreestanding_format.a
+MATH_ARCHIVE := target/release/libfreestanding_math.a
+FREESTANDING_ARCHIVES := $(FORMAT_ARCHIVE) $(MATH_ARCHIVE)
 
-ifneq ($(filter compile run hir mir,$(firstword $(MAKECMDGOALS))),)
+ifneq ($(filter compile run hir mir example,$(firstword $(MAKECMDGOALS))),)
 ifneq ($(TARGET),)
 .PHONY: $(TARGET)
 $(TARGET):
@@ -63,12 +66,28 @@ install-nasm:
 	@$(ASDF) reshim nasm
 
 .PHONY: compile
-compile:
+compile: $(FREESTANDING_ARCHIVES)
 	@test -n "$(TARGET)" || { echo "usage: make compile <target> [INPUT=path/to/main.af]"; exit 2; }
 	@mkdir -p bin
 	@cargo run -- $(INPUT) $(TARGET) bin/$(TARGET).asm
 	@nasm -felf64 bin/$(TARGET).asm -o bin/$(TARGET).o
-	@ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc bin/$(TARGET).o -o bin/$(TARGET)
+	@ld --gc-sections --strip-debug bin/$(TARGET).o $(FREESTANDING_ARCHIVES) -o bin/$(TARGET)
+
+.PHONY: example
+example: $(FREESTANDING_ARCHIVES)
+	@test -f code/examples/$(TARGET)/main.af || { echo "unknown example: $(TARGET)"; exit 2; }
+	@mkdir -p bin
+	@cargo run -- code/examples/$(TARGET)/main.af main bin/$(TARGET).asm
+	@nasm -felf64 bin/$(TARGET).asm -o bin/$(TARGET).o
+	@ld --gc-sections --strip-debug bin/$(TARGET).o $(FREESTANDING_ARCHIVES) -o bin/$(TARGET)
+	@./bin/$(TARGET)
+	@echo ""
+
+$(MATH_ARCHIVE): kit/math/Cargo.toml kit/math/src/lib.rs Cargo.lock
+	@cargo build -p freestanding-math --release
+
+$(FORMAT_ARCHIVE): kit/format/Cargo.toml kit/format/src/lib.rs Cargo.lock
+	@cargo build -p freestanding-format --release
 
 .PHONY: run
 run: compile

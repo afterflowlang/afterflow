@@ -730,10 +730,7 @@ fn display_module(project_root: &Path, path: &Path) -> String {
 }
 
 fn bundled_library_root() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .expect("compiler manifest must be inside the repository")
-        .join("lib")
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("lib")
 }
 
 fn module_relative<'a>(project_root: &'a Path, path: &'a Path) -> &'a Path {

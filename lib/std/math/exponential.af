@@ -1,0 +1,11 @@
+exp: (value: @f64, ok: (@f64)) {
+    @exp_f64(value, ok)
+}
+
+exp2: (value: @f64, ok: (@f64)) {
+    @exp2_f64(value, ok)
+}
+
+exp_m1: (value: @f64, ok: (@f64)) {
+    @expm1_f64(value, ok)
+}

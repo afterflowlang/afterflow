@@ -1,0 +1,20 @@
+str: (value: @str, tail: arg, next: (format_value, arg), ()) {
+    next(as_str(value))
+    tail
+}
+
+int: (value: @int, tail: arg, next: (format_value, arg), ()) {
+    next(as_int(value))
+    tail
+}
+
+f64: (value: @f64, tail: arg, next: (format_value, arg), ()) {
+    next(as_f64(value))
+    tail
+}
+
+std: /std
+
+end: (value: (format_value, arg), done_case: ()) {
+    std.end(value, done_case)
+}

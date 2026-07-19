@@ -1,0 +1,3 @@
+pipe: <T>(value: T, ok: (T)) {
+    ok(value)
+}

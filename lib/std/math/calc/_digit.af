@@ -1,0 +1,21 @@
+digit: (value: @u8, not_digit: (), ok: (@f64)) {
+    eq_byte(value, 48, ok(0.0), () {
+        eq_byte(value, 49, ok(1.0), () {
+            eq_byte(value, 50, ok(2.0), () {
+                eq_byte(value, 51, ok(3.0), () {
+                    eq_byte(value, 52, ok(4.0), () {
+                        eq_byte(value, 53, ok(5.0), () {
+                            eq_byte(value, 54, ok(6.0), () {
+                                eq_byte(value, 55, ok(7.0), () {
+                                    eq_byte(value, 56, ok(8.0), () {
+                                        eq_byte(value, 57, ok(9.0), not_digit)
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    })
+}

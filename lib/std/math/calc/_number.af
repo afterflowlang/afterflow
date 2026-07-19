@@ -1,0 +1,42 @@
+parse_fraction_digits: (source_l: @uint, source_nth: nth, idx: @uint, numerator: calculation, denominator: calculation, invalid: (), ok: (@uint, calculation)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, invalid)
+        digit(value, parse_exponent(source_l, source_nth, idx, divide(numerator, denominator), invalid, ok), (digit_value: @f64) {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            next_numerator: append_digit(numerator, digit_value)
+            next_denominator: append_digit(denominator, 0.0)
+            parse_fraction_digits(source_l, source_nth, next_idx, next_numerator, next_denominator, invalid, ok)
+        })
+    }, parse_exponent(source_l, source_nth, idx, divide(numerator, denominator), invalid, ok))
+}
+
+parse_fraction: (source_l: @uint, source_nth: nth, idx: @uint, numerator: calculation, invalid: (), ok: (@uint, calculation)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, invalid)
+        digit(value, invalid, (digit_value: @f64) {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            next_numerator: append_digit(numerator, digit_value)
+            parse_fraction_digits(source_l, source_nth, next_idx, next_numerator, constant(10.0), invalid, ok)
+        })
+    }, invalid)
+}
+
+parse_number_tail: (source_l: @uint, source_nth: nth, idx: @uint, number: calculation, invalid: (), ok: (@uint, calculation)) {
+    @lt_uint(idx, source_l, () {
+        (value: @u8) = source_nth(idx, invalid)
+        digit(value, () {
+            eq_byte(value, 46, () {
+                (next_idx: @uint) = @add_uint(idx, 1)
+                parse_fraction(source_l, source_nth, next_idx, number, invalid, ok)
+            }, parse_exponent(source_l, source_nth, idx, number, invalid, ok))
+        }, (digit_value: @f64) {
+            (next_idx: @uint) = @add_uint(idx, 1)
+            next_number: append_digit(number, digit_value)
+            parse_number_tail(source_l, source_nth, next_idx, next_number, invalid, ok)
+        })
+    }, parse_exponent(source_l, source_nth, idx, number, invalid, ok))
+}
+
+parse_number: (source_l: @uint, source_nth: nth, idx: @uint, first_digit: @f64, invalid: (), ok: (@uint, calculation)) {
+    parse_number_tail(source_l, source_nth, idx, constant(first_digit), invalid, ok)
+}
