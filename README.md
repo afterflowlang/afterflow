@@ -14,6 +14,10 @@ different strategy.
 
 The grammar file lives in: [grammar.peg](./grammar.peg)
 
+Editor-independent language tooling lives in
+[language-server](./language-server/README.md). Run it over standard input and
+output with `cargo run -p afterflow-language-server`.
+
 ## compile-direct purpose
 
 compile-direct is intentionally unoptimized. It is a *what you write is what you get*

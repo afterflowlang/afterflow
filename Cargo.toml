@@ -3,15 +3,19 @@ members = [
     "frontend",
     "compile-direct",
     "kit/format",
+    "kit/lsp",
     "kit/math",
     "kit/runtime",
+    "language-server",
 ]
 default-members = [
     "frontend",
     "compile-direct",
     "kit/format",
+    "kit/lsp",
     "kit/math",
     "kit/runtime",
+    "language-server",
 ]
 resolver = "2"
 

@@ -1,0 +1,11 @@
+[package]
+name = "afterflow-language-server"
+version = "0.1.0"
+edition = "2021"
+description = "Language Server Protocol implementation for Afterflow"
+license = "Apache-2.0"
+default-run = "afterflow-language-server"
+
+[dependencies]
+afterflow-frontend = { path = "../frontend" }
+language-server-protocol = { path = "../kit/lsp" }
