@@ -58,6 +58,42 @@ implementation must support. It is separate from user labels. Keyword-like
 types are usually given short aliases. Source packages use explicit namespace
 bindings such as `math: /std/math`.
 
+## Scientific calculator
+
+The staged `calc` library evaluates a scientific expression while retaining its
+numeric inputs and output at runtime. This example combines a named-variable
+hypotenuse with trigonometry and prints `result: 6.0`:
+
+```af
+fmt: /std/fmt
+calc: /std/math/calc
+
+fmt_error: @compile_error("invalid format", @exit(1))
+print_result: (result: @f64, ok: ()) {
+    fmt.new(
+        "result: %\n", fmt_error,
+        fmt.f64(result) fmt.end,
+        @write(ok: ok)
+    )
+}
+
+calc_error: @compile_error("invalid calculation", @exit(1))
+main: () {
+    calc.new("hypot(width, height) + sin(pi / 2) ^ 2", calc_error,
+        calc.var("width", 3.0)
+        calc.var("height", 4.0)
+        calc.end,
+        print_result(ok: @exit(0))
+    )
+}
+```
+
+Run the checked-in example with:
+
+```sh
+make example calc
+```
+
 ## Execution Model & Core Semantics
 
 It is a **identifier-driven, definition-oriented, definition before use, static single assignment, expression-less, continuation-passing language**.  
