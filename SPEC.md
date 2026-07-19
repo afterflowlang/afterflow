@@ -1,7 +1,7 @@
-# Rgo v1 Spec
+# Afterflow compile-direct Spec
 
 This document records implementation and runtime representation choices for the
-v1 compiler.
+compile-direct compiler.
 
 For source-language behavior and user-visible rules, see
 [SEMANTICS.md](SEMANTICS.md).
@@ -41,7 +41,7 @@ Compile flow:
 
 ## Closure Representation
 
-v1 represents a function passed as an argument as a heap-allocated closure.
+compile-direct represents a function passed as an argument as a heap-allocated closure.
 The runtime value is one word: a pointer to `env_end`. The closure code pointer
 lives in metadata at offset 0 from `env_end` and is loaded when the closure is
 executed.
@@ -114,7 +114,7 @@ heap_end
 
 ## Process Memory Model
 
-The v1 runtime model assumes code/data, heap, free space, and stack in the
+The compile-direct runtime model assumes code/data, heap, free space, and stack in the
 process address space:
 
 ```txt
@@ -142,7 +142,7 @@ released with `munmap`.
 
 Because functions tail-jump and do not return, a function can know when a
 closure parameter is no longer needed. Before an invocation, if a closure
-parameter is not passed onward and is not the invocation target, v1 releases
+parameter is not passed onward and is not the invocation target, compile-direct releases
 that closure environment.
 
 Release decision flow:
@@ -194,7 +194,7 @@ then jumps to `one` with the element or to `none`.
 
 The generated source-level shape is effectively:
 
-```rgo
+```af
 items: internal_array_str
 ```
 
@@ -251,7 +251,7 @@ Variadic lowering flow:
 
 ## Closure Affinity Lowering
 
-v1 implements closure affinity with mutable heap closure objects plus
+compile-direct implements closure affinity with mutable heap closure objects plus
 conservative deep cloning.
 
 Each closure-typed runtime value is the `env_end` pointer of a mutable heap
@@ -311,7 +311,7 @@ Deep-clone flow:
 
 Example 1:
 
-```rgo
+```af
 foo: (p0: int, p1: closure) {
      bar: p1(1, 2)
      k(bar)
@@ -323,7 +323,7 @@ use.
 
 Example 2:
 
-```rgo
+```af
 foo: (p0: int, p1: closure) {
      bar: p1(1, 2)
      baz: p1(3, 4)
@@ -336,7 +336,7 @@ same closure state.
 
 Example 3:
 
-```rgo
+```af
 qux: (p0: int){...}
 foo: (p0: int, p1: closure) {
      bar: p1(1, 2)
@@ -349,7 +349,7 @@ foo: (p0: int, p1: closure) {
 
 Example 4:
 
-```rgo
+```af
 qux: (p0: int){...}
 foo: (p0: int, p1: closure) {
      baz: qux(1, 2)

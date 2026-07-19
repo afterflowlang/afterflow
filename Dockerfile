@@ -1,6 +1,6 @@
 FROM rust:1.96-trixie
 
-WORKDIR /rgo
+WORKDIR /afterflow
 
 RUN apt-get update && \
     apt-get install -y nasm binutils make && \
@@ -14,7 +14,7 @@ RUN cargo install --path .
 ENV PATH="/usr/local/cargo/bin:${PATH}"
 
 # Install wrapper
-COPY compile.sh /usr/local/bin/rgo-compile
-RUN chmod +x /usr/local/bin/rgo-compile
+COPY compile.sh /usr/local/bin/afterflow-compile
+RUN chmod +x /usr/local/bin/afterflow-compile
 
-ENTRYPOINT ["/usr/local/bin/rgo-compile"]
+ENTRYPOINT ["/usr/local/bin/afterflow-compile"]

@@ -1,6 +1,6 @@
-# Compiler
+# Afterflow compile-direct compiler
 
-This is a small experimental programming language focused on simplicity, predictability, and explicit semantics. The compiler is written in Rust and lowers Rgo programs directly to NASM AMD64 assembly, producing ELF binaries that run on any AMD64 Linux system with hooks to standard libc (no LLVM, no JIT, and no garbage collector but with automatic garbage collection).
+This is a small experimental programming language focused on simplicity, predictability, and explicit semantics. The compile-direct compiler is written in Rust and lowers Afterflow programs directly to NASM AMD64 assembly, producing ELF binaries that run on any AMD64 Linux system with hooks to standard libc (no LLVM, no JIT, and no garbage collector but with automatic garbage collection).
 
 It is statically typed, compiled, single static assignment, explicit continuation passing, declaration before use, automatically memory managed using linear types (No garbage collector) and with no runtime errors.
 
@@ -31,7 +31,7 @@ hello: (){
 }
 ```
 
-`@name` addresses the compiler-provided types and operations that every Rgo
+`@name` addresses the compiler-provided types and operations that every Afterflow
 implementation must support. It is separate from user labels; keyword-like
 types are usually given short aliases. Source packages use explicit namespace
 bindings such as `math: /math`.
@@ -111,7 +111,7 @@ read("a.txt", (a:str) {
 ```
 Each operation encloses the next, causing the structure to collapse inward.
 
-Rgo avoids such nesting through **scope capture** using `=`.
+Afterflow avoids such nesting through **scope capture** using `=`.
 The operator does not assign or mutate, it transforms the remainder of the block into a continuation that receives the named value.
 
 The same logical flow becomes:
@@ -182,18 +182,18 @@ make run hello
 ## Quick start (Using Docker)
 
 ```sh
-git clone https://github.com/rgolang/rgo.git
-cd rgo
-docker build -t rgo-compiler .
-docker run --rm -i rgo-compiler code/main.rgo hello
+git clone https://github.com/afterflowlang/afterflow.git
+cd afterflow
+docker build -t afterflow-compiler .
+docker run --rm -i afterflow-compiler code/main.af hello
 ```
 
-This compiles and runs the `hello` target in `code/main.rgo`.
+This compiles and runs the `hello` target in `code/main.af`.
 
 This is what happens inside the container (or on your linux machine)
 ```sh
 apt-get install -y nasm gcc make
-cargo run -- code/main.rgo hello hello.asm
+cargo run -- code/main.af hello hello.asm
 nasm -felf64 hello.asm -o bin/hello.o
 ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc bin/hello.o -o bin/hello
 ./bin/hello
@@ -210,7 +210,7 @@ ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc bin/hello.o -o bin/hello
 - Rebuild the compiler or run the golden snapshot suite with `cargo test`. This also executes `tests/golden_test.rs`, which reads each fixture from its own numbered complexity folder under `tests/golden/` or `tests/failing/` and regenerates matching snapshots under `tests/generated/`:
   - `*.asm` contains the final NASM output.
   - `*.air` records the pseudo-assembly that feeds the final backend.
-  - `*.hir.rgo` is the normalized high-level IR after parsing.
+  - `*.hir.af` is the normalized high-level IR after parsing.
   - `*.hir.debug.txt` shows the HIR structure.
   - `*.txt` captures the parser AST dump.
 - Whenever you change the compiler or templates that affect these snapshots, re-run `cargo test` and check the updated files into source control if they reflect expected behavior.
@@ -218,19 +218,19 @@ ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc bin/hello.o -o bin/hello
 ## Project structure
 
 - `src/`: Rust implementation of the lexer, parser, HIR, and back-end code generator.
-- `code/`: sample Rgo workspace files (`main.rgo` contains target functions such as `hello` for Makefile shortcuts).
+- `code/`: sample Afterflow workspace files (`main.af` contains target functions such as `hello` for Makefile shortcuts).
 - `tests/`: integration and golden snapshot tests; `golden_test.rs` is the automated snapshot generator.
 - [SEMANTICS.md](SEMANTICS.md) describes source-language rules and
   user-visible behavior.
-- [SPEC.md](SPEC.md) describes v1 runtime representation, lowering, and
+- [SPEC.md](SPEC.md) describes compile-direct runtime representation, lowering, and
   heap details.
 
 ## Compilation
 
-For v1, the input file locates the project root: its containing folder is the
-root package, and every `.rgo` file directly in that folder is compiled into
+For compile-direct, the input file locates the project root: its containing folder is the
+root package, and every `.af` file directly in that folder is compiled into
 the same package. A source binding such as `lib: /lib` loads every direct
-`.rgo` file from the `lib` folder beneath that project root.
+`.af` file from the `lib` folder beneath that project root.
 The root package itself cannot be imported; declarations shared with imported
 packages belong in a named package that each consumer imports.
 

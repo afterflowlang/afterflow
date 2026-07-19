@@ -1,9 +1,9 @@
 
 # Lambda-calculus
 
-This document follows the evolution from lambda calculus into Rgo. Each step
+This document follows the evolution from lambda calculus into Afterflow. Each step
 keeps the preceding computational model while making it more explicit and
-practical. The final step describes the current v1 language. For the complete,
+practical. The final step describes the current compile-direct language. For the complete,
 normative rules, see [SEMANTICS.md](SEMANTICS.md).
 
 https://en.wikipedia.org/wiki/Lambda_calculus
@@ -169,9 +169,9 @@ run: calculate(printdouble)
 run(0)
 ```
 
-## Rgo v1: current step
+## Afterflow compile-direct: current step
 
-The current v1 language is the next step in this progression:
+The current compile-direct language is the next step in this progression:
 
 - compiler-provided types and operations use the separate `@name` label space;
   they no longer need to be imported into the user label space
@@ -187,9 +187,9 @@ The current v1 language is the next step in this progression:
 - source packages use explicit compile-time namespace bindings such as
   `math: /math`
 
-The final example from the previous step becomes valid v1 Rgo as follows:
+The final example from the previous step becomes valid compile-direct Afterflow as follows:
 
-```rgo
+```af
 int: @int
 str: @str
 
@@ -210,5 +210,5 @@ main: (){
 ```
 
 The program still represents the same reduction: add `2` and `3`, add `3`
-again, multiply the result by `2`, then print `16`. The difference is that v1
+again, multiply the result by `2`, then print `16`. The difference is that compile-direct
 makes the continuation flow, types, bindings, and final side effect explicit.

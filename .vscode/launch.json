@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug rgo",
+            "name": "Debug Afterflow",
             "type": "go",
             "request": "launch",
             "mode": "debug",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/main.go",
-            "args": ["./code/hello.rgo"]
+            "args": ["./code/hello.af"]
         }
     ]
 }

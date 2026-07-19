@@ -15,7 +15,7 @@
   "editor.fontSize": 14,
   "files.associations": {
     "*.proto": "proto3",
-    "*.rgo": "c",
+    "*.af": "c",
     "*.example": "c"
   },
   // NASM extension settings

@@ -2,7 +2,7 @@
 set -e
 
 usage() {
-    echo "usage: rgo-compile <input.rgo|-> <target>" >&2
+    echo "usage: afterflow-compile <input.af|-> <target>" >&2
     exit 64
 }
 
@@ -12,15 +12,15 @@ fi
 
 target="$2"
 
-# If input is "-" read RGO source from stdin.
+# If input is "-" read Afterflow source from stdin.
 if [ "$1" = "-" ]; then
-    file="stdin_input.rgo"
+    file="stdin_input.af"
     cat > "$file"
 else
     file="$1"
 fi
 
-base="${file%.rgo}"
+base="${file%.af}"
 
 # Compile source → assembly
 /usr/local/cargo/bin/compiler "$file" "$target" "$base.asm"

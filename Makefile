@@ -3,7 +3,7 @@ ASDF_DATA_DIR ?= $(HOME)/.asdf
 RUST_VERSION := 1.96.0
 NASM_VERSION := 3.01
 NASM_URL := https://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)/nasm-$(NASM_VERSION).tar.gz
-INPUT ?= code/main.rgo
+INPUT ?= code/main.af
 TARGET := $(word 2,$(MAKECMDGOALS))
 
 ifneq ($(filter compile run hir mir,$(firstword $(MAKECMDGOALS))),)
@@ -64,7 +64,7 @@ install-nasm:
 
 .PHONY: compile
 compile:
-	@test -n "$(TARGET)" || { echo "usage: make compile <target> [INPUT=path/to/main.rgo]"; exit 2; }
+	@test -n "$(TARGET)" || { echo "usage: make compile <target> [INPUT=path/to/main.af]"; exit 2; }
 	@mkdir -p bin
 	@cargo run -- $(INPUT) $(TARGET) bin/$(TARGET).asm
 	@nasm -felf64 bin/$(TARGET).asm -o bin/$(TARGET).o
@@ -76,13 +76,13 @@ run: compile
 
 .PHONY: hir
 hir:
-	@test -n "$(TARGET)" || { echo "usage: make hir <target> [INPUT=path/to/main.rgo]"; exit 2; }
+	@test -n "$(TARGET)" || { echo "usage: make hir <target> [INPUT=path/to/main.af]"; exit 2; }
 	@mkdir -p code/generated/$(TARGET)
-	@cargo run --bin render_hir -- $(INPUT) $(TARGET) code/generated/$(TARGET)/main.rgo
+	@cargo run --bin render_hir -- $(INPUT) $(TARGET) code/generated/$(TARGET)/main.af
 
 .PHONY: mir
 mir:
-	@test -n "$(TARGET)" || { echo "usage: make mir <target> [INPUT=path/to/main.rgo]"; exit 2; }
+	@test -n "$(TARGET)" || { echo "usage: make mir <target> [INPUT=path/to/main.af]"; exit 2; }
 	@mkdir -p code/generated/$(TARGET)
 	@cargo run --bin render_mir -- $(INPUT) $(TARGET) code/generated/$(TARGET)/main.mir
 
