@@ -1,6 +1,6 @@
 # Afterflow language server
 
-`afterflow-language-server` is the editor-independent Language Server Protocol
+`afterflow-ls` is the editor-independent Language Server Protocol
 implementation for Afterflow. It communicates over standard input and output.
 An editor extension owns the process lifetime and associates `.af` documents
 with the server.
@@ -10,19 +10,24 @@ with the server.
 Run a development build from the repository root:
 
 ```sh
-cargo run -p afterflow-language-server
+cargo run -p afterflow-ls
 ```
 
 Build the binary that an editor extension can launch:
 
 ```sh
-cargo build -p afterflow-language-server --release
+cargo build -p afterflow-ls --release
 ```
 
 The resulting executable is
-`target/release/afterflow-language-server`. It writes protocol messages to
+`target/release/afterflow-ls`. It writes protocol messages to
 standard output and reserves standard error for fatal startup or transport
 errors. It accepts no command-line arguments yet.
+
+The short binary name is intentional. Linux exposes process names through a
+15-byte `comm` field; `afterflow-ls` remains recognizable there instead of
+being truncated. The language server is part of the public `afterflow`
+workspace so editor integrations do not depend on `afterflow-private`.
 
 ## Features
 
@@ -75,15 +80,21 @@ provide multi-root workspace isolation.
 
 ## VS Code client contract
 
-A future VS Code extension should:
+A VS Code extension should:
 
 1. Register an `afterflow` language for files matching `**/*.af`.
-2. Start `afterflow-language-server` with no arguments and use standard input
+2. Start `afterflow-ls` with no arguments and use standard input
    and output as the transport.
 3. Set the document selector to `{ scheme: "file", language: "afterflow" }`.
 4. Pass the opened project folder as an LSP workspace folder.
 5. Let the language client perform the standard `initialize`, `initialized`,
    `shutdown`, and `exit` lifecycle.
+
+After the protocol loop returns, the server must drop its connection before
+joining the standard-I/O worker threads. Keeping the connection alive retains
+channel senders and can make shutdown wait forever, forcing an editor to kill
+the process. `tests/lifecycle.rs` exercises the complete protocol lifecycle and
+guards this ordering.
 
 The server advertises full text synchronization, UTF-16 positions, hover,
 completion, definition, and document-symbol capabilities during initialization.
@@ -140,7 +151,7 @@ workspace symbols, configuration, cancellation, or persistent caches.
 Run the language-server tests while iterating:
 
 ```sh
-cargo test -p afterflow-language-server
+cargo test -p afterflow-ls
 ```
 
 Before submitting changes, run the repository checks:

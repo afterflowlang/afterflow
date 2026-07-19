@@ -1,10 +1,10 @@
 [package]
-name = "afterflow-language-server"
+name = "afterflow-ls"
 version = "0.1.0"
 edition = "2021"
 description = "Language Server Protocol implementation for Afterflow"
 license = "Apache-2.0"
-default-run = "afterflow-language-server"
+default-run = "afterflow-ls"
 
 [dependencies]
 afterflow-frontend = { path = "../frontend" }

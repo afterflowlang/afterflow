@@ -25,7 +25,7 @@ use language_server_protocol::{
 use crate::analysis::{Definition, DefinitionKind};
 use crate::document::Document;
 
-const SERVER_NAME: &str = "afterflow-language-server";
+const SERVER_NAME: &str = "afterflow-ls";
 
 #[derive(Debug)]
 pub struct Error {
@@ -72,6 +72,7 @@ pub fn run() -> Result<(), Error> {
 
     let mut server = Server::new(root);
     server.serve(&connection)?;
+    drop(connection);
     io_threads.join().map_err(Error::new)
 }
 
