@@ -46,11 +46,9 @@ str: @str
 
 name: "Alice"
 hello: (){
-   fmt.new(
-       "hello %",
-       fmt.str(name) fmt.end,
-       @write(ok: @exit(0))
-   )
+   (msg: str) = fmt.new("hello %", fmt.str(name) fmt.end)
+   @write(msg)
+   @exit(0)
 }
 ```
 
@@ -69,21 +67,15 @@ hypotenuse with trigonometry and prints `result: 6.0`:
 fmt: /std/fmt
 calc: /std/math/calc
 
-print_result: (result: @f64, ok: ()) {
-    fmt.new(
-        "result: %\n",
-        fmt.f64(result) fmt.end,
-        @write(ok: ok)
-    )
-}
-
 main: () {
-    calc.new("hypot(width, height) + sin(pi / 2) ^ 2",
+    (result: @f64) = calc.new("hypot(width, height) + sin(pi / 2) ^ 2",
         calc.var("width", 3.0)
         calc.var("height", 4.0)
-        calc.end,
-        print_result(ok: @exit(0))
+        calc.end
     )
+    (message: @str) = fmt.new("result: %\n", fmt.f64(result) fmt.end)
+    @write(message)
+    @exit(0)
 }
 ```
 
@@ -113,11 +105,9 @@ str: @str
 
 name: "Bob"
 foo: (ok:()){
-   fmt.new(
-       "hello %",
-       fmt.str(name) fmt.end,
-       @write(ok: ok)
-   )
+   (message: str) = fmt.new("hello %", fmt.str(name) fmt.end)
+   @write(message)
+   ok
 }
 ```
 
@@ -130,11 +120,9 @@ str: @str
 
 name: "Bob"
 foo: (ok:()){
-   fmt.new(
-       "hello %",
-       fmt.str(name) fmt.end,
-       @write(ok: ok)
-   )
+   (message: str) = fmt.new("hello %", fmt.str(name) fmt.end)
+   @write(message)
+   ok
 }
 end: @exit(0)
 foo(end)

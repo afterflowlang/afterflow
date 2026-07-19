@@ -196,12 +196,9 @@ int: @int
 
 printdouble: (z: int){
     (d: int) = @mul(2, z)
-    fmt.new(
-        "%\n",
-        @exit(1),
-        fmt.int(d) fmt.end,
-        @write(ok: @exit(0))
-    )
+    (message: @str) = fmt.new("%\n", fmt.int(d) fmt.end)
+    @write(message)
+    @exit(0)
 }
 
 calculate: (f: (int)){

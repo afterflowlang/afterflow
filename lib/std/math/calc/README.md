@@ -14,13 +14,13 @@ result to the final unmarked continuation. There is no call-level bang.
 calc: /std/math/calc
 
 calculate: (price: @f64, tax: @f64, ok: (@f64)) {
-    calc.new(
+    (result: @f64) = calc.new(
         "(price + 2.5) * tax",
         calc.var("price", price)
         calc.var("tax", tax)
-        calc.end,
-        ok
+        calc.end
     )
+    ok(result)
 }
 ```
 

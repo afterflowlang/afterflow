@@ -3,11 +3,13 @@ str: @str
 int: @int
 
 greet: (name: str, count: int, ok: ()) {
-    fmt.new("hello %, you have % messages\n",
+    (message: str) = fmt.new("hello %, you have % messages\n",
         fmt.str(name)
         fmt.int(count)
-        fmt.end, @write(ok: ok)
+        fmt.end
     )
+    @write(message)
+    ok
 }
 main: () {
     greet("Alice", 3, @exit(0))

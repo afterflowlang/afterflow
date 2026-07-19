@@ -18,14 +18,15 @@ unmarked, so payload conversion and string construction remain runtime work.
 fmt: /std/fmt
 
 main: () {
-    fmt.new(
+    (message: @str) = fmt.new(
         "hello %, count %, price %\n",
         fmt.str("Alice")
         fmt.int(3)
         fmt.f64(12.5)
-        fmt.end,
-        @write(ok: @exit(0))
+        fmt.end
     )
+    @write(message)
+    @exit(0)
 }
 ```
 
@@ -44,13 +45,14 @@ Prefer right-associated indentation for the argument chain:
 fmt: /std/fmt
 
 main: () {
-    fmt.new(
+    (message: @str) = fmt.new(
         "hello %, count %\n",
         fmt.str("Alice")
         fmt.int(3)
-        fmt.end,
-        @write(ok: @exit(0))
+        fmt.end
     )
+    @write(message)
+    @exit(0)
 }
 ```
 
@@ -62,12 +64,12 @@ fmt: /std/fmt
 greeting: fmt.new("hello %, count %")
 
 build_greeting: (name: @str, count: @int, ok: (@str)) {
-    greeting(
+    (message: @str) = greeting(
         fmt.str(name)
         fmt.int(count)
-        fmt.end,
-        ok
+        fmt.end
     )
+    ok(message)
 }
 ```
 
