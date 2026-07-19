@@ -32,6 +32,12 @@ impl PartialEq for Span {
 
 impl Eq for Span {}
 
+impl std::fmt::Debug for Span {
+    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        Ok(())
+    }
+}
+
 // 2. Hashing ignores the position
 impl std::hash::Hash for Span {
     fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {

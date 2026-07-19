@@ -2,7 +2,6 @@ use std::fmt;
 
 use crate::compiler::air;
 use crate::compiler::builtins;
-use crate::compiler::span::Span;
 
 pub fn render_air_functions(functions: &[air::AirFunction]) -> String {
     let mut out = String::new();
@@ -615,11 +614,5 @@ fn format_binding_name(name: &str) -> String {
         name.to_string()
     } else {
         format!("${name}")
-    }
-}
-
-impl fmt::Debug for Span {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        Ok(())
     }
 }

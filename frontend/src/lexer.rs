@@ -1,8 +1,8 @@
 use std::io::{self, BufRead};
 
-use crate::compiler::error::{Code, Error};
-use crate::compiler::span::Span;
-use crate::compiler::token::{Token, TokenKind};
+use crate::error::{Code, Error};
+use crate::span::Span;
+use crate::token::{Token, TokenKind};
 
 pub struct Lexer<R: BufRead> {
     reader: R,

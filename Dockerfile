@@ -10,7 +10,7 @@ RUN apt-get update && \
 COPY . .
 
 # Build and install the compiler and its freestanding runtime archives.
-RUN cargo install --path . --bin compiler && \
+RUN cargo install --path compile-direct --bin compiler && \
     cargo build -p freestanding-format --release && \
     cargo build -p freestanding-math --release && \
     mkdir -p /usr/local/lib/afterflow && \

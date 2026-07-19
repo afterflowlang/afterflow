@@ -1,15 +1,13 @@
 use std::collections::{BTreeSet, HashSet, VecDeque};
 use std::io::BufRead;
 
-use crate::compiler::ast;
-use crate::compiler::ast::{
-    Block, BlockItem, Ident, Lambda, Literal, SigIdent, SigKind, Signature, Term,
-};
-use crate::compiler::builtins;
-use crate::compiler::error::{Code, Error};
-use crate::compiler::lexer::Lexer;
-use crate::compiler::span::Span;
-use crate::compiler::token::{Token, TokenKind};
+use crate::ast;
+use crate::ast::{Block, BlockItem, Ident, Lambda, Literal, SigIdent, SigKind, Signature, Term};
+use crate::builtins;
+use crate::error::{Code, Error};
+use crate::lexer::Lexer;
+use crate::span::Span;
+use crate::token::{Token, TokenKind};
 
 pub struct Parser<R: BufRead> {
     lexer: Lexer<R>,
@@ -877,7 +875,7 @@ fn desugar_block_sequence(items: Vec<BlockItem>) -> Vec<BlockItem> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::compiler::lexer::Lexer;
+    use crate::lexer::Lexer;
     use std::io::Cursor;
 
     #[test]

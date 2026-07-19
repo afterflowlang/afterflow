@@ -1,4 +1,4 @@
-use crate::compiler::span::Span;
+use crate::span::Span;
 use std::collections::BTreeSet;
 use std::hash::{Hash, Hasher};
 

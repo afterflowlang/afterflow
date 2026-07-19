@@ -1,4 +1,4 @@
-use crate::compiler::hir::{self, FixedIntKind, SigItem, SigKind, Signature};
+use crate::hir::{self, FixedIntKind, SigItem, SigKind, Signature};
 use std::collections::BTreeSet;
 
 // TODO: Needed?
@@ -226,7 +226,7 @@ pub enum Builtin {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum AirRoute {
+pub enum AirRoute {
     Instruction,
     Conditional,
     Call,
@@ -234,7 +234,7 @@ pub(crate) enum AirRoute {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum ComptimeRoute {
+pub enum ComptimeRoute {
     Evaluate,
     Residual,
 }
@@ -548,7 +548,7 @@ impl Builtin {
         }
     }
 
-    pub(crate) fn air_route(self) -> AirRoute {
+    pub fn air_route(self) -> AirRoute {
         self.function()
             .map(|function| function.air_route)
             .unwrap_or_else(|| match self {
@@ -557,7 +557,7 @@ impl Builtin {
             })
     }
 
-    pub(crate) fn comptime_route(self) -> ComptimeRoute {
+    pub fn comptime_route(self) -> ComptimeRoute {
         self.function()
             .map(|function| function.comptime_route)
             .unwrap_or_else(|| match self {

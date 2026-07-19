@@ -1,9 +1,8 @@
-use crate::compiler::air::ENTRY_FUNCTION_NAME;
-use crate::compiler::builtins;
-use crate::compiler::error::{Code, Error};
-use crate::compiler::hir::Closure;
-use crate::compiler::hir::{SigItem, SigKind, Signature};
-use crate::compiler::span::Span;
+use crate::builtins;
+use crate::error::{Code, Error};
+use crate::hir::Closure;
+use crate::hir::{SigItem, SigKind, Signature};
+use crate::span::Span;
 use std::cell::Cell;
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
@@ -46,7 +45,7 @@ impl Default for Context {
 impl Context {
     pub fn new() -> Self {
         Context {
-            name: ENTRY_FUNCTION_NAME.to_string(),
+            name: String::new(),
             is_root_fn: true,
             counter: Rc::new(Cell::new(0)),
             ns: String::new(),

@@ -1,0 +1,17 @@
+
+[package]
+name = "compiler"
+version = "0.1.0"
+edition = "2021"
+default-run = "compiler"
+
+[dependencies]
+afterflow-frontend = { path = "../frontend" }
+
+[[bin]]
+name = "render_hir"
+path = "src/tools/render_hir.rs"
+
+[[bin]]
+name = "render_mir"
+path = "src/tools/render_mir.rs"

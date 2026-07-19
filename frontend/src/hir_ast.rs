@@ -1,5 +1,5 @@
-pub use crate::compiler::hir_context::{Context, ContextEntry};
-use crate::compiler::span::Span;
+pub use crate::hir_context::{Context, ContextEntry};
+use crate::span::Span;
 use std::collections::BTreeSet;
 use std::hash::{Hash, Hasher};
 

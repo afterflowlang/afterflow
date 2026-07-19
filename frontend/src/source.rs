@@ -3,12 +3,12 @@ use std::fs;
 use std::io::Cursor;
 use std::path::{Component, Path, PathBuf};
 
-use crate::compiler::ast;
-use crate::compiler::builtins;
-use crate::compiler::error::{Code, Error, Source};
-use crate::compiler::lexer::Lexer;
-use crate::compiler::parser::Parser;
-use crate::compiler::span::Span;
+use crate::ast;
+use crate::builtins;
+use crate::error::{Code, Error, Source};
+use crate::lexer::Lexer;
+use crate::parser::Parser;
+use crate::span::Span;
 
 pub struct Project {
     pub items: Vec<ast::BlockItem>,
@@ -730,7 +730,10 @@ fn display_module(project_root: &Path, path: &Path) -> String {
 }
 
 fn bundled_library_root() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("lib")
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("frontend manifest must be inside the repository")
+        .join("lib")
 }
 
 fn module_relative<'a>(project_root: &'a Path, path: &'a Path) -> &'a Path {

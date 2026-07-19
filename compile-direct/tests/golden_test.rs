@@ -357,7 +357,9 @@ fn freestanding_format_archive() -> &'static Path {
 }
 
 fn freestanding_archive(package: &str, filename: &str) -> PathBuf {
-    let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("compiler package should have a workspace root");
     let mut cmd = Command::new("cargo");
     cmd.current_dir(repo_root)
         .arg("build")

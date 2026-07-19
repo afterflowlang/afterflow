@@ -3,7 +3,7 @@ use std::fmt::{self, Display, Formatter};
 use std::io;
 use std::path::PathBuf;
 
-use crate::compiler::span::Span;
+use crate::span::Span;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Code {

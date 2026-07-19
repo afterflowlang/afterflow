@@ -1,12 +1,12 @@
-use crate::compiler::ast;
-use crate::compiler::builtins;
-use crate::compiler::error;
-use crate::compiler::error::{Code, Error};
-use crate::compiler::format_hir;
-pub use crate::compiler::hir_ast::*;
-use crate::compiler::hir_context as ctx;
-use crate::compiler::signature;
-use crate::compiler::span::Span;
+use crate::ast;
+use crate::builtins;
+use crate::error;
+use crate::error::{Code, Error};
+use crate::format_hir;
+pub use crate::hir_ast::*;
+use crate::hir_context as ctx;
+use crate::signature;
+use crate::span::Span;
 use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
 
 pub struct Lowerer {

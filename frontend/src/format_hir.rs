@@ -1,6 +1,6 @@
 use std::fmt::Write;
 
-use crate::compiler::hir::{self, Block, BlockItem, Closure, Function};
+use crate::hir::{self, Block, BlockItem, Closure, Function};
 pub fn render_normalized_rgo(items: &[BlockItem]) -> String {
     let mut out = String::new();
     for (i, item) in items.iter().enumerate() {

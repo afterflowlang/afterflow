@@ -1,9 +1,9 @@
-use crate::compiler::ast;
-use crate::compiler::builtins;
-use crate::compiler::error::Error;
-use crate::compiler::hir;
-use crate::compiler::hir_context as ctx;
-use crate::compiler::span::Span;
+use crate::ast;
+use crate::builtins;
+use crate::error::Error;
+use crate::hir;
+use crate::hir_context as ctx;
+use crate::span::Span;
 use std::collections::{BTreeSet, HashMap, HashSet};
 
 pub fn ast_signature_to_hir(signature: ast::Signature) -> hir::Signature {
@@ -283,7 +283,7 @@ fn instantiate_generic_inst(
     Some(hir::SigKind::Sig(substitute_signature(signature, &mapping)))
 }
 
-pub(crate) fn substitute_signature(
+pub fn substitute_signature(
     signature: &hir::Signature,
     mapping: &HashMap<String, hir::SigKind>,
 ) -> hir::Signature {

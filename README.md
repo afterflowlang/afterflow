@@ -264,15 +264,15 @@ make example comptime_format
 git clone https://github.com/afterflowlang/afterflow.git
 cd afterflow
 docker build -t afterflow-compiler .
-docker run --rm -i afterflow-compiler code/main.af hello
+docker run --rm -i afterflow-compiler compile-direct/code/main.af hello
 ```
 
-This compiles and runs the `hello` target in `code/main.af`.
+This compiles and runs the `hello` target in `compile-direct/code/main.af`.
 
 This is what happens inside the container (or on your linux machine)
 ```sh
 apt-get install -y nasm gcc make
-cargo run -- code/main.af hello hello.asm
+cargo run -p compiler -- compile-direct/code/main.af hello hello.asm
 nasm -felf64 hello.asm -o bin/hello.o
 cargo build -p freestanding-format --release
 cargo build -p freestanding-math --release
@@ -288,7 +288,7 @@ ld --gc-sections --strip-debug bin/hello.o target/release/libfreestanding_format
 
 ## Building and testing
 
-- Rebuild the compiler or run the golden snapshot suite with `cargo test`. This also executes `tests/golden_test.rs`, which reads each fixture from its own numbered complexity folder under `tests/golden/` or `tests/failing/` and regenerates matching snapshots under `tests/generated/`:
+- Rebuild the compiler or run the golden snapshot suite with `cargo test -p compiler`. This also executes `compile-direct/tests/golden_test.rs`, which reads each fixture from its own numbered complexity folder under `compile-direct/tests/golden/` or `compile-direct/tests/failing/` and regenerates matching snapshots under `compile-direct/tests/generated/`:
   - `*.asm` contains the final NASM output.
   - `*.air` records the pseudo-assembly that feeds the final backend.
   - `*.hir.af` is the normalized high-level IR after parsing.
@@ -298,9 +298,10 @@ ld --gc-sections --strip-debug bin/hello.o target/release/libfreestanding_format
 
 ## Project structure
 
-- `src/`: Rust implementation of the lexer, parser, HIR, and back-end code generator.
-- `code/`: sample Afterflow workspace files (`main.af` contains target functions such as `hello` for Makefile shortcuts).
-- `tests/`: integration and golden snapshot tests; `golden_test.rs` is the automated snapshot generator.
+- `frontend/src/`: shared Rust implementation of source loading, lexing, parsing, AST, and HIR construction.
+- `compile-direct/src/`: direct compiler implementation from HIR through compile-time execution, AIR, and NASM code generation.
+- `compile-direct/code/`: sample Afterflow workspace files (`main.af` contains target functions such as `hello` for Makefile shortcuts).
+- `compile-direct/tests/`: integration and golden snapshot tests; `golden_test.rs` is the automated snapshot generator.
 - [SEMANTICS.md](SEMANTICS.md) describes source-language rules and
   user-visible behavior.
 - [SPEC.md](SPEC.md) describes compile-direct runtime representation, lowering, and
@@ -315,7 +316,7 @@ the same package. A source binding such as `lib: /lib` loads every direct
 The root package itself cannot be imported. Declarations shared with imported
 packages belong in a named package that each consumer imports.
 
-The compilation process flows as follows:
+The compilation process flows as follows. The first three phases live in the shared `afterflow-frontend` crate:
 1. `Lexer`: Transforms source text into a stream of `Token`s.
 2. `Parser`: Consumes tokens to produce an Abstract Syntax Tree (AST).
 3. `HIR`: AST is desugared and type checked.

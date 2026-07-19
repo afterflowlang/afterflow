@@ -3,7 +3,7 @@ ASDF_DATA_DIR ?= $(HOME)/.asdf
 RUST_VERSION := 1.96.0
 NASM_VERSION := 3.01
 NASM_URL := https://www.nasm.us/pub/nasm/releasebuilds/$(NASM_VERSION)/nasm-$(NASM_VERSION).tar.gz
-INPUT ?= code/main.af
+INPUT ?= compile-direct/code/main.af
 TARGET := $(word 2,$(MAKECMDGOALS))
 FORMAT_ARCHIVE := target/release/libfreestanding_format.a
 MATH_ARCHIVE := target/release/libfreestanding_math.a
@@ -69,15 +69,15 @@ install-nasm:
 compile: $(FREESTANDING_ARCHIVES)
 	@test -n "$(TARGET)" || { echo "usage: make compile <target> [INPUT=path/to/main.af]"; exit 2; }
 	@mkdir -p bin
-	@cargo run -- $(INPUT) $(TARGET) bin/$(TARGET).asm
+	@cargo run -p compiler -- $(INPUT) $(TARGET) bin/$(TARGET).asm
 	@nasm -felf64 bin/$(TARGET).asm -o bin/$(TARGET).o
 	@ld --gc-sections --strip-debug bin/$(TARGET).o $(FREESTANDING_ARCHIVES) -o bin/$(TARGET)
 
 .PHONY: example
 example: $(FREESTANDING_ARCHIVES)
-	@test -f code/examples/$(TARGET)/main.af || { echo "unknown example: $(TARGET)"; exit 2; }
+	@test -f compile-direct/code/examples/$(TARGET)/main.af || { echo "unknown example: $(TARGET)"; exit 2; }
 	@mkdir -p bin
-	@cargo run -- code/examples/$(TARGET)/main.af main bin/$(TARGET).asm
+	@cargo run -p compiler -- compile-direct/code/examples/$(TARGET)/main.af main bin/$(TARGET).asm
 	@nasm -felf64 bin/$(TARGET).asm -o bin/$(TARGET).o
 	@ld --gc-sections --strip-debug bin/$(TARGET).o $(FREESTANDING_ARCHIVES) -o bin/$(TARGET)
 	@./bin/$(TARGET)
@@ -96,14 +96,14 @@ run: compile
 .PHONY: hir
 hir:
 	@test -n "$(TARGET)" || { echo "usage: make hir <target> [INPUT=path/to/main.af]"; exit 2; }
-	@mkdir -p code/generated/$(TARGET)
-	@cargo run --bin render_hir -- $(INPUT) $(TARGET) code/generated/$(TARGET)/main.af
+	@mkdir -p compile-direct/code/generated/$(TARGET)
+	@cargo run -p compiler --bin render_hir -- $(INPUT) $(TARGET) compile-direct/code/generated/$(TARGET)/main.af
 
 .PHONY: mir
 mir:
 	@test -n "$(TARGET)" || { echo "usage: make mir <target> [INPUT=path/to/main.af]"; exit 2; }
-	@mkdir -p code/generated/$(TARGET)
-	@cargo run --bin render_mir -- $(INPUT) $(TARGET) code/generated/$(TARGET)/main.mir
+	@mkdir -p compile-direct/code/generated/$(TARGET)
+	@cargo run -p compiler --bin render_mir -- $(INPUT) $(TARGET) compile-direct/code/generated/$(TARGET)/main.mir
 
 .PHONY: test
 test:
