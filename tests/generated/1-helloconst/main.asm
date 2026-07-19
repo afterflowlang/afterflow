@@ -1,6 +1,10 @@
 bits 64
 default rel
 section .text
+__rgo_allocation_failed:
+    mov rdi, 1 ; allocation failure exit code
+    mov rax, 60 ; exit syscall
+    syscall
 global _1_main
 _1_main:
     push rbp ; save executor frame pointer
@@ -75,14 +79,16 @@ main:
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
     mov [rbp-8], rdi ; store x arg in frame
+    mov rsi, 48 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 48 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov r12, rbx ; env_end pointer before metadata
     mov rax, 0 ; store env size metadata
@@ -167,6 +173,7 @@ clone_descriptor_ptr:
     mov r13, [r12+8] ; byte length
     mov rsi, r13 ; data and terminator size
     add rsi, 33 ; include descriptor
+    jc __rgo_allocation_failed ; allocation size overflow
     mov rax, 9
     xor rdi, rdi
     mov rdx, 3
@@ -174,6 +181,8 @@ clone_descriptor_ptr:
     mov r8, -1
     xor r9, r9
     syscall
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; cloned mapping base
     xor rcx, rcx ; byte offset
 clone_descriptor_ptr_copy:

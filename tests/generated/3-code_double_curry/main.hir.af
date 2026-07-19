@@ -431,65 +431,66 @@ __rgo_7374642f666d74__f64: (value: f64, tail:((((str), (int), (f64)), __rgo_7374
 __rgo_7374642f666d74__end: (value:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), done_case:()){
     __rgo_737464__end(value, done_case)
 }
-_339___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
+_334___rgo_7374642f666d74__new: (){
+    _335: 1
+    @exit(_335)
+}
+_344___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
     __rgo_7374642f666d74__finish(output, invalid, ok)
 }
 
-_335___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
-    _336___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
-    _337: 0
-    _340___rgo_7374642f666d74__new: _339___rgo_7374642f666d74__new(invalid, ok)
-    __rgo_7374642f666d74__parse(l, _336___rgo_7374642f666d74__raw_nth, _337, __rgo_7374642f666d74__empty, invalid, args, _340___rgo_7374642f666d74__new)
+_340___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
+    _341___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
+    _342: 0
+    _345___rgo_7374642f666d74__new: _344___rgo_7374642f666d74__new(invalid, ok)
+    __rgo_7374642f666d74__parse(l, _341___rgo_7374642f666d74__raw_nth, _342, __rgo_7374642f666d74__empty, invalid, args, _345___rgo_7374642f666d74__new)
 }
 
-_333___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
-    _341___rgo_7374642f666d74__new: _335___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
-    @bytes_descriptor_len(source_bytes, _341___rgo_7374642f666d74__new)
+_338___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
+    _346___rgo_7374642f666d74__new: _340___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
+    @bytes_descriptor_len(source_bytes, _346___rgo_7374642f666d74__new)
 }
 
-__rgo_7374642f666d74__new: (template: str!, invalid:()!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
-    _342___rgo_7374642f666d74__new: _333___rgo_7374642f666d74__new(invalid, args, ok)
-    @bytes_from_str(template, _342___rgo_7374642f666d74__new)
+__rgo_7374642f666d74__new: (template: str!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
+    _332: "invalid format"
+    invalid: @compile_error(_332, _334___rgo_7374642f666d74__new)
+    _347___rgo_7374642f666d74__new: _338___rgo_7374642f666d74__new(invalid, args, ok)
+    @bytes_from_str(template, _347___rgo_7374642f666d74__new)
 }
 
 foo: (ok:(str)){
-    _344: "charlie"
-    ok(_344)
+    _349: "charlie"
+    ok(_349)
 }
 
 baz: (ok:(str, str)){
-    _347: "bob"
-    _348_ok: ok(_347)
-    foo(_348_ok)
+    _352: "bob"
+    _353_ok: ok(_352)
+    foo(_353_ok)
 }
-_351_bar: (){
-    _352: 1
-    @exit(_352)
-}
-_359_bar: (ok:(), value: str){
+_360_bar: (ok:(), value: str){
     @write(value, ok)
 }
-
-_361_bar: (){
-    _362: 0
-    @exit(_362)
+_362_bar: (){
+    _363: 0
+    @exit(_363)
 }
 
-_358_bar: (_331___rgo_7374642f666d74__new: str){
-    _359_bar(_361_bar, _331___rgo_7374642f666d74__new)
+_359_bar: (_331___rgo_7374642f666d74__new: str){
+    _360_bar(_362_bar, _331___rgo_7374642f666d74__new)
 }
 
 bar: (name0: str, name1: str, name2: str){
-    _349: "hello %, % and %\n"
-    _354___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(name2, __rgo_7374642f666d74__end)
-    _355___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(name1, _354___rgo_7374642f666d74__str)
-    _356___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(name0, _355___rgo_7374642f666d74__str)
-    __rgo_7374642f666d74__new(_349, _351_bar, _356___rgo_7374642f666d74__str, _358_bar)
+    _354: "hello %, % and %\n"
+    _355___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(name2, __rgo_7374642f666d74__end)
+    _356___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(name1, _355___rgo_7374642f666d74__str)
+    _357___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(name0, _356___rgo_7374642f666d74__str)
+    __rgo_7374642f666d74__new(_354, _357___rgo_7374642f666d74__str, _359_bar)
 }
 
 main: (){
-    _365: "alice"
-    _366_bar: bar(_365)
-    baz(_366_bar)
+    _366: "alice"
+    _367_bar: bar(_366)
+    baz(_367_bar)
 }
 main()

@@ -2,7 +2,7 @@ fmt: /std/fmt
 str: @str
 
 foo: (a: str, b: str, c:str){
-    fmt.new("% % and %", @exit(1), fmt.str(a) fmt.str(b) fmt.str(c) fmt.end, @write(ok: @exit(0)))
+    fmt.new("% % and %", fmt.str(a) fmt.str(b) fmt.str(c) fmt.end, @write(ok: @exit(0)))
 }
 baz: (ok:(str)){
     ok("hello")

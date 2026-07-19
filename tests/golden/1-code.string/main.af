@@ -3,5 +3,5 @@ str: @str
 int: @int
 
 main: () {
-    fmt.new("hello\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+    fmt.new("hello\n", fmt.end, @write(ok: @exit(0)))
 }

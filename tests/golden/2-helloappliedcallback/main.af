@@ -3,7 +3,7 @@ str: @str
 int: @int
 
 bar: (m1:str, m2:str, ok:()) {
-    fmt.new("msg1: %, msg2: %\n", @exit(1), fmt.str(m1) fmt.str(m2) fmt.end, @write(ok: ok))
+    fmt.new("msg1: %, msg2: %\n", fmt.str(m1) fmt.str(m2) fmt.end, @write(ok: ok))
 }
 foo: (cb:(str, ()), ok:()){
     cb("bye", ok)

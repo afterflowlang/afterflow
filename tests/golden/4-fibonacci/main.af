@@ -20,5 +20,5 @@ fib: (n: int, k: (int)){
 
 main: () {
     (result: int) = fib(7)
-    fmt.new("fib(7) = %\n", @exit(1), fmt.int(result) fmt.end, @write(ok: @exit(0)))
+    fmt.new("fib(7) = %\n", fmt.int(result) fmt.end, @write(ok: @exit(0)))
 }

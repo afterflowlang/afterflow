@@ -13,11 +13,11 @@ array3: (a:str, b:str, c:str, ok:(len:int, nth:(index:int, one:(str), none:())))
 }
 main: () {
     array3("alice", "bob", "charlie", (len:int, nth:(index:int, one:(str), none:())){
-        fmt.new("array has % elements\n", @exit(1), fmt.int(len) fmt.end, @write(ok: () {
+        fmt.new("array has % elements\n", fmt.int(len) fmt.end, @write(ok: () {
             nth(1, (s:str){
-                fmt.new("element at index 1 is %\n", @exit(1), fmt.str(s) fmt.end, @write(ok: @exit(0)))
+                fmt.new("element at index 1 is %\n", fmt.str(s) fmt.end, @write(ok: @exit(0)))
             }, () {
-                fmt.new("index out of bounds\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+                fmt.new("index out of bounds\n", fmt.end, @write(ok: @exit(0)))
             })
         }))
     })

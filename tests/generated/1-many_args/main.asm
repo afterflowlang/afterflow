@@ -1,8 +1,12 @@
 bits 64
 default rel
 section .text
-global _375_main
-_375_main:
+__rgo_allocation_failed:
+    mov rdi, 1 ; allocation failure exit code
+    mov rax, 60 ; exit syscall
+    syscall
+global _376_main
+_376_main:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
@@ -25,8 +29,8 @@ release_heap_ptr:
     pop rbx
     pop rbp
     ret
-global _375_main_unwrapper
-_375_main_unwrapper:
+global _376_main_unwrapper
+_376_main_unwrapper:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -35,9 +39,9 @@ _375_main_unwrapper:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
     leave ; unwind before named jump
-    jmp _375_main
-global _375_main_deep_release
-_375_main_deep_release:
+    jmp _376_main
+global _376_main_deep_release
+_376_main_deep_release:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -48,8 +52,8 @@ _375_main_deep_release:
     leave
     ret
 
-global _375_main_deepcopy
-_375_main_deepcopy:
+global _376_main_deepcopy
+_376_main_deepcopy:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -183,14 +187,16 @@ deepcopy_heap_ptr:
     mov r15, [r12+32] ; load heap size metadata
     mov rbx, r12 ; keep env_end pointer
     sub rbx, r14 ; compute env base pointer
-    mov rdi, 0 ; addr hint so kernel picks mmap base
     mov rsi, r15 ; length = heap size
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags = private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    mov rax, 9 ; mmap syscall
-    syscall ; allocate new closure env
+    mov rax, 9
+    xor rdi, rdi
+    mov rdx, 3
+    mov r10, 34
+    mov r8, -1
+    xor r9, r9
+    syscall
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r13, rax ; new env base pointer
     mov rdi, r13 ; memcpy dest
     mov rsi, rbx ; memcpy src
@@ -264,14 +270,16 @@ __rgo_7374642f666d74__single:
     sub rsp, 32 ; reserve stack space for locals
     mov [rbp-8], rdi ; store value arg in frame
     mov [rbp-16], rsi ; store inspect_value arg in frame
+    mov rsi, 80 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 80 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -488,14 +496,16 @@ __rgo_7374642f666d74__empty:
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
     mov [rbp-8], rdi ; store inspect_value arg in frame
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -738,14 +748,16 @@ _117___rgo_7374642f666d74__concat_nth:
     mov [rbp-24], rdx ; store b arg in frame
     mov [rbp-32], rcx ; store empty_case arg in frame
     mov [rbp-40], r8 ; store one arg in frame
+    mov rsi, 80 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 80 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -924,14 +936,16 @@ __rgo_7374642f666d74__concat_nth:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -954,14 +968,16 @@ __rgo_7374642f666d74__concat_nth:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -987,14 +1003,16 @@ __rgo_7374642f666d74__concat_nth:
     mov [r12-8], rcx ; store env field
     mov rcx, 0 ; operand literal
     mov [r12+40], rcx ; store env field
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-32] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -1212,14 +1230,16 @@ _127___rgo_7374642f666d74__concat:
     mov [rbp-24], rdx ; store a_nth arg in frame
     mov [rbp-32], rcx ; store b_nth arg in frame
     mov [rbp-40], r8 ; store l arg in frame
+    mov rsi, 96 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 96 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -1389,14 +1409,16 @@ _125___rgo_7374642f666d74__concat:
     mov [rbp-24], rdx ; store a_nth arg in frame
     mov [rbp-32], rcx ; store b_l arg in frame
     mov [rbp-40], r8 ; store b_nth arg in frame
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -1567,14 +1589,16 @@ _123___rgo_7374642f666d74__concat:
     mov [rbp-16], rsi ; store inspect_value arg in frame
     mov [rbp-24], rdx ; store a_l arg in frame
     mov [rbp-32], rcx ; store a_nth arg in frame
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -1735,14 +1759,16 @@ __rgo_7374642f666d74__concat:
     mov [rbp-8], rdi ; store a arg in frame
     mov [rbp-16], rsi ; store b arg in frame
     mov [rbp-24], rdx ; store inspect_value arg in frame
+    mov rsi, 80 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 80 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -1888,16 +1914,16 @@ __rgo_7374642f666d74__concat_deepcopy_skip_2:
     leave
     ret
 
-global _342_foo
-_342_foo:
+global _331___rgo_7374642f666d74__new
+_331___rgo_7374642f666d74__new:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     ; load exit code
     mov rdi, 1 ; operand literal
     mov rax, 60 ; exit syscall
     syscall
-global _342_foo_unwrapper
-_342_foo_unwrapper:
+global _331___rgo_7374642f666d74__new_unwrapper
+_331___rgo_7374642f666d74__new_unwrapper:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -1906,9 +1932,9 @@ _342_foo_unwrapper:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
     leave ; unwind before named jump
-    jmp _342_foo
-global _342_foo_deep_release
-_342_foo_deep_release:
+    jmp _331___rgo_7374642f666d74__new
+global _331___rgo_7374642f666d74__new_deep_release
+_331___rgo_7374642f666d74__new_deep_release:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -1919,8 +1945,8 @@ _342_foo_deep_release:
     leave
     ret
 
-global _342_foo_deepcopy
-_342_foo_deepcopy:
+global _331___rgo_7374642f666d74__new_deepcopy
+_331___rgo_7374642f666d74__new_deepcopy:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -2041,14 +2067,16 @@ _243___rgo_7374642f666d74__from_int:
     sub rsp, 32 ; reserve stack space for locals
     mov [rbp-8], rdi ; store ok arg in frame
     mov [rbp-16], rsi ; store magnitude arg in frame
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 45 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -2067,14 +2095,16 @@ _243___rgo_7374642f666d74__from_int:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy _245___rgo_7374642f666d74__single closure env_end to rax
     mov [rbp-24], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -2201,14 +2231,16 @@ _229___rgo_7374642f666d74__negative_digits:
     mov [rbp-8], rdi ; store ok arg in frame
     mov [rbp-16], rsi ; store suffix arg in frame
     mov [rbp-24], rdx ; store prefix arg in frame
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -2364,14 +2396,16 @@ _227___rgo_7374642f666d74__negative_digits:
     mov [rbp-24], rdx ; store invalid arg in frame
     mov [rbp-32], rcx ; store ok arg in frame
     mov [rbp-40], r8 ; store suffix arg in frame
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-32] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -2569,14 +2603,16 @@ _223___rgo_7374642f666d74__negative_digits:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -2599,14 +2635,16 @@ _223___rgo_7374642f666d74__negative_digits:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -2628,14 +2666,16 @@ _223___rgo_7374642f666d74__negative_digits:
     mov [r12-8], rcx ; store env field
     mov rcx, 0 ; operand literal
     mov [r12+40], rcx ; store env field
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -2845,14 +2885,16 @@ _179___rgo_7374642f666d74__digit:
     sub rsp, 32 ; reserve stack space for locals
     mov [rbp-8], rdi ; store ok arg in frame
     mov [rbp-16], rsi ; store ascii arg in frame
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -2954,14 +2996,16 @@ _177___rgo_7374642f666d74__digit:
     sub rsp, 32 ; reserve stack space for locals
     mov [rbp-8], rdi ; store ok arg in frame
     mov [rbp-16], rsi ; store ascii_bits arg in frame
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -3065,14 +3109,16 @@ _175___rgo_7374642f666d74__digit:
     mov [rbp-8], rdi ; store value_bits arg in frame
     mov [rbp-16], rsi ; store ok arg in frame
     mov [rbp-24], rdx ; store zero_bits arg in frame
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -3182,14 +3228,16 @@ _172___rgo_7374642f666d74__digit:
     sub rsp, 32 ; reserve stack space for locals
     mov [rbp-8], rdi ; store ok arg in frame
     mov [rbp-16], rsi ; store value_bits arg in frame
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -3294,14 +3342,16 @@ _170___rgo_7374642f666d74__digit:
     sub rsp, 32 ; reserve stack space for locals
     mov [rbp-8], rdi ; store ok arg in frame
     mov [rbp-16], rsi ; store value_u8 arg in frame
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -3405,14 +3455,16 @@ __rgo_7374642f666d74__digit:
     mov [rbp-8], rdi ; store value arg in frame
     mov [rbp-16], rsi ; store invalid arg in frame
     mov [rbp-24], rdx ; store ok arg in frame
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -3572,14 +3624,16 @@ _221___rgo_7374642f666d74__negative_digits:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -3596,14 +3650,16 @@ _221___rgo_7374642f666d74__negative_digits:
     pop r12 ; restore cloned env_end pointer
     mov rax, r12 ; copy cloned env_end pointer
     mov [rbp-48], rax ; store value
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -3777,14 +3833,16 @@ _218___rgo_7374642f666d74__negative_digits:
     mov [rbp-24], rdx ; store ok arg in frame
     mov [rbp-32], rcx ; store __rgo_7374642f666d74__negative_digits arg in frame
     mov [rbp-40], r8 ; store negative_remainder arg in frame
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -3957,14 +4015,16 @@ _216___rgo_7374642f666d74__negative_digits:
     mov [rbp-32], rcx ; store ok arg in frame
     mov [rbp-40], r8 ; store __rgo_7374642f666d74__negative_digits arg in frame
     mov [rbp-48], r9 ; store magnitude arg in frame
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -4141,14 +4201,16 @@ _213___rgo_7374642f666d74__negative_digits:
     mov [rbp-24], rdx ; store ok arg in frame
     mov [rbp-32], rcx ; store __rgo_7374642f666d74__negative_digits arg in frame
     mov [rbp-40], r8 ; store quotient arg in frame
+    mov rsi, 96 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 96 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -4320,14 +4382,16 @@ __rgo_7374642f666d74__negative_digits:
     mov [rbp-8], rdi ; store value arg in frame
     mov [rbp-16], rsi ; store invalid arg in frame
     mov [rbp-24], rdx ; store ok arg in frame
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -4350,14 +4414,16 @@ __rgo_7374642f666d74__negative_digits:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -4374,14 +4440,16 @@ __rgo_7374642f666d74__negative_digits:
     pop r12 ; restore cloned env_end pointer
     mov rax, r12 ; copy cloned env_end pointer
     mov [rbp-40], rax ; store value
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -4539,14 +4607,16 @@ _241___rgo_7374642f666d74__from_int:
     mov [rbp-8], rdi ; store value arg in frame
     mov [rbp-16], rsi ; store invalid arg in frame
     mov [rbp-24], rdx ; store ok arg in frame
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -4680,14 +4750,16 @@ _202___rgo_7374642f666d74__positive_digits:
     mov [rbp-8], rdi ; store ok arg in frame
     mov [rbp-16], rsi ; store suffix arg in frame
     mov [rbp-24], rdx ; store prefix arg in frame
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -4843,14 +4915,16 @@ _200___rgo_7374642f666d74__positive_digits:
     mov [rbp-24], rdx ; store invalid arg in frame
     mov [rbp-32], rcx ; store ok arg in frame
     mov [rbp-40], r8 ; store suffix arg in frame
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-32] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -5048,14 +5122,16 @@ _196___rgo_7374642f666d74__positive_digits:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -5078,14 +5154,16 @@ _196___rgo_7374642f666d74__positive_digits:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -5107,14 +5185,16 @@ _196___rgo_7374642f666d74__positive_digits:
     mov [r12-8], rcx ; store env field
     mov rcx, 0 ; operand literal
     mov [r12+40], rcx ; store env field
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -5333,14 +5413,16 @@ _194___rgo_7374642f666d74__positive_digits:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -5357,14 +5439,16 @@ _194___rgo_7374642f666d74__positive_digits:
     pop r12 ; restore cloned env_end pointer
     mov rax, r12 ; copy cloned env_end pointer
     mov [rbp-48], rax ; store value
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -5539,14 +5623,16 @@ _192___rgo_7374642f666d74__positive_digits:
     mov [rbp-32], rcx ; store ok arg in frame
     mov [rbp-40], r8 ; store __rgo_7374642f666d74__positive_digits arg in frame
     mov [rbp-48], r9 ; store magnitude arg in frame
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -5723,14 +5809,16 @@ _189___rgo_7374642f666d74__positive_digits:
     mov [rbp-24], rdx ; store ok arg in frame
     mov [rbp-32], rcx ; store __rgo_7374642f666d74__positive_digits arg in frame
     mov [rbp-40], r8 ; store quotient arg in frame
+    mov rsi, 96 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 96 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -5902,14 +5990,16 @@ __rgo_7374642f666d74__positive_digits:
     mov [rbp-8], rdi ; store value arg in frame
     mov [rbp-16], rsi ; store invalid arg in frame
     mov [rbp-24], rdx ; store ok arg in frame
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -5932,14 +6022,16 @@ __rgo_7374642f666d74__positive_digits:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -5956,14 +6048,16 @@ __rgo_7374642f666d74__positive_digits:
     pop r12 ; restore cloned env_end pointer
     mov rax, r12 ; copy cloned env_end pointer
     mov [rbp-40], rax ; store value
+    mov rsi, 88 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 88 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -6242,14 +6336,16 @@ __rgo_7374642f666d74__from_int:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -6272,14 +6368,16 @@ __rgo_7374642f666d74__from_int:
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -6296,14 +6394,16 @@ __rgo_7374642f666d74__from_int:
     pop r12 ; restore cloned env_end pointer
     mov rax, r12 ; copy cloned env_end pointer
     mov [rbp-40], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -6326,14 +6426,16 @@ __rgo_7374642f666d74__from_int:
     mov qword [r12+40], 0 ; store num_remaining
     mov rax, r12 ; copy _248___rgo_7374642f666d74__from_int closure env_end to rax
     mov [rbp-48], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; capture arg into env
@@ -6486,14 +6588,16 @@ __rgo_7374642f666d74__int_source:
     mov [rbp-8], rdi ; store value arg in frame
     mov [rbp-16], rsi ; store invalid arg in frame
     mov [rbp-24], rdx ; store inspect_value arg in frame
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-24] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -6630,8 +6734,8 @@ release_descriptor_ptr:
     syscall
 release_descriptor_ptr_done:
     ret
-global _350_foo
-_350_foo:
+global _351_foo
+_351_foo:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
@@ -6654,6 +6758,158 @@ _350_foo:
     mov rdi, r12 ; pass env_end pointer to continuation
     leave ; unwind before jumping
     jmp rax
+global _351_foo_unwrapper
+_351_foo_unwrapper:
+    push rbp ; save executor frame pointer
+    mov rbp, rsp ; establish new frame base
+    sub rsp, 32 ; reserve stack space for locals
+    mov [rbp-8], rdi ; store env_end arg in frame
+    mov r12, [rbp-8] ; load operand
+    mov rax, [r12-16] ; load ok env field
+    mov [rbp-16], rax ; store value
+    mov rax, [r12-8] ; load value env field
+    mov [rbp-24], rax ; store value
+    mov rdi, r12 ; use pinned __env_end env_end pointer
+    call release_heap_ptr ; release __env_end closure environment
+    mov rax, [rbp-24] ; load operand
+    push rax ; stack arg
+    mov rax, [rbp-16] ; load operand
+    push rax ; stack arg
+    pop rdi ; restore arg into register
+    pop rsi ; restore arg into register
+    leave ; unwind before named jump
+    jmp _351_foo
+global _351_foo_deep_release
+_351_foo_deep_release:
+    push rbp ; save executor frame pointer
+    mov rbp, rsp ; establish new frame base
+    sub rsp, 32 ; reserve stack space for locals
+    mov [rbp-8], rdi ; store env_end arg in frame
+    mov r12, [rbp-8] ; load operand
+    mov rax, [r12+40] ; load __num_remaining env field
+    mov [rbp-16], rax ; store value
+    mov rax, [rbp-16] ; load operand
+    mov rbx, 1 ; operand literal
+    cmp rax, rbx
+    jg _351_foo_release_skip_0
+    mov rax, [r12-16] ; load _351_foo_release_field_0 env field
+    mov [rbp-24], rax ; store value
+    push r12 ; preserve current environment
+    mov rdi, [rbp-24] ; load operand
+    mov rax, [rdi+8] ; load closure release helper
+    call rax ; recursively release closure
+    pop r12 ; restore current environment
+_351_foo_release_skip_0:
+    mov rax, [rbp-16] ; load operand
+    mov rbx, 0 ; operand literal
+    cmp rax, rbx
+    jg _351_foo_release_skip_1
+    mov rax, [r12-8] ; load _351_foo_release_field_1 env field
+    mov [rbp-32], rax ; store value
+    push r12 ; preserve current environment
+    mov rdi, [rbp-32] ; load operand
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
+_351_foo_release_skip_1:
+    mov rdi, r12 ; use pinned __env_end env_end pointer
+    call release_heap_ptr ; release __env_end closure environment
+    leave
+    ret
+
+global clone_descriptor_ptr
+clone_descriptor_ptr:
+    push rbx ; preserve callee-saved registers
+    push r12
+    push r13
+    mov r12, rdi ; source descriptor
+    cmp qword [r12+16], 0 ; static descriptor?
+    je clone_descriptor_ptr_static
+    mov r13, [r12+8] ; byte length
+    mov rsi, r13 ; data and terminator size
+    add rsi, 33 ; include descriptor
+    jc __rgo_allocation_failed ; allocation size overflow
+    mov rax, 9
+    xor rdi, rdi
+    mov rdx, 3
+    mov r10, 34
+    mov r8, -1
+    xor r9, r9
+    syscall
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; cloned mapping base
+    xor rcx, rcx ; byte offset
+clone_descriptor_ptr_copy:
+    cmp rcx, r13
+    ja clone_descriptor_ptr_copied
+    mov rdi, [r12] ; source data
+    mov dl, [rdi+rcx]
+    mov [rbx+rcx], dl
+    inc rcx
+    jmp clone_descriptor_ptr_copy
+clone_descriptor_ptr_copied:
+    lea rax, [rbx+r13+1] ; cloned descriptor
+    mov [rax], rbx ; cloned data
+    mov [rax+8], r13 ; cloned byte length
+    mov [rax+16], rbx ; owned mapping base
+    mov rdx, r13
+    add rdx, 33
+    mov [rax+24], rdx ; owned mapping size
+    jmp clone_descriptor_ptr_done
+clone_descriptor_ptr_static:
+    mov rax, r12 ; static descriptors are immutable
+clone_descriptor_ptr_done:
+    pop r13
+    pop r12
+    pop rbx
+    ret
+global _351_foo_deepcopy
+_351_foo_deepcopy:
+    push rbp ; save executor frame pointer
+    mov rbp, rsp ; establish new frame base
+    sub rsp, 32 ; reserve stack space for locals
+    mov [rbp-8], rdi ; store env_end arg in frame
+    mov r12, [rbp-8] ; load operand
+    mov rax, [r12+40] ; load num_remaining env field
+    mov [rbp-16], rax ; store value
+    mov rax, [rbp-16] ; load operand
+    mov rbx, 1 ; operand literal
+    cmp rax, rbx
+    jg _351_foo_deepcopy_skip_0
+    mov rcx, [r12-16] ; load field pointer
+    mov rdi, rcx ; copy pointer argument for deepcopy
+    call deepcopy_heap_ptr ; duplicate owned pointer
+    mov [r12-16], rax ; store duplicated pointer
+    mov [rbp-24], rax ; store value
+_351_foo_deepcopy_skip_0:
+    mov rax, [rbp-16] ; load operand
+    mov rbx, 0 ; operand literal
+    cmp rax, rbx
+    jg _351_foo_deepcopy_skip_1
+    mov rcx, [r12-8] ; load field pointer
+    mov rdi, rcx ; copy pointer argument for deepcopy
+    call clone_descriptor_ptr ; duplicate owned pointer
+    mov [r12-8], rax ; store duplicated pointer
+    mov [rbp-32], rax ; store value
+_351_foo_deepcopy_skip_1:
+    leave
+    ret
+
+global _350_foo
+_350_foo:
+    push rbp ; save executor frame pointer
+    mov rbp, rsp ; establish new frame base
+    sub rsp, 16 ; reserve stack space for locals
+    mov [rbp-8], rdi ; store ok arg in frame
+    mov [rbp-16], rsi ; store _328___rgo_7374642f666d74__new arg in frame
+    mov rax, [rbp-16] ; load operand
+    push rax ; stack arg
+    mov rax, [rbp-8] ; load operand
+    push rax ; stack arg
+    pop rdi ; restore arg into register
+    pop rsi ; restore arg into register
+    leave ; unwind before named jump
+    jmp _351_foo
 global _350_foo_unwrapper
 _350_foo_unwrapper:
     push rbp ; save executor frame pointer
@@ -6663,7 +6919,7 @@ _350_foo_unwrapper:
     mov r12, [rbp-8] ; load operand
     mov rax, [r12-16] ; load ok env field
     mov [rbp-16], rax ; store value
-    mov rax, [r12-8] ; load value env field
+    mov rax, [r12-8] ; load _328___rgo_7374642f666d74__new env field
     mov [rbp-24], rax ; store value
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
@@ -6712,50 +6968,6 @@ _350_foo_release_skip_1:
     leave
     ret
 
-global clone_descriptor_ptr
-clone_descriptor_ptr:
-    push rbx ; preserve callee-saved registers
-    push r12
-    push r13
-    mov r12, rdi ; source descriptor
-    cmp qword [r12+16], 0 ; static descriptor?
-    je clone_descriptor_ptr_static
-    mov r13, [r12+8] ; byte length
-    mov rsi, r13 ; data and terminator size
-    add rsi, 33 ; include descriptor
-    mov rax, 9
-    xor rdi, rdi
-    mov rdx, 3
-    mov r10, 34
-    mov r8, -1
-    xor r9, r9
-    syscall
-    mov rbx, rax ; cloned mapping base
-    xor rcx, rcx ; byte offset
-clone_descriptor_ptr_copy:
-    cmp rcx, r13
-    ja clone_descriptor_ptr_copied
-    mov rdi, [r12] ; source data
-    mov dl, [rdi+rcx]
-    mov [rbx+rcx], dl
-    inc rcx
-    jmp clone_descriptor_ptr_copy
-clone_descriptor_ptr_copied:
-    lea rax, [rbx+r13+1] ; cloned descriptor
-    mov [rax], rbx ; cloned data
-    mov [rax+8], r13 ; cloned byte length
-    mov [rax+16], rbx ; owned mapping base
-    mov rdx, r13
-    add rdx, 33
-    mov [rax+24], rdx ; owned mapping size
-    jmp clone_descriptor_ptr_done
-clone_descriptor_ptr_static:
-    mov rax, r12 ; static descriptors are immutable
-clone_descriptor_ptr_done:
-    pop r13
-    pop r12
-    pop rbx
-    ret
 global _350_foo_deepcopy
 _350_foo_deepcopy:
     push rbp ; save executor frame pointer
@@ -6785,111 +6997,6 @@ _350_foo_deepcopy_skip_0:
     mov [r12-8], rax ; store duplicated pointer
     mov [rbp-32], rax ; store value
 _350_foo_deepcopy_skip_1:
-    leave
-    ret
-
-global _349_foo
-_349_foo:
-    push rbp ; save executor frame pointer
-    mov rbp, rsp ; establish new frame base
-    sub rsp, 16 ; reserve stack space for locals
-    mov [rbp-8], rdi ; store ok arg in frame
-    mov [rbp-16], rsi ; store _328___rgo_7374642f666d74__new arg in frame
-    mov rax, [rbp-16] ; load operand
-    push rax ; stack arg
-    mov rax, [rbp-8] ; load operand
-    push rax ; stack arg
-    pop rdi ; restore arg into register
-    pop rsi ; restore arg into register
-    leave ; unwind before named jump
-    jmp _350_foo
-global _349_foo_unwrapper
-_349_foo_unwrapper:
-    push rbp ; save executor frame pointer
-    mov rbp, rsp ; establish new frame base
-    sub rsp, 32 ; reserve stack space for locals
-    mov [rbp-8], rdi ; store env_end arg in frame
-    mov r12, [rbp-8] ; load operand
-    mov rax, [r12-16] ; load ok env field
-    mov [rbp-16], rax ; store value
-    mov rax, [r12-8] ; load _328___rgo_7374642f666d74__new env field
-    mov [rbp-24], rax ; store value
-    mov rdi, r12 ; use pinned __env_end env_end pointer
-    call release_heap_ptr ; release __env_end closure environment
-    mov rax, [rbp-24] ; load operand
-    push rax ; stack arg
-    mov rax, [rbp-16] ; load operand
-    push rax ; stack arg
-    pop rdi ; restore arg into register
-    pop rsi ; restore arg into register
-    leave ; unwind before named jump
-    jmp _349_foo
-global _349_foo_deep_release
-_349_foo_deep_release:
-    push rbp ; save executor frame pointer
-    mov rbp, rsp ; establish new frame base
-    sub rsp, 32 ; reserve stack space for locals
-    mov [rbp-8], rdi ; store env_end arg in frame
-    mov r12, [rbp-8] ; load operand
-    mov rax, [r12+40] ; load __num_remaining env field
-    mov [rbp-16], rax ; store value
-    mov rax, [rbp-16] ; load operand
-    mov rbx, 1 ; operand literal
-    cmp rax, rbx
-    jg _349_foo_release_skip_0
-    mov rax, [r12-16] ; load _349_foo_release_field_0 env field
-    mov [rbp-24], rax ; store value
-    push r12 ; preserve current environment
-    mov rdi, [rbp-24] ; load operand
-    mov rax, [rdi+8] ; load closure release helper
-    call rax ; recursively release closure
-    pop r12 ; restore current environment
-_349_foo_release_skip_0:
-    mov rax, [rbp-16] ; load operand
-    mov rbx, 0 ; operand literal
-    cmp rax, rbx
-    jg _349_foo_release_skip_1
-    mov rax, [r12-8] ; load _349_foo_release_field_1 env field
-    mov [rbp-32], rax ; store value
-    push r12 ; preserve current environment
-    mov rdi, [rbp-32] ; load operand
-    call release_descriptor_ptr ; release owned descriptor
-    pop r12 ; restore current environment
-_349_foo_release_skip_1:
-    mov rdi, r12 ; use pinned __env_end env_end pointer
-    call release_heap_ptr ; release __env_end closure environment
-    leave
-    ret
-
-global _349_foo_deepcopy
-_349_foo_deepcopy:
-    push rbp ; save executor frame pointer
-    mov rbp, rsp ; establish new frame base
-    sub rsp, 32 ; reserve stack space for locals
-    mov [rbp-8], rdi ; store env_end arg in frame
-    mov r12, [rbp-8] ; load operand
-    mov rax, [r12+40] ; load num_remaining env field
-    mov [rbp-16], rax ; store value
-    mov rax, [rbp-16] ; load operand
-    mov rbx, 1 ; operand literal
-    cmp rax, rbx
-    jg _349_foo_deepcopy_skip_0
-    mov rcx, [r12-16] ; load field pointer
-    mov rdi, rcx ; copy pointer argument for deepcopy
-    call deepcopy_heap_ptr ; duplicate owned pointer
-    mov [r12-16], rax ; store duplicated pointer
-    mov [rbp-24], rax ; store value
-_349_foo_deepcopy_skip_0:
-    mov rax, [rbp-16] ; load operand
-    mov rbx, 0 ; operand literal
-    cmp rax, rbx
-    jg _349_foo_deepcopy_skip_1
-    mov rcx, [r12-8] ; load field pointer
-    mov rdi, rcx ; copy pointer argument for deepcopy
-    call clone_descriptor_ptr ; duplicate owned pointer
-    mov [r12-8], rax ; store duplicated pointer
-    mov [rbp-32], rax ; store value
-_349_foo_deepcopy_skip_1:
     leave
     ret
 
@@ -7173,7 +7280,7 @@ bytes_build_inspector_unwrapper:
     call release_heap_ptr
     mov rsi, [rbp-32]
     add rsi, 33
-    jc bytes_build_inspector_invalid
+    jc __rgo_allocation_failed ; allocation size overflow
     mov rax, 9
     xor rdi, rdi
     mov rdx, 3
@@ -7181,8 +7288,8 @@ bytes_build_inspector_unwrapper:
     mov r8, -1
     xor r9, r9
     syscall
-    test rax, rax
-    js bytes_build_inspector_invalid
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov [rbp-48], rax
     cmp qword [rbp-32], 0
     je bytes_build_inspector_empty
@@ -7341,8 +7448,8 @@ bytes_build_step:
     mov r8, -1
     xor r9, r9
     syscall
-    test rax, rax
-    js bytes_build_step_invalid
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov [rbp-56], rax
     mov rdi, [rbp-8]
     call deepcopy_heap_ptr
@@ -7382,8 +7489,8 @@ bytes_build_step:
     mov r8, -1
     xor r9, r9
     syscall
-    test rax, rax
-    js bytes_build_step_one_invalid
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax
     mov rax, [rbp-8]
     mov [rbx+0], rax
@@ -7420,27 +7527,6 @@ bytes_build_step:
     mov qword [rbx+40], 0
     mov rdi, rbx
     mov rax, [rbx]
-    leave
-    jmp rax
-bytes_build_step_one_invalid:
-    mov rdi, [rbp-56]
-    mov rax, [rdi+8]
-    call rax
-bytes_build_step_invalid:
-    mov rdi, [rbp-32]
-    mov rsi, [rbp-40]
-    add rsi, 33
-    mov rax, 11
-    syscall
-    mov rdi, [rbp-16]
-    mov rax, [rdi+8]
-    call rax
-    mov rdi, [rbp-24]
-    mov rax, [rdi+8]
-    call rax
-    mov rdi, [rbp-8]
-    mov qword [rdi+40], 0
-    mov rax, [rdi]
     leave
     jmp rax
 global bytes_build_inspector_deep_release
@@ -7600,7 +7686,7 @@ global foo
 foo:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
-    sub rsp, 608 ; reserve stack space for locals
+    sub rsp, 640 ; reserve stack space for locals
     mov [rbp-8], rdi ; store a1 arg in frame
     mov [rbp-16], rsi ; store a2 arg in frame
     mov [rbp-24], rdx ; store a3 arg in frame
@@ -7641,14 +7727,16 @@ foo:
     mov [rbp-176], rax ; store spilled arg
     mov rax, [rbp+136] ; load spilled ok arg
     mov [rbp-184], rax ; store spilled arg
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 97 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -7667,14 +7755,16 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_1 closure env_end to rax
     mov [rbp-192], rax ; store value
+    mov rsi, 56 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 56 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov r12, rbx ; env_end pointer before metadata
     add r12, 8 ; move pointer past env payload
@@ -7691,14 +7781,16 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __rgo_7374642f666d74__empty closure env_end to rax
     mov [rbp-200], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-200] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -7719,14 +7811,16 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_2 closure env_end to rax
     mov [rbp-208], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 49 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -7745,14 +7839,16 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_4 closure env_end to rax
     mov [rbp-216], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-208] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -7773,14 +7869,16 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_5 closure env_end to rax
     mov [rbp-224], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 58 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -7799,14 +7897,16 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_7 closure env_end to rax
     mov [rbp-232], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-224] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -7827,14 +7927,16 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_8 closure env_end to rax
     mov [rbp-240], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 32 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -7853,14 +7955,16 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_10 closure env_end to rax
     mov [rbp-248], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-240] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -7881,43 +7985,47 @@ foo:
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_11 closure env_end to rax
     mov [rbp-256], rax ; store value
+    mov rsi, 48 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 48 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov r12, rbx ; env_end pointer before metadata
     mov rax, 0 ; store env size metadata
     mov qword [r12+24], rax ; env size metadata
     mov rax, 48 ; store heap size metadata
     mov qword [r12+32], rax ; heap size metadata
-    lea rax, [_342_foo_unwrapper] ; load unwrapper entry point
+    lea rax, [_331___rgo_7374642f666d74__new_unwrapper] ; load unwrapper entry point
     mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [_342_foo_deep_release] ; load release helper entry point
+    lea rax, [_331___rgo_7374642f666d74__new_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [_342_foo_deepcopy] ; load deep copy helper entry point
+    lea rax, [_331___rgo_7374642f666d74__new_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 0 ; store num_remaining
-    mov rax, r12 ; copy _342_foo closure env_end to rax
+    mov rax, r12 ; copy _331___rgo_7374642f666d74__new closure env_end to rax
     mov [rbp-264], rax ; store value
-    mov rbx, [rbp-264] ; original closure _342_foo to ____comptime_12_arg_clone_1 env_end pointer for clone
+    mov rbx, [rbp-264] ; original closure _331___rgo_7374642f666d74__new to ____comptime_13_arg_clone_1 env_end pointer for clone
     mov rbx, rbx ; clone source env_end pointer
     mov r13, [rbx+24] ; load env size metadata for clone
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -7934,18 +8042,50 @@ foo:
     pop r12 ; restore cloned env_end pointer
     mov rax, r12 ; copy cloned env_end pointer
     mov [rbp-272], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    lea rax, [rel __comptime_12] ; point to string literal
+    mov [rbx+0], rax ; capture arg into env
+    mov rax, [rbp-272] ; load operand
+    mov [rbx+8], rax ; move closure pointer into environment
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 16 ; move pointer past env payload
+    mov rax, 16 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 64 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [compile_error_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [compile_error_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [compile_error_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 0 ; store num_remaining
+    mov rax, r12 ; copy __comptime_13 closure env_end to rax
+    mov [rbp-280], rax ; store value
+    mov rsi, 72 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
     mov [rbx+0], rax ; capture arg into env
-    mov rax, [rbp-272] ; load operand
+    mov rax, [rbp-280] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -7960,20 +8100,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__int_source_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_12 closure env_end to rax
-    mov [rbp-280], rax ; store value
+    mov rax, r12 ; copy __comptime_14 closure env_end to rax
+    mov [rbp-288], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-256] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
-    mov rax, [rbp-280] ; load operand
+    mov rax, [rbp-288] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -7988,16 +8130,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_13 closure env_end to rax
-    mov [rbp-288], rax ; store value
+    mov rax, r12 ; copy __comptime_15 closure env_end to rax
+    mov [rbp-296], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 44 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -8014,20 +8158,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_15 closure env_end to rax
-    mov [rbp-296], rax ; store value
+    mov rax, r12 ; copy __comptime_17 closure env_end to rax
+    mov [rbp-304], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-288] ; load operand
-    mov [rbx+0], rax ; move closure pointer into environment
     mov rax, [rbp-296] ; load operand
+    mov [rbx+0], rax ; move closure pointer into environment
+    mov rax, [rbp-304] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8042,16 +8188,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_16 closure env_end to rax
-    mov [rbp-304], rax ; store value
+    mov rax, r12 ; copy __comptime_18 closure env_end to rax
+    mov [rbp-312], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 32 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -8068,20 +8216,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_18 closure env_end to rax
-    mov [rbp-312], rax ; store value
+    mov rax, r12 ; copy __comptime_20 closure env_end to rax
+    mov [rbp-320], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-304] ; load operand
-    mov [rbx+0], rax ; move closure pointer into environment
     mov rax, [rbp-312] ; load operand
+    mov [rbx+0], rax ; move closure pointer into environment
+    mov rax, [rbp-320] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8096,16 +8246,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_19 closure env_end to rax
-    mov [rbp-320], rax ; store value
+    mov rax, r12 ; copy __comptime_21 closure env_end to rax
+    mov [rbp-328], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 97 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -8122,20 +8274,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_21 closure env_end to rax
-    mov [rbp-328], rax ; store value
+    mov rax, r12 ; copy __comptime_23 closure env_end to rax
+    mov [rbp-336], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-320] ; load operand
-    mov [rbx+0], rax ; move closure pointer into environment
     mov rax, [rbp-328] ; load operand
+    mov [rbx+0], rax ; move closure pointer into environment
+    mov rax, [rbp-336] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8148,72 +8302,20 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
-    mov qword [r12+16], rax ; store deep copy pointer in metadata
-    mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_22 closure env_end to rax
-    mov [rbp-336], rax ; store value
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags: private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    syscall ; allocate env pages
-    mov rbx, rax ; closure env base pointer
-    mov rax, 49 ; operand literal
-    mov [rbx+0], rax ; capture arg into env
-    mov r12, rbx ; env_end pointer before metadata
-    add r12, 16 ; move pointer past env payload
-    mov rax, 16 ; store env size metadata
-    mov qword [r12+24], rax ; env size metadata
-    mov rax, 64 ; store heap size metadata
-    mov qword [r12+32], rax ; heap size metadata
-    lea rax, [__rgo_7374642f666d74__single_unwrapper] ; load unwrapper entry point
-    mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [__rgo_7374642f666d74__single_deep_release] ; load release helper entry point
-    mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_24 closure env_end to rax
     mov [rbp-344], rax ; store value
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags: private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    syscall ; allocate env pages
-    mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-336] ; load operand
-    mov [rbx+0], rax ; move closure pointer into environment
-    mov rax, [rbp-344] ; load operand
-    mov [rbx+8], rax ; move closure pointer into environment
-    mov r12, rbx ; env_end pointer before metadata
-    add r12, 24 ; move pointer past env payload
-    mov rax, 24 ; store env size metadata
-    mov qword [r12+24], rax ; env size metadata
-    mov rax, 72 ; store heap size metadata
-    mov qword [r12+32], rax ; heap size metadata
-    lea rax, [__rgo_7374642f666d74__concat_unwrapper] ; load unwrapper entry point
-    mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [__rgo_7374642f666d74__concat_deep_release] ; load release helper entry point
-    mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
-    mov qword [r12+16], rax ; store deep copy pointer in metadata
-    mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_25 closure env_end to rax
-    mov [rbp-352], rax ; store value
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
     mov rsi, 64 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 49 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -8230,20 +8332,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_27 closure env_end to rax
-    mov [rbp-360], rax ; store value
+    mov rax, r12 ; copy __comptime_26 closure env_end to rax
+    mov [rbp-352], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-352] ; load operand
+    mov rax, [rbp-344] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
-    mov rax, [rbp-360] ; load operand
+    mov rax, [rbp-352] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8258,16 +8362,76 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_28 closure env_end to rax
-    mov [rbp-368], rax ; store value
+    mov rax, r12 ; copy __comptime_27 closure env_end to rax
+    mov [rbp-360], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    mov rax, 49 ; operand literal
+    mov [rbx+0], rax ; capture arg into env
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 16 ; move pointer past env payload
+    mov rax, 16 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 64 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [__rgo_7374642f666d74__single_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [__rgo_7374642f666d74__single_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 1 ; store num_remaining
+    mov rax, r12 ; copy __comptime_29 closure env_end to rax
+    mov [rbp-368], rax ; store value
+    mov rsi, 72 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    mov rax, [rbp-360] ; load operand
+    mov [rbx+0], rax ; move closure pointer into environment
+    mov rax, [rbp-368] ; load operand
+    mov [rbx+8], rax ; move closure pointer into environment
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 24 ; move pointer past env payload
+    mov rax, 24 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 72 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [__rgo_7374642f666d74__concat_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [__rgo_7374642f666d74__concat_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 1 ; store num_remaining
+    mov rax, r12 ; copy __comptime_30 closure env_end to rax
+    mov [rbp-376], rax ; store value
+    mov rsi, 64 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 58 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -8284,20 +8448,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_30 closure env_end to rax
-    mov [rbp-376], rax ; store value
+    mov rax, r12 ; copy __comptime_32 closure env_end to rax
+    mov [rbp-384], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-368] ; load operand
-    mov [rbx+0], rax ; move closure pointer into environment
     mov rax, [rbp-376] ; load operand
+    mov [rbx+0], rax ; move closure pointer into environment
+    mov rax, [rbp-384] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8312,16 +8478,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_31 closure env_end to rax
-    mov [rbp-384], rax ; store value
+    mov rax, r12 ; copy __comptime_33 closure env_end to rax
+    mov [rbp-392], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 32 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -8338,106 +8506,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_33 closure env_end to rax
-    mov [rbp-392], rax ; store value
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags: private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    syscall ; allocate env pages
-    mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-384] ; load operand
-    mov [rbx+0], rax ; move closure pointer into environment
-    mov rax, [rbp-392] ; load operand
-    mov [rbx+8], rax ; move closure pointer into environment
-    mov r12, rbx ; env_end pointer before metadata
-    add r12, 24 ; move pointer past env payload
-    mov rax, 24 ; store env size metadata
-    mov qword [r12+24], rax ; env size metadata
-    mov rax, 72 ; store heap size metadata
-    mov qword [r12+32], rax ; heap size metadata
-    lea rax, [__rgo_7374642f666d74__concat_unwrapper] ; load unwrapper entry point
-    mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [__rgo_7374642f666d74__concat_deep_release] ; load release helper entry point
-    mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
-    mov qword [r12+16], rax ; store deep copy pointer in metadata
-    mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_34 closure env_end to rax
-    mov [rbp-400], rax ; store value
-    mov rbx, [rbp-264] ; original closure _342_foo to ____comptime_35_arg_clone_1 env_end pointer for clone
-    mov rbx, rbx ; clone source env_end pointer
-    mov r13, [rbx+24] ; load env size metadata for clone
-    mov r14, [rbx+32] ; load heap size metadata for clone
-    mov r12, rbx ; compute env base pointer for clone
-    sub r12, r13 ; env base pointer for clone source
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags: private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
-    mov r15, rax ; cloned closure env base pointer
-    mov rsi, r12 ; source env base for clone copy
-    mov rdi, r15 ; destination env base for clone copy
-    mov rcx, r14 ; bytes to copy for cloned env
-    cld ; ensure forward copy for env clone
-    rep movsb ; duplicate closure env data
-    mov rbx, r15 ; start from cloned env base
-    add rbx, r13 ; compute cloned env_end pointer
-    mov r12, rbx ; cloned env_end pointer
-    mov rax, [r12+16] ; load deepcopy helper entry point
-    push r12 ; preserve cloned env_end pointer
-    mov rdi, r12 ; pass env_end pointer to deepcopy helper
-    call rax ; deepcopy reference fields
-    pop r12 ; restore cloned env_end pointer
-    mov rax, r12 ; copy cloned env_end pointer
-    mov [rbp-408], rax ; store value
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags: private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    syscall ; allocate env pages
-    mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-88] ; load operand
-    mov [rbx+0], rax ; capture arg into env
-    mov rax, [rbp-408] ; load operand
-    mov [rbx+8], rax ; move closure pointer into environment
-    mov r12, rbx ; env_end pointer before metadata
-    add r12, 24 ; move pointer past env payload
-    mov rax, 24 ; store env size metadata
-    mov qword [r12+24], rax ; env size metadata
-    mov rax, 72 ; store heap size metadata
-    mov qword [r12+32], rax ; heap size metadata
-    lea rax, [__rgo_7374642f666d74__int_source_unwrapper] ; load unwrapper entry point
-    mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [__rgo_7374642f666d74__int_source_deep_release] ; load release helper entry point
-    mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [__rgo_7374642f666d74__int_source_deepcopy] ; load deep copy helper entry point
-    mov qword [r12+16], rax ; store deep copy pointer in metadata
-    mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_35 closure env_end to rax
-    mov [rbp-416], rax ; store value
+    mov [rbp-400], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-400] ; load operand
+    mov rax, [rbp-392] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
-    mov rax, [rbp-416] ; load operand
+    mov rax, [rbp-400] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8453,43 +8537,111 @@ foo:
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
     mov rax, r12 ; copy __comptime_36 closure env_end to rax
-    mov [rbp-424], rax ; store value
+    mov [rbp-408], rax ; store value
+    mov rbx, [rbp-264] ; original closure _331___rgo_7374642f666d74__new to ____comptime_38_arg_clone_1 env_end pointer for clone
+    mov rbx, rbx ; clone source env_end pointer
+    mov r13, [rbx+24] ; load env size metadata for clone
+    mov r14, [rbx+32] ; load heap size metadata for clone
+    mov r12, rbx ; compute env base pointer for clone
+    sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov r15, rax ; cloned closure env base pointer
+    mov rsi, r12 ; source env base for clone copy
+    mov rdi, r15 ; destination env base for clone copy
+    mov rcx, r14 ; bytes to copy for cloned env
+    cld ; ensure forward copy for env clone
+    rep movsb ; duplicate closure env data
+    mov rbx, r15 ; start from cloned env base
+    add rbx, r13 ; compute cloned env_end pointer
+    mov r12, rbx ; cloned env_end pointer
+    mov rax, [r12+16] ; load deepcopy helper entry point
+    push r12 ; preserve cloned env_end pointer
+    mov rdi, r12 ; pass env_end pointer to deepcopy helper
+    call rax ; deepcopy reference fields
+    pop r12 ; restore cloned env_end pointer
+    mov rax, r12 ; copy cloned env_end pointer
+    mov [rbp-416], rax ; store value
+    mov rsi, 64 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, 44 ; operand literal
+    lea rax, [rel __comptime_37] ; point to string literal
     mov [rbx+0], rax ; capture arg into env
+    mov rax, [rbp-416] ; load operand
+    mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 16 ; move pointer past env payload
     mov rax, 16 ; store env size metadata
     mov qword [r12+24], rax ; env size metadata
     mov rax, 64 ; store heap size metadata
     mov qword [r12+32], rax ; heap size metadata
-    lea rax, [__rgo_7374642f666d74__single_unwrapper] ; load unwrapper entry point
+    lea rax, [compile_error_unwrapper] ; load unwrapper entry point
     mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [__rgo_7374642f666d74__single_deep_release] ; load release helper entry point
+    lea rax, [compile_error_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
+    lea rax, [compile_error_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
-    mov qword [r12+40], 1 ; store num_remaining
+    mov qword [r12+40], 0 ; store num_remaining
     mov rax, r12 ; copy __comptime_38 closure env_end to rax
-    mov [rbp-432], rax ; store value
+    mov [rbp-424], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
+    mov rax, [rbp-88] ; load operand
+    mov [rbx+0], rax ; capture arg into env
     mov rax, [rbp-424] ; load operand
+    mov [rbx+8], rax ; move closure pointer into environment
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 24 ; move pointer past env payload
+    mov rax, 24 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 72 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [__rgo_7374642f666d74__int_source_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [__rgo_7374642f666d74__int_source_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [__rgo_7374642f666d74__int_source_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 1 ; store num_remaining
+    mov rax, r12 ; copy __comptime_39 closure env_end to rax
+    mov [rbp-432], rax ; store value
+    mov rsi, 72 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    mov rax, [rbp-408] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
     mov rax, [rbp-432] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
@@ -8506,18 +8658,20 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_39 closure env_end to rax
+    mov rax, r12 ; copy __comptime_40 closure env_end to rax
     mov [rbp-440], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, 32 ; operand literal
+    mov rax, 44 ; operand literal
     mov [rbx+0], rax ; capture arg into env
     mov r12, rbx ; env_end pointer before metadata
     add r12, 16 ; move pointer past env payload
@@ -8532,16 +8686,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_41 closure env_end to rax
+    mov rax, r12 ; copy __comptime_42 closure env_end to rax
     mov [rbp-448], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-440] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -8560,18 +8716,20 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_42 closure env_end to rax
+    mov rax, r12 ; copy __comptime_43 closure env_end to rax
     mov [rbp-456], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, 97 ; operand literal
+    mov rax, 32 ; operand literal
     mov [rbx+0], rax ; capture arg into env
     mov r12, rbx ; env_end pointer before metadata
     add r12, 16 ; move pointer past env payload
@@ -8586,16 +8744,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_44 closure env_end to rax
+    mov rax, r12 ; copy __comptime_45 closure env_end to rax
     mov [rbp-464], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-456] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -8614,18 +8774,20 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_45 closure env_end to rax
+    mov rax, r12 ; copy __comptime_46 closure env_end to rax
     mov [rbp-472], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, 50 ; operand literal
+    mov rax, 97 ; operand literal
     mov [rbx+0], rax ; capture arg into env
     mov r12, rbx ; env_end pointer before metadata
     add r12, 16 ; move pointer past env payload
@@ -8640,16 +8802,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_47 closure env_end to rax
+    mov rax, r12 ; copy __comptime_48 closure env_end to rax
     mov [rbp-480], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-472] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -8668,18 +8832,20 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_48 closure env_end to rax
+    mov rax, r12 ; copy __comptime_49 closure env_end to rax
     mov [rbp-488], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, 49 ; operand literal
+    mov rax, 50 ; operand literal
     mov [rbx+0], rax ; capture arg into env
     mov r12, rbx ; env_end pointer before metadata
     add r12, 16 ; move pointer past env payload
@@ -8694,16 +8860,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_50 closure env_end to rax
+    mov rax, r12 ; copy __comptime_51 closure env_end to rax
     mov [rbp-496], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-488] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -8722,18 +8890,20 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_51 closure env_end to rax
+    mov rax, r12 ; copy __comptime_52 closure env_end to rax
     mov [rbp-504], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, 58 ; operand literal
+    mov rax, 49 ; operand literal
     mov [rbx+0], rax ; capture arg into env
     mov r12, rbx ; env_end pointer before metadata
     add r12, 16 ; move pointer past env payload
@@ -8748,16 +8918,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_53 closure env_end to rax
+    mov rax, r12 ; copy __comptime_54 closure env_end to rax
     mov [rbp-512], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-504] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -8776,18 +8948,20 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_54 closure env_end to rax
+    mov rax, r12 ; copy __comptime_55 closure env_end to rax
     mov [rbp-520], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, 32 ; operand literal
+    mov rax, 58 ; operand literal
     mov [rbx+0], rax ; capture arg into env
     mov r12, rbx ; env_end pointer before metadata
     add r12, 16 ; move pointer past env payload
@@ -8802,16 +8976,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_56 closure env_end to rax
+    mov rax, r12 ; copy __comptime_57 closure env_end to rax
     mov [rbp-528], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-520] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
@@ -8830,22 +9006,82 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_57 closure env_end to rax
+    mov rax, r12 ; copy __comptime_58 closure env_end to rax
     mov [rbp-536], rax ; store value
-    mov rbx, [rbp-264] ; original closure _342_foo to ____comptime_58_arg_clone_1 env_end pointer for clone
+    mov rsi, 64 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    mov rax, 32 ; operand literal
+    mov [rbx+0], rax ; capture arg into env
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 16 ; move pointer past env payload
+    mov rax, 16 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 64 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [__rgo_7374642f666d74__single_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [__rgo_7374642f666d74__single_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 1 ; store num_remaining
+    mov rax, r12 ; copy __comptime_60 closure env_end to rax
+    mov [rbp-544], rax ; store value
+    mov rsi, 72 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    mov rax, [rbp-536] ; load operand
+    mov [rbx+0], rax ; move closure pointer into environment
+    mov rax, [rbp-544] ; load operand
+    mov [rbx+8], rax ; move closure pointer into environment
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 24 ; move pointer past env payload
+    mov rax, 24 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 72 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [__rgo_7374642f666d74__concat_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [__rgo_7374642f666d74__concat_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 1 ; store num_remaining
+    mov rax, r12 ; copy __comptime_61 closure env_end to rax
+    mov [rbp-552], rax ; store value
+    mov rbx, [rbp-264] ; original closure _331___rgo_7374642f666d74__new to ____comptime_63_arg_clone_1 env_end pointer for clone
     mov rbx, rbx ; clone source env_end pointer
     mov r13, [rbx+24] ; load env size metadata for clone
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -8861,19 +9097,51 @@ foo:
     call rax ; deepcopy reference fields
     pop r12 ; restore cloned env_end pointer
     mov rax, r12 ; copy cloned env_end pointer
-    mov [rbp-544], rax ; store value
+    mov [rbp-560], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    lea rax, [rel __comptime_62] ; point to string literal
+    mov [rbx+0], rax ; capture arg into env
+    mov rax, [rbp-560] ; load operand
+    mov [rbx+8], rax ; move closure pointer into environment
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 16 ; move pointer past env payload
+    mov rax, 16 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 64 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [compile_error_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [compile_error_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [compile_error_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 0 ; store num_remaining
+    mov rax, r12 ; copy __comptime_63 closure env_end to rax
+    mov [rbp-568], rax ; store value
+    mov rsi, 72 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-168] ; load operand
     mov [rbx+0], rax ; capture arg into env
-    mov rax, [rbp-544] ; load operand
+    mov rax, [rbp-568] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8888,20 +9156,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__int_source_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_58 closure env_end to rax
-    mov [rbp-552], rax ; store value
+    mov rax, r12 ; copy __comptime_64 closure env_end to rax
+    mov [rbp-576], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-536] ; load operand
-    mov [rbx+0], rax ; move closure pointer into environment
     mov rax, [rbp-552] ; load operand
+    mov [rbx+0], rax ; move closure pointer into environment
+    mov rax, [rbp-576] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8916,16 +9186,18 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_59 closure env_end to rax
-    mov [rbp-560], rax ; store value
+    mov rax, r12 ; copy __comptime_65 closure env_end to rax
+    mov [rbp-584], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov rax, 10 ; operand literal
     mov [rbx+0], rax ; capture arg into env
@@ -8942,20 +9214,22 @@ foo:
     lea rax, [__rgo_7374642f666d74__single_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_61 closure env_end to rax
-    mov [rbp-568], rax ; store value
+    mov rax, r12 ; copy __comptime_67 closure env_end to rax
+    mov [rbp-592], rax ; store value
+    mov rsi, 72 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-560] ; load operand
+    mov rax, [rbp-584] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
-    mov rax, [rbp-568] ; load operand
+    mov rax, [rbp-592] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -8970,48 +9244,24 @@ foo:
     lea rax, [__rgo_7374642f666d74__concat_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_62 closure env_end to rax
-    mov [rbp-576], rax ; store value
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 64 ; length for allocation
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags: private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    syscall ; allocate env pages
-    mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-184] ; load operand
-    mov [rbx+0], rax ; move closure pointer into environment
-    mov r12, rbx ; env_end pointer before metadata
-    add r12, 16 ; move pointer past env payload
-    mov rax, 16 ; store env size metadata
-    mov qword [r12+24], rax ; env size metadata
-    mov rax, 64 ; store heap size metadata
-    mov qword [r12+32], rax ; heap size metadata
-    lea rax, [_349_foo_unwrapper] ; load unwrapper entry point
-    mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [_349_foo_deep_release] ; load release helper entry point
-    mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [_349_foo_deepcopy] ; load deep copy helper entry point
-    mov qword [r12+16], rax ; store deep copy pointer in metadata
-    mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_63 closure env_end to rax
-    mov [rbp-584], rax ; store value
-    mov rbx, [rbp-264] ; original closure _342_foo to ____comptime_64_arg_clone_0 env_end pointer for clone
+    mov rax, r12 ; copy __comptime_68 closure env_end to rax
+    mov [rbp-600], rax ; store value
+    mov rbx, [rbp-264] ; original closure _331___rgo_7374642f666d74__new to ____comptime_70_arg_clone_1 env_end pointer for clone
     mov rbx, rbx ; clone source env_end pointer
     mov r13, [rbx+24] ; load env size metadata for clone
     mov r14, [rbx+32] ; load heap size metadata for clone
     mov r12, rbx ; compute env base pointer for clone
     sub r12, r13 ; env base pointer for clone source
+    mov rsi, r14 ; length for cloned environment
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov r15, rax ; cloned closure env base pointer
     mov rsi, r12 ; source env base for clone copy
     mov rdi, r15 ; destination env base for clone copy
@@ -9027,19 +9277,109 @@ foo:
     call rax ; deepcopy reference fields
     pop r12 ; restore cloned env_end pointer
     mov rax, r12 ; copy cloned env_end pointer
-    mov [rbp-592], rax ; store value
+    mov [rbp-608], rax ; store value
+    mov rsi, 64 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 72 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
-    mov rax, [rbp-592] ; load operand
+    lea rax, [rel __comptime_69] ; point to string literal
+    mov [rbx+0], rax ; capture arg into env
+    mov rax, [rbp-608] ; load operand
+    mov [rbx+8], rax ; move closure pointer into environment
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 16 ; move pointer past env payload
+    mov rax, 16 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 64 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [compile_error_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [compile_error_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [compile_error_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 0 ; store num_remaining
+    mov rax, r12 ; copy __comptime_70 closure env_end to rax
+    mov [rbp-616], rax ; store value
+    mov rsi, 64 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    lea rax, [rel __comptime_71] ; point to string literal
+    mov [rbx+0], rax ; capture arg into env
+    mov rax, [rbp-264] ; load operand
+    mov [rbx+8], rax ; move closure pointer into environment
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 16 ; move pointer past env payload
+    mov rax, 16 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 64 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [compile_error_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [compile_error_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [compile_error_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 0 ; store num_remaining
+    mov rax, r12 ; copy __comptime_72 closure env_end to rax
+    mov [rbp-624], rax ; store value
+    mov rsi, 64 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    mov rax, [rbp-184] ; load operand
     mov [rbx+0], rax ; move closure pointer into environment
-    mov rax, [rbp-584] ; load operand
+    mov r12, rbx ; env_end pointer before metadata
+    add r12, 16 ; move pointer past env payload
+    mov rax, 16 ; store env size metadata
+    mov qword [r12+24], rax ; env size metadata
+    mov rax, 64 ; store heap size metadata
+    mov qword [r12+32], rax ; heap size metadata
+    lea rax, [_350_foo_unwrapper] ; load unwrapper entry point
+    mov qword [r12+0], rax ; store unwrapper entry in metadata
+    lea rax, [_350_foo_deep_release] ; load release helper entry point
+    mov qword [r12+8], rax ; store release pointer in metadata
+    lea rax, [_350_foo_deepcopy] ; load deep copy helper entry point
+    mov qword [r12+16], rax ; store deep copy pointer in metadata
+    mov qword [r12+40], 1 ; store num_remaining
+    mov rax, r12 ; copy __comptime_73 closure env_end to rax
+    mov [rbp-632], rax ; store value
+    mov rsi, 72 ; length for allocation
+    mov rax, 9 ; mmap syscall
+    xor rdi, rdi ; addr hint for kernel base selection
+    mov rdx, 3 ; prot = read/write
+    mov r10, 34 ; flags: private & anonymous
+    mov r8, -1 ; fd = -1
+    xor r9, r9 ; offset = 0
+    syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
+    mov rbx, rax ; closure env base pointer
+    mov rax, [rbp-624] ; load operand
+    mov [rbx+0], rax ; move closure pointer into environment
+    mov rax, [rbp-632] ; load operand
     mov [rbx+8], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 24 ; move pointer past env payload
@@ -9054,22 +9394,22 @@ foo:
     lea rax, [_166___rgo_7374642f666d74__finish_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 1 ; store num_remaining
-    mov rax, r12 ; copy __comptime_64 closure env_end to rax
-    mov [rbp-600], rax ; store value
+    mov rax, r12 ; copy __comptime_74 closure env_end to rax
+    mov [rbp-640], rax ; store value
+    mov rsi, 80 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 80 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
-    test rax, rax
-    js foo_bytes_build_allocation_failed_0
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax
-    mov rax, [rbp-264] ; load operand
+    mov rax, [rbp-616] ; load operand
     mov [rbx], rax
-    mov rax, [rbp-600] ; load operand
+    mov rax, [rbp-640] ; load operand
     mov [rbx+8], rax
     lea r12, [rbx+32]
     lea rax, [bytes_build_inspector_unwrapper]
@@ -9081,28 +9421,12 @@ foo:
     mov qword [r12+24], 32
     mov qword [r12+32], 80
     mov qword [r12+40], 2
-    mov rbx, [rbp-576] ; load operand
+    mov rbx, [rbp-600] ; load operand
     mov [rbx-8], r12
     mov qword [rbx+40], 0
     mov rdi, rbx
     mov rax, [rbx]
     leave
-    jmp rax
-foo_bytes_build_allocation_failed_0:
-    push r12 ; preserve current environment
-    mov rdi, [rbp-600] ; load operand
-    mov rax, [rdi+8] ; load closure release helper
-    call rax ; recursively release closure
-    pop r12 ; restore current environment
-    push r12 ; preserve current environment
-    mov rdi, [rbp-576] ; load operand
-    mov rax, [rdi+8] ; load closure release helper
-    call rax ; recursively release closure
-    pop r12 ; restore current environment
-    mov r12, [rbp-264] ; load continuation env_end pointer
-    mov rax, [r12+0] ; load continuation entry point
-    mov rdi, r12 ; pass env_end pointer to continuation
-    leave ; unwind before jumping
     jmp rax
 global foo_unwrapper
 foo_unwrapper:
@@ -9265,33 +9589,122 @@ foo_deepcopy_skip_22:
     leave
     ret
 
+global compile_error_unwrapper
+compile_error_unwrapper:
+    push rbp ; save executor frame pointer
+    mov rbp, rsp ; establish new frame base
+    sub rsp, 32 ; reserve stack space for locals
+    mov [rbp-8], rdi ; store env_end arg in frame
+    mov r12, [rbp-8] ; load operand
+    mov rax, [r12-16] ; load message env field
+    mov [rbp-16], rax ; store value
+    mov rax, [r12-8] ; load runtime_fallback env field
+    mov [rbp-24], rax ; store value
+    mov rdi, r12 ; use pinned __env_end env_end pointer
+    call release_heap_ptr ; release __env_end closure environment
+    mov rbx, [rbp-24] ; load runtime_fallback closure env_end pointer
+    mov rdi, rbx ; pass env_end pointer to closure
+    mov rax, [rdi+0] ; load closure unwrapper entry point
+    leave ; unwind before jumping
+    jmp rax ; tail call into closure
+global compile_error_deep_release
+compile_error_deep_release:
+    push rbp ; save executor frame pointer
+    mov rbp, rsp ; establish new frame base
+    sub rsp, 32 ; reserve stack space for locals
+    mov [rbp-8], rdi ; store env_end arg in frame
+    mov r12, [rbp-8] ; load operand
+    mov rax, [r12+40] ; load __num_remaining env field
+    mov [rbp-16], rax ; store value
+    mov rax, [rbp-16] ; load operand
+    mov rbx, 1 ; operand literal
+    cmp rax, rbx
+    jg compile_error_deep_release_compile_error_release_skip_0
+    mov rax, [r12-16] ; load compile_error_release_field_0 env field
+    mov [rbp-24], rax ; store value
+    push r12 ; preserve current environment
+    mov rdi, [rbp-24] ; load operand
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
+compile_error_deep_release_compile_error_release_skip_0:
+    mov rax, [rbp-16] ; load operand
+    mov rbx, 0 ; operand literal
+    cmp rax, rbx
+    jg compile_error_deep_release_compile_error_release_skip_1
+    mov rax, [r12-8] ; load compile_error_release_field_1 env field
+    mov [rbp-32], rax ; store value
+    push r12 ; preserve current environment
+    mov rdi, [rbp-32] ; load operand
+    mov rax, [rdi+8] ; load closure release helper
+    call rax ; recursively release closure
+    pop r12 ; restore current environment
+compile_error_deep_release_compile_error_release_skip_1:
+    mov rdi, r12 ; use pinned __env_end env_end pointer
+    call release_heap_ptr ; release __env_end closure environment
+    leave
+    ret
+
+global compile_error_deepcopy
+compile_error_deepcopy:
+    push rbp ; save executor frame pointer
+    mov rbp, rsp ; establish new frame base
+    sub rsp, 32 ; reserve stack space for locals
+    mov [rbp-8], rdi ; store env_end arg in frame
+    mov r12, [rbp-8] ; load operand
+    mov rax, [r12+40] ; load num_remaining env field
+    mov [rbp-16], rax ; store value
+    mov rax, [rbp-16] ; load operand
+    mov rbx, 1 ; operand literal
+    cmp rax, rbx
+    jg compile_error_deepcopy_compile_error_deepcopy_skip_0
+    mov rcx, [r12-16] ; load field pointer
+    mov rdi, rcx ; copy pointer argument for deepcopy
+    call clone_descriptor_ptr ; duplicate owned pointer
+    mov [r12-16], rax ; store duplicated pointer
+    mov [rbp-24], rax ; store value
+compile_error_deepcopy_compile_error_deepcopy_skip_0:
+    mov rax, [rbp-16] ; load operand
+    mov rbx, 0 ; operand literal
+    cmp rax, rbx
+    jg compile_error_deepcopy_compile_error_deepcopy_skip_1
+    mov rcx, [r12-8] ; load field pointer
+    mov rdi, rcx ; copy pointer argument for deepcopy
+    call deepcopy_heap_ptr ; duplicate owned pointer
+    mov [r12-8], rax ; store duplicated pointer
+    mov [rbp-32], rax ; store value
+compile_error_deepcopy_compile_error_deepcopy_skip_1:
+    leave
+    ret
+
 global main
 main:
     push rbp ; save executor frame pointer
     mov rbp, rsp ; establish new frame base
     sub rsp, 16 ; reserve stack space for locals
+    mov rsi, 48 ; length for allocation
     mov rax, 9 ; mmap syscall
     xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, 48 ; length for allocation
     mov rdx, 3 ; prot = read/write
     mov r10, 34 ; flags: private & anonymous
     mov r8, -1 ; fd = -1
     xor r9, r9 ; offset = 0
     syscall ; allocate env pages
+    test rax, rax ; negative rax is -errno
+    js __rgo_allocation_failed ; mmap failed
     mov rbx, rax ; closure env base pointer
     mov r12, rbx ; env_end pointer before metadata
     mov rax, 0 ; store env size metadata
     mov qword [r12+24], rax ; env size metadata
     mov rax, 48 ; store heap size metadata
     mov qword [r12+32], rax ; heap size metadata
-    lea rax, [_375_main_unwrapper] ; load unwrapper entry point
+    lea rax, [_376_main_unwrapper] ; load unwrapper entry point
     mov qword [r12+0], rax ; store unwrapper entry in metadata
-    lea rax, [_375_main_deep_release] ; load release helper entry point
+    lea rax, [_376_main_deep_release] ; load release helper entry point
     mov qword [r12+8], rax ; store release pointer in metadata
-    lea rax, [_375_main_deepcopy] ; load deep copy helper entry point
+    lea rax, [_376_main_deepcopy] ; load deep copy helper entry point
     mov qword [r12+16], rax ; store deep copy pointer in metadata
     mov qword [r12+40], 0 ; store num_remaining
-    mov rax, r12 ; copy _375_main closure env_end to rax
+    mov rax, r12 ; copy _376_main closure env_end to rax
     mov [rbp-8], rax ; store value
     mov rax, [rbp-8] ; load operand
     push rax ; stack arg
@@ -9390,3 +9803,24 @@ _start:
     mov rbp, rsp ; establish new frame base
     leave ; unwind before named jump
     jmp main
+section .rodata
+__comptime_12:
+    dq __comptime_12_data, 14, 0, 0 ; data, byte length, heap base, heap size
+__comptime_12_data:
+    db "invalid format", 0
+__comptime_37:
+    dq __comptime_37_data, 14, 0, 0 ; data, byte length, heap base, heap size
+__comptime_37_data:
+    db "invalid format", 0
+__comptime_62:
+    dq __comptime_62_data, 14, 0, 0 ; data, byte length, heap base, heap size
+__comptime_62_data:
+    db "invalid format", 0
+__comptime_69:
+    dq __comptime_69_data, 14, 0, 0 ; data, byte length, heap base, heap size
+__comptime_69_data:
+    db "invalid format", 0
+__comptime_71:
+    dq __comptime_71_data, 14, 0, 0 ; data, byte length, heap base, heap size
+__comptime_71_data:
+    db "invalid format", 0

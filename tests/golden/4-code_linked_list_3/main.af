@@ -17,9 +17,9 @@ iterate: (handler:(int, ()), arr:list, end:()){
 }
 mylist: cons(1, cons(2, cons(3, cons(4, nil))))
 handler: (n: int, ok: ()){
-    fmt.new("%, ", @exit(1), fmt.int(n) fmt.end, @write(ok: ok))
+    fmt.new("%, ", fmt.int(n) fmt.end, @write(ok: ok))
 }
-end: () {fmt.new("end\n", @exit(1), fmt.end, @write(ok: @exit(0)))}
+end: () {fmt.new("end\n", fmt.end, @write(ok: @exit(0)))}
 main: () {
     iterate(handler, mylist, end)
 }

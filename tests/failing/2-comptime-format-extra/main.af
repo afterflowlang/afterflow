@@ -4,7 +4,6 @@ str: @str
 print_name: (name: str, ok: ()) {
     fmt.new(
         "%",
-        @compile_error("extra format argument", @exit(1)),
         fmt.str(name) fmt.str("extra") fmt.end, @write(ok: ok)
     )
 }

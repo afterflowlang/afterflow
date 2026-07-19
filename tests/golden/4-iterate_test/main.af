@@ -17,10 +17,10 @@ iterate: (handler:(int, ()), arr: list, end:()){
     arr(iterate_inner(iterate, handler, end), end)
 }
 handler: (n: int, ok:()){
-    fmt.new("%, ", @exit(1), fmt.int(n) fmt.end, @write(ok: ok))
+    fmt.new("%, ", fmt.int(n) fmt.end, @write(ok: ok))
 }
 end: (){
-    fmt.new("end\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+    fmt.new("end\n", fmt.end, @write(ok: @exit(0)))
 }
 mylist: cons(1, cons(2, cons(3, cons(4, nil))))
 main: () {

@@ -9,7 +9,7 @@ foo: (ok:()) {
     b: bar(1)
     c1: b(2)
     c2: b(3)
-    c1((x:int){fmt.new("got: %\n", @exit(1), fmt.int(x) fmt.end, @write(ok: ok))})
+    c1((x:int){fmt.new("got: %\n", fmt.int(x) fmt.end, @write(ok: ok))})
 }
 main: () {
     foo(@exit(0))

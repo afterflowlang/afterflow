@@ -4,6 +4,6 @@ int: @int
 
 main: () {
     @sub(9, 4, (n: int) {
-        fmt.new("sub: %", @exit(1), fmt.int(n) fmt.end, @write(ok: @exit(0)))
+        fmt.new("sub: %", fmt.int(n) fmt.end, @write(ok: @exit(0)))
     })
 }

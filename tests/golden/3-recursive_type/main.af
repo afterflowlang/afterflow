@@ -18,11 +18,11 @@ accept: (value: chain, ok: ()) {
 }
 
 identity: (node: tail) {
-    fmt.new("unused\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+    fmt.new("unused\n", fmt.end, @write(ok: @exit(0)))
 }
 
 hello: () {
-    fmt.new("hi\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+    fmt.new("hi\n", fmt.end, @write(ok: @exit(0)))
 }
 
 main: () {

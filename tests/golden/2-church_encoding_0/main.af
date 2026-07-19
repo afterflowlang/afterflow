@@ -9,6 +9,6 @@ main: () {
     zero((x: int, ok:(int)){
         @add(x, 10, ok)
     }, 0, (x: int){
-        fmt.new("result: %", @exit(1), fmt.int(x) fmt.end, @write(ok: @exit(0)))
+        fmt.new("result: %", fmt.int(x) fmt.end, @write(ok: @exit(0)))
     })
 }

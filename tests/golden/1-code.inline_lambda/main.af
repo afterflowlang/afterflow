@@ -4,6 +4,6 @@ int: @int
 
 main: () {
     (x:int){
-        fmt.new("the answer is: %", @exit(1), fmt.int(x) fmt.end, @write(ok: @exit(0)))
+        fmt.new("the answer is: %", fmt.int(x) fmt.end, @write(ok: @exit(0)))
     }(42)
 }

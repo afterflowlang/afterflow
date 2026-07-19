@@ -4,7 +4,6 @@ str: @str
 print_name: (source: str, name: str, ok: ()) {
     fmt.new(
         source,
-        @compile_error("invalid format", @exit(1)),
         fmt.str(name) fmt.end, @write(ok: ok)
     )
 }

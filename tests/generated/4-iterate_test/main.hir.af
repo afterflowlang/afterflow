@@ -439,25 +439,31 @@ __rgo_7374642f666d74__f64: (value: f64, tail:((((str), (int), (f64)), __rgo_7374
 __rgo_7374642f666d74__end: (value:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), done_case:()){
     __rgo_737464__end(value, done_case)
 }
-_364___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
+_359___rgo_7374642f666d74__new: (){
+    _360: 1
+    @exit(_360)
+}
+_369___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
     __rgo_7374642f666d74__finish(output, invalid, ok)
 }
 
-_360___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
-    _361___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
-    _362: 0
-    _365___rgo_7374642f666d74__new: _364___rgo_7374642f666d74__new(invalid, ok)
-    __rgo_7374642f666d74__parse(l, _361___rgo_7374642f666d74__raw_nth, _362, __rgo_7374642f666d74__empty, invalid, args, _365___rgo_7374642f666d74__new)
+_365___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
+    _366___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
+    _367: 0
+    _370___rgo_7374642f666d74__new: _369___rgo_7374642f666d74__new(invalid, ok)
+    __rgo_7374642f666d74__parse(l, _366___rgo_7374642f666d74__raw_nth, _367, __rgo_7374642f666d74__empty, invalid, args, _370___rgo_7374642f666d74__new)
 }
 
-_358___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
-    _366___rgo_7374642f666d74__new: _360___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
-    @bytes_descriptor_len(source_bytes, _366___rgo_7374642f666d74__new)
+_363___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
+    _371___rgo_7374642f666d74__new: _365___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
+    @bytes_descriptor_len(source_bytes, _371___rgo_7374642f666d74__new)
 }
 
-__rgo_7374642f666d74__new: (template: str!, invalid:()!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
-    _367___rgo_7374642f666d74__new: _358___rgo_7374642f666d74__new(invalid, args, ok)
-    @bytes_from_str(template, _367___rgo_7374642f666d74__new)
+__rgo_7374642f666d74__new: (template: str!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
+    _357: "invalid format"
+    invalid: @compile_error(_357, _359___rgo_7374642f666d74__new)
+    _372___rgo_7374642f666d74__new: _363___rgo_7374642f666d74__new(invalid, args, ok)
+    @bytes_from_str(template, _372___rgo_7374642f666d74__new)
 }
 
 nil: (next:(int, ((int, list), ())), end:()){
@@ -474,47 +480,38 @@ iterate_inner: (iterate:((int, ()), ((int, list), ()), ()), handler:(int, ()), e
 }
 
 iterate: (handler:(int, ()), arr:((int, list), ()), end:()){
-    _381_iterate_inner: iterate_inner(iterate, handler, end)
-    arr(_381_iterate_inner, end)
+    _386_iterate_inner: iterate_inner(iterate, handler, end)
+    arr(_386_iterate_inner, end)
 }
-_384_handler: (){
-    _385: 1
-    @exit(_385)
-}
-_390_handler: (ok:(), value: str){
+_391_handler: (ok:(), value: str){
     @write(value, ok)
 }
 
-_389_handler: (ok:(), _356___rgo_7374642f666d74__new: str){
-    _390_handler(ok, _356___rgo_7374642f666d74__new)
+_390_handler: (ok:(), _356___rgo_7374642f666d74__new: str){
+    _391_handler(ok, _356___rgo_7374642f666d74__new)
 }
 
 handler: (n: int, ok:()){
-    _382: "%, "
-    _387___rgo_7374642f666d74__int: __rgo_7374642f666d74__int(n, __rgo_7374642f666d74__end)
-    _391_handler: _389_handler(ok)
-    __rgo_7374642f666d74__new(_382, _384_handler, _387___rgo_7374642f666d74__int, _391_handler)
+    _387: "%, "
+    _388___rgo_7374642f666d74__int: __rgo_7374642f666d74__int(n, __rgo_7374642f666d74__end)
+    _392_handler: _390_handler(ok)
+    __rgo_7374642f666d74__new(_387, _388___rgo_7374642f666d74__int, _392_handler)
 }
-_394_end: (){
-    _395: 1
-    @exit(_395)
-}
-_399_end: (ok:(), value: str){
+_396_end: (ok:(), value: str){
     @write(value, ok)
 }
-
-_401_end: (){
-    _402: 0
-    @exit(_402)
+_398_end: (){
+    _399: 0
+    @exit(_399)
 }
 
-_398_end: (_356___rgo_7374642f666d74__new: str){
-    _399_end(_401_end, _356___rgo_7374642f666d74__new)
+_395_end: (_356___rgo_7374642f666d74__new: str){
+    _396_end(_398_end, _356___rgo_7374642f666d74__new)
 }
 
 end: (){
-    _392: "end\n"
-    __rgo_7374642f666d74__new(_392, _394_end, __rgo_7374642f666d74__end, _398_end)
+    _393: "end\n"
+    __rgo_7374642f666d74__new(_393, __rgo_7374642f666d74__end, _395_end)
 }
 
 main: (mylist:((int, ((int, ((int, ((int, list), ())), ())), ())), ())!){

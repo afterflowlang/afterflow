@@ -270,30 +270,6 @@
                                                 name: None,
                                                 term: Ident(
                                                     Ident {
-                                                        name: "@exit",
-                                                        args: [
-                                                            Arg {
-                                                                name: None,
-                                                                term: Lit(
-                                                                    Literal {
-                                                                        value: Int(
-                                                                            1,
-                                                                        ),
-                                                                        span: ,
-                                                                    },
-                                                                ),
-                                                                span: ,
-                                                            },
-                                                        ],
-                                                        span: ,
-                                                    },
-                                                ),
-                                                span: ,
-                                            },
-                                            Arg {
-                                                name: None,
-                                                term: Ident(
-                                                    Ident {
                                                         name: "fmt.end",
                                                         args: [],
                                                         span: ,
@@ -383,30 +359,6 @@
                                                                                 value: Str(
                                                                                     "works",
                                                                                 ),
-                                                                                span: ,
-                                                                            },
-                                                                        ),
-                                                                        span: ,
-                                                                    },
-                                                                    Arg {
-                                                                        name: None,
-                                                                        term: Ident(
-                                                                            Ident {
-                                                                                name: "@exit",
-                                                                                args: [
-                                                                                    Arg {
-                                                                                        name: None,
-                                                                                        term: Lit(
-                                                                                            Literal {
-                                                                                                value: Int(
-                                                                                                    1,
-                                                                                                ),
-                                                                                                span: ,
-                                                                                            },
-                                                                                        ),
-                                                                                        span: ,
-                                                                                    },
-                                                                                ],
                                                                                 span: ,
                                                                             },
                                                                         ),

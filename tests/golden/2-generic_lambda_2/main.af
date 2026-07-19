@@ -7,7 +7,7 @@ foo: <T, U>(x:T, y:U, ok:(T, U)){
 }
 
 done: (a:int, b:str){
-    fmt.new("a=% b=%\n", @exit(1), fmt.int(a) fmt.str(b) fmt.end, @write(ok: @exit(0)))
+    fmt.new("a=% b=%\n", fmt.int(a) fmt.str(b) fmt.end, @write(ok: @exit(0)))
 }
 
 main: () {

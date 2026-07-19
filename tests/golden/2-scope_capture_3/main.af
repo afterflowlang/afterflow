@@ -4,7 +4,7 @@ int: @int
 
 foo: (){
     (x: int) = (ok:(int)){ @add(1, 2, ok) }
-    fmt.new("result: %", @exit(1), fmt.int(x) fmt.end, @write(ok: @exit(0)))
+    fmt.new("result: %", fmt.int(x) fmt.end, @write(ok: @exit(0)))
 }
 main: () {
     foo()

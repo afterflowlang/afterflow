@@ -22,7 +22,7 @@ iterate: (handler:(int, ()), arr:((int, list), ()), end:()){
 }
 
 handler: (n: int, ok:()){
-    fmt.new("%, ", @exit(1), fmt.int(n) fmt.end, @write(ok: ok))
+    fmt.new("%, ", fmt.int(n) fmt.end, @write(ok: ok))
 }
 
 end_exit: (){
@@ -30,7 +30,7 @@ end_exit: (){
 }
 
 end: (){
-    fmt.new("end\n", @exit(1), fmt.end, @write(ok: end_exit))
+    fmt.new("end\n", fmt.end, @write(ok: end_exit))
 }
 mylist: cons(1, nil)
 main: () {

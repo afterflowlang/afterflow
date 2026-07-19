@@ -4,7 +4,7 @@ int: @int
 
 print_sum: (ok:()){
     (total:int) = @add(3, 4)
-    fmt.new("sum is %\n", @exit(1), fmt.int(total) fmt.end, @write(ok: ok))
+    fmt.new("sum is %\n", fmt.int(total) fmt.end, @write(ok: ok))
 }
 
 main: () {

@@ -7,6 +7,6 @@ foo: (ok:(())){
 }
 main: () {
     foo((ok:()) {
-        fmt.new("result: %", @exit(1), fmt.int(1) fmt.end, @write(ok: ok))
+        fmt.new("result: %", fmt.int(1) fmt.end, @write(ok: ok))
     })
 }

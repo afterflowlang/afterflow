@@ -16,7 +16,6 @@ calc: /std/math/calc
 calculate: (price: @f64, tax: @f64, ok: (@f64)) {
     calc.new(
         "(price + 2.5) * tax",
-        @compile_error("invalid calculation", @exit(1)),
         calc.var("price", price)
         calc.var("tax", tax)
         calc.end,
@@ -43,6 +42,8 @@ calculate: (value: @f64, ok: (@f64)) {
 
 - `new` validates source and a recursive placeholder-binding chain, evaluates
   the prepared calculation at runtime, then gives its `@f64` result to `ok`.
+  It reports invalid source or bindings during compilation without requiring
+  an error continuation.
 - `var` binds a compile-time lowercase placeholder name to a runtime `@f64`
   payload.
 - `end` closes the recursive binding chain.
@@ -91,10 +92,10 @@ degrees.
 Placeholder names contain one or more lowercase ASCII letters. Constants and
 function names are reserved, as is `i` for possible future complex-number
 support. Every placeholder used by the source must have exactly one binding,
-and every binding must be used by the source. Missing, duplicate, extra,
-or malformed bindings enter `invalid`. Reserved bindings report whether the
-name conflicts with a calculation constant or function, or with future syntax,
-and use `invalid` as their ordinary runtime fallback.
+and every binding must be used by the source. Missing, duplicate, extra, or
+malformed bindings report `invalid calculation` during compilation. Reserved
+bindings report whether the name conflicts with a calculation constant or
+function, or with future syntax.
 
 Bindings are matched by their complete names rather than their chain position.
 They may appear in any order, and one binding supplies every occurrence of its

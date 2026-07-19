@@ -4,7 +4,6 @@ fmt: /std/fmt
 calculated: (ok: (), value: @f64) {
     fmt.new(
         "%\n",
-        @compile_error("invalid result", @exit(1)),
         fmt.f64(value) fmt.end,
         @write(ok: ok)
     )
@@ -13,7 +12,6 @@ calculated: (ok: (), value: @f64) {
 main: () {
     calc.new(
         "width + height + width",
-        @compile_error("invalid calculation", @exit(1)),
         calc.var("height", 4.0)
         calc.var("width", 3.0)
         calc.end,

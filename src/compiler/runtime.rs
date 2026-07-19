@@ -2,10 +2,11 @@ use std::io::Write;
 
 use crate::compiler::air;
 use crate::compiler::codegen::{
-    DESCRIPTOR_HEAP_BASE_OFFSET, DESCRIPTOR_HEAP_SIZE_OFFSET, ENV_METADATA_DEEP_COPY_OFFSET,
-    ENV_METADATA_ENV_SIZE_OFFSET, ENV_METADATA_HEAP_SIZE_OFFSET, ENV_METADATA_NUM_REMAINING_OFFSET,
-    ENV_METADATA_RELEASE_OFFSET, ENV_METADATA_UNWRAPPER_OFFSET, MAP_ANONYMOUS, MAP_PRIVATE,
-    PROT_READ, PROT_WRITE, STRING_DESCRIPTOR_SIZE, SYSCALL_MMAP, SYSCALL_MUNMAP,
+    self, ALLOCATION_FAILED_LABEL, DESCRIPTOR_HEAP_BASE_OFFSET, DESCRIPTOR_HEAP_SIZE_OFFSET,
+    ENV_METADATA_DEEP_COPY_OFFSET, ENV_METADATA_ENV_SIZE_OFFSET, ENV_METADATA_HEAP_SIZE_OFFSET,
+    ENV_METADATA_NUM_REMAINING_OFFSET, ENV_METADATA_RELEASE_OFFSET, ENV_METADATA_UNWRAPPER_OFFSET,
+    MAP_ANONYMOUS, MAP_PRIVATE, PROT_READ, PROT_WRITE, STRING_DESCRIPTOR_SIZE, SYSCALL_MMAP,
+    SYSCALL_MUNMAP,
 };
 use crate::compiler::error;
 
@@ -101,22 +102,8 @@ pub fn emit_deepcopy_heap_ptr<W: Write>(out: &mut W) -> Result<(), error::Error>
     )?;
     writeln!(out, "    mov rbx, r12 ; keep env_end pointer")?;
     writeln!(out, "    sub rbx, r14 ; compute env base pointer")?;
-    writeln!(out, "    mov rdi, 0 ; addr hint so kernel picks mmap base")?;
     writeln!(out, "    mov rsi, r15 ; length = heap size")?;
-    writeln!(
-        out,
-        "    mov rdx, {} ; prot = read/write",
-        PROT_READ | PROT_WRITE
-    )?;
-    writeln!(
-        out,
-        "    mov r10, {} ; flags = private & anonymous",
-        MAP_PRIVATE | MAP_ANONYMOUS
-    )?;
-    writeln!(out, "    mov r8, -1 ; fd = -1")?;
-    writeln!(out, "    xor r9, r9 ; offset = 0")?;
-    writeln!(out, "    mov rax, {} ; mmap syscall", SYSCALL_MMAP)?;
-    writeln!(out, "    syscall ; allocate new closure env")?;
+    emit_dynamic_mmap(out)?;
     writeln!(out, "    mov r13, rax ; new env base pointer")?;
     writeln!(out, "    mov rdi, r13 ; memcpy dest")?;
     writeln!(out, "    mov rsi, rbx ; memcpy src")?;
@@ -182,6 +169,10 @@ pub fn emit_clone_descriptor_ptr<W: Write>(out: &mut W) -> Result<(), error::Err
         out,
         "    add rsi, {} ; include descriptor",
         STRING_DESCRIPTOR_SIZE + 1
+    )?;
+    writeln!(
+        out,
+        "    jc {ALLOCATION_FAILED_LABEL} ; allocation size overflow"
     )?;
     emit_dynamic_mmap(out)?;
     writeln!(out, "    mov rbx, rax ; cloned mapping base")?;
@@ -296,10 +287,11 @@ fn emit_bytes_build_inspector<W: Write>(out: &mut W) -> Result<(), error::Error>
     writeln!(out, "    call release_heap_ptr")?;
     writeln!(out, "    mov rsi, [rbp-32]")?;
     writeln!(out, "    add rsi, {}", STRING_DESCRIPTOR_SIZE + 1)?;
-    writeln!(out, "    jc bytes_build_inspector_invalid")?;
+    writeln!(
+        out,
+        "    jc {ALLOCATION_FAILED_LABEL} ; allocation size overflow"
+    )?;
     emit_dynamic_mmap(out)?;
-    writeln!(out, "    test rax, rax")?;
-    writeln!(out, "    js bytes_build_inspector_invalid")?;
     writeln!(out, "    mov [rbp-48], rax")?;
     writeln!(out, "    cmp qword [rbp-32], 0")?;
     writeln!(out, "    je bytes_build_inspector_empty")?;
@@ -451,8 +443,6 @@ fn emit_bytes_build_step<W: Write>(out: &mut W) -> Result<(), error::Error> {
     }
     writeln!(out, "    mov rsi, 96")?;
     emit_dynamic_mmap(out)?;
-    writeln!(out, "    test rax, rax")?;
-    writeln!(out, "    js bytes_build_step_invalid")?;
     writeln!(out, "    mov [rbp-56], rax")?;
     for (slot, offset) in [(8, 0), (16, 8), (24, 16)] {
         writeln!(out, "    mov rdi, [rbp-{slot}]")?;
@@ -484,8 +474,6 @@ fn emit_bytes_build_step<W: Write>(out: &mut W) -> Result<(), error::Error> {
 
     writeln!(out, "    mov rsi, 104")?;
     emit_dynamic_mmap(out)?;
-    writeln!(out, "    test rax, rax")?;
-    writeln!(out, "    js bytes_build_step_one_invalid")?;
     writeln!(out, "    mov rbx, rax")?;
     for (slot, offset) in [(8, 0), (16, 8), (24, 16), (32, 24), (40, 32), (48, 40)] {
         writeln!(out, "    mov rax, [rbp-{slot}]")?;
@@ -520,23 +508,6 @@ fn emit_bytes_build_step<W: Write>(out: &mut W) -> Result<(), error::Error> {
     writeln!(out, "    leave")?;
     writeln!(out, "    jmp rax")?;
 
-    writeln!(out, "bytes_build_step_one_invalid:")?;
-    writeln!(out, "    mov rdi, [rbp-56]")?;
-    writeln!(out, "    mov rax, [rdi+8]")?;
-    writeln!(out, "    call rax")?;
-    writeln!(out, "bytes_build_step_invalid:")?;
-    writeln!(out, "    mov rdi, [rbp-32]")?;
-    writeln!(out, "    mov rsi, [rbp-40]")?;
-    writeln!(out, "    add rsi, {}", STRING_DESCRIPTOR_SIZE + 1)?;
-    writeln!(out, "    mov rax, {SYSCALL_MUNMAP}")?;
-    writeln!(out, "    syscall")?;
-    emit_release_stack_closure(out, 16)?;
-    emit_release_stack_closure(out, 24)?;
-    writeln!(out, "    mov rdi, [rbp-8]")?;
-    writeln!(out, "    mov qword [rdi+40], 0")?;
-    writeln!(out, "    mov rax, [rdi]")?;
-    writeln!(out, "    leave")?;
-    writeln!(out, "    jmp rax")?;
     Ok(())
 }
 
@@ -548,7 +519,7 @@ fn emit_dynamic_mmap<W: Write>(out: &mut W) -> Result<(), error::Error> {
     writeln!(out, "    mov r8, -1")?;
     writeln!(out, "    xor r9, r9")?;
     writeln!(out, "    syscall")?;
-    Ok(())
+    codegen::emit_allocation_failure_check(out)
 }
 
 fn emit_release_stack_closure<W: Write>(out: &mut W, slot: usize) -> Result<(), error::Error> {

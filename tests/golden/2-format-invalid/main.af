@@ -1,6 +1,6 @@
 fmt: /std/fmt
 main: () {
     @write("before\n", () {
-        fmt.new("after\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+        fmt.new("after\n", fmt.end, @write(ok: @exit(0)))
     })
 }

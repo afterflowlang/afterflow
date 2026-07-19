@@ -431,81 +431,82 @@ __rgo_7374642f666d74__f64: (value: f64, tail:((((str), (int), (f64)), __rgo_7374
 __rgo_7374642f666d74__end: (value:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), done_case:()){
     __rgo_737464__end(value, done_case)
 }
-_338___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
+_333___rgo_7374642f666d74__new: (){
+    _334: 1
+    @exit(_334)
+}
+_343___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
     __rgo_7374642f666d74__finish(output, invalid, ok)
 }
 
-_334___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
-    _335___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
-    _336: 0
-    _339___rgo_7374642f666d74__new: _338___rgo_7374642f666d74__new(invalid, ok)
-    __rgo_7374642f666d74__parse(l, _335___rgo_7374642f666d74__raw_nth, _336, __rgo_7374642f666d74__empty, invalid, args, _339___rgo_7374642f666d74__new)
+_339___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
+    _340___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
+    _341: 0
+    _344___rgo_7374642f666d74__new: _343___rgo_7374642f666d74__new(invalid, ok)
+    __rgo_7374642f666d74__parse(l, _340___rgo_7374642f666d74__raw_nth, _341, __rgo_7374642f666d74__empty, invalid, args, _344___rgo_7374642f666d74__new)
 }
 
-_332___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
-    _340___rgo_7374642f666d74__new: _334___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
-    @bytes_descriptor_len(source_bytes, _340___rgo_7374642f666d74__new)
+_337___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
+    _345___rgo_7374642f666d74__new: _339___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
+    @bytes_descriptor_len(source_bytes, _345___rgo_7374642f666d74__new)
 }
 
-__rgo_7374642f666d74__new: (template: str!, invalid:()!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
-    _341___rgo_7374642f666d74__new: _332___rgo_7374642f666d74__new(invalid, args, ok)
-    @bytes_from_str(template, _341___rgo_7374642f666d74__new)
+__rgo_7374642f666d74__new: (template: str!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
+    _331: "invalid format"
+    invalid: @compile_error(_331, _333___rgo_7374642f666d74__new)
+    _346___rgo_7374642f666d74__new: _337___rgo_7374642f666d74__new(invalid, args, ok)
+    @bytes_from_str(template, _346___rgo_7374642f666d74__new)
 }
-_345_fib_iter: (k:(int), a: int){
+_350_fib_iter: (k:(int), a: int){
     k(a)
 }
-_353_fib_iter: (fib_iter:(int, int, int, (int))!, n1: int, b: int, k:(int), ab: int){
+_358_fib_iter: (fib_iter:(int, int, int, (int))!, n1: int, b: int, k:(int), ab: int){
     fib_iter(n1, b, ab, k)
 }
 
-_351_fib_iter: (a: int, b: int, fib_iter:(int, int, int, (int))!, k:(int), n1: int){
-    _354_fib_iter: _353_fib_iter(fib_iter, n1, b, k)
-    @add(a, b, _354_fib_iter)
+_356_fib_iter: (a: int, b: int, fib_iter:(int, int, int, (int))!, k:(int), n1: int){
+    _359_fib_iter: _358_fib_iter(fib_iter, n1, b, k)
+    @add(a, b, _359_fib_iter)
 }
 
-_348_fib_iter: (n: int, a: int, b: int, fib_iter:(int, int, int, (int))!, k:(int)){
-    _349: 1
-    _355_fib_iter: _351_fib_iter(a, b, fib_iter, k)
-    @sub(n, _349, _355_fib_iter)
+_353_fib_iter: (n: int, a: int, b: int, fib_iter:(int, int, int, (int))!, k:(int)){
+    _354: 1
+    _360_fib_iter: _356_fib_iter(a, b, fib_iter, k)
+    @sub(n, _354, _360_fib_iter)
 }
 
 fib_iter: (n: int, a: int, b: int, k:(int)){
-    _343: 0
-    _346_fib_iter: _345_fib_iter(k, a)
-    _356_fib_iter: _348_fib_iter(n, a, b, fib_iter, k)
-    @eq_int(n, _343, _346_fib_iter, _356_fib_iter)
+    _348: 0
+    _351_fib_iter: _350_fib_iter(k, a)
+    _361_fib_iter: _353_fib_iter(n, a, b, fib_iter, k)
+    @eq_int(n, _348, _351_fib_iter, _361_fib_iter)
 }
 
 fib: (n: int, k:(int)){
-    _358: 0
-    _359: 1
-    fib_iter(n, _358, _359, k)
+    _363: 0
+    _364: 1
+    fib_iter(n, _363, _364, k)
 }
-_365_main: (){
-    _366: 1
-    @exit(_366)
-}
-_371_main: (ok:(), value: str){
+_372_main: (ok:(), value: str){
     @write(value, ok)
 }
-
-_373_main: (){
-    _374: 0
-    @exit(_374)
+_374_main: (){
+    _375: 0
+    @exit(_375)
 }
 
-_370_main: (_330___rgo_7374642f666d74__new: str){
-    _371_main(_373_main, _330___rgo_7374642f666d74__new)
+_371_main: (_330___rgo_7374642f666d74__new: str){
+    _372_main(_374_main, _330___rgo_7374642f666d74__new)
 }
 
-_362_main: (result: int){
-    _363: "fib(7) = %\n"
-    _368___rgo_7374642f666d74__int: __rgo_7374642f666d74__int(result, __rgo_7374642f666d74__end)
-    __rgo_7374642f666d74__new(_363, _365_main, _368___rgo_7374642f666d74__int, _370_main)
+_367_main: (result: int){
+    _368: "fib(7) = %\n"
+    _369___rgo_7374642f666d74__int: __rgo_7374642f666d74__int(result, __rgo_7374642f666d74__end)
+    __rgo_7374642f666d74__new(_368, _369___rgo_7374642f666d74__int, _371_main)
 }
 
 main: (){
-    _360: 7
-    fib(_360, _362_main)
+    _365: 7
+    fib(_365, _367_main)
 }
 main()

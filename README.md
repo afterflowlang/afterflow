@@ -27,7 +27,9 @@ elimination.
 
 - **Continuation-Passing Style (CPS)**: Every label ends with a tail transfer to its continuation, enabling predictable control flow, no stack frames.
 - **compile-direct deterministic memory management**: compile-direct closure environments and other
-  dynamic allocations use `mmap`/`munmap` with compiler-tracked lifetimes.
+  dynamic allocations use `mmap`/`munmap` with compiler-tracked lifetimes. Allocation
+  failure terminates the process with status 1 instead of entering a source-level
+  operation continuation.
 - **Strictly typed**: All interfaces, closure shapes, and continuation types are explicit and checked at compile time.
 - **Punctuation-driven syntax**: A minimal surface language that stays readable while keeping the parser and backend fast.
 - **No keywords**: There are no built-ins like `let`, `fn`, `if`, or `struct`, every semantic construct arises from punctuation and continuation form.
@@ -46,7 +48,6 @@ name: "Alice"
 hello: (){
    fmt.new(
        "hello %",
-       @compile_error("invalid format", @exit(1)),
        fmt.str(name) fmt.end,
        @write(ok: @exit(0))
    )
@@ -68,18 +69,16 @@ hypotenuse with trigonometry and prints `result: 6.0`:
 fmt: /std/fmt
 calc: /std/math/calc
 
-fmt_error: @compile_error("invalid format", @exit(1))
 print_result: (result: @f64, ok: ()) {
     fmt.new(
-        "result: %\n", fmt_error,
+        "result: %\n",
         fmt.f64(result) fmt.end,
         @write(ok: ok)
     )
 }
 
-calc_error: @compile_error("invalid calculation", @exit(1))
 main: () {
-    calc.new("hypot(width, height) + sin(pi / 2) ^ 2", calc_error,
+    calc.new("hypot(width, height) + sin(pi / 2) ^ 2",
         calc.var("width", 3.0)
         calc.var("height", 4.0)
         calc.end,
@@ -116,7 +115,6 @@ name: "Bob"
 foo: (ok:()){
    fmt.new(
        "hello %",
-       @exit(1),
        fmt.str(name) fmt.end,
        @write(ok: ok)
    )
@@ -134,7 +132,6 @@ name: "Bob"
 foo: (ok:()){
    fmt.new(
        "hello %",
-       @exit(1),
        fmt.str(name) fmt.end,
        @write(ok: ok)
    )

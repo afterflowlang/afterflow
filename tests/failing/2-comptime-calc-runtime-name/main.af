@@ -7,7 +7,6 @@ calculated: (ok: (), @f64) {
 calculate: (name: @str, value: @f64, ok: ()) {
     calc.new(
         "value",
-        @exit(1),
         calc.var(name, value) calc.end,
         calculated(ok)
     )

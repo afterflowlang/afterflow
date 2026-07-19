@@ -1,12 +1,9 @@
 calc: /std/math/calc
 fmt: /std/fmt
 
-invalid: @compile_error("invalid scientific calculation", @exit(1))
-
 show: (label: @str, ok: (), value: @f64) {
     fmt.new(
         "%: %\n",
-        @compile_error("invalid scientific output", @exit(1)),
         fmt.str(label)
         fmt.f64(value)
         fmt.end,
@@ -15,51 +12,51 @@ show: (label: @str, ok: (), value: @f64) {
 }
 
 power_case: (ok: ()) {
-    calc.new("2 ^ 3 ^ 2 + -2 ^ 2 + 2 ^ -2 + pow(2, 3)", invalid, calc.end, show("powers", ok))
+    calc.new("2 ^ 3 ^ 2 + -2 ^ 2 + 2 ^ -2 + pow(2, 3)", calc.end, show("powers", ok))
 }
 
 notation_case: (ok: ()) {
-    calc.new("1.25e2 + 5E-1", invalid, calc.end, show("notation", ok))
+    calc.new("1.25e2 + 5E-1", calc.end, show("notation", ok))
 }
 
 roots_case: (ok: ()) {
-    calc.new("sqrt(81) + cbrt(27) + hypot(3, 4)", invalid, calc.end, show("roots", ok))
+    calc.new("sqrt(81) + cbrt(27) + hypot(3, 4)", calc.end, show("roots", ok))
 }
 
 logs_case: (ok: ()) {
-    calc.new("ln(e) + log(1000) + log(81, 3) + log2(8) + log10(100)", invalid, calc.end, show("logs", ok))
+    calc.new("ln(e) + log(1000) + log(81, 3) + log2(8) + log10(100)", calc.end, show("logs", ok))
 }
 
 trigonometry_case: (ok: ()) {
-    calc.new("sin(pi / 2) + cos(0) + tan(0) + deg(pi) + rad(180) / pi", invalid, calc.end, show("trigonometry", ok))
+    calc.new("sin(pi / 2) + cos(0) + tan(0) + deg(pi) + rad(180) / pi", calc.end, show("trigonometry", ok))
 }
 
 inverse_case: (ok: ()) {
-    calc.new("asin(0) + acos(1) + atan(0) + atan2(0, 1)", invalid, calc.end, show("inverse", ok))
+    calc.new("asin(0) + acos(1) + atan(0) + atan2(0, 1)", calc.end, show("inverse", ok))
 }
 
 hyperbolic_case: (ok: ()) {
-    calc.new("sinh(0) + cosh(0) + tanh(0) + asinh(0) + acosh(1) + atanh(0)", invalid, calc.end, show("hyperbolic", ok))
+    calc.new("sinh(0) + cosh(0) + tanh(0) + asinh(0) + acosh(1) + atanh(0)", calc.end, show("hyperbolic", ok))
 }
 
 exponential_case: (ok: ()) {
-    calc.new("exp(0) + exp2(3) + expm1(0) + ln1p(0)", invalid, calc.end, show("exponential", ok))
+    calc.new("exp(0) + exp2(3) + expm1(0) + ln1p(0)", calc.end, show("exponential", ok))
 }
 
 utility_case: (ok: ()) {
-    calc.new("abs(-4) + min(max(2, 5), 3) + mod(7, 4) + remainder(7, 4)", invalid, calc.end, show("utilities", ok))
+    calc.new("abs(-4) + min(max(2, 5), 3) + mod(7, 4) + remainder(7, 4)", calc.end, show("utilities", ok))
 }
 
 rounding_case: (ok: ()) {
-    calc.new("ceil(2.1) + floor(2.9) + round(2.6) + trunc(2.9)", invalid, calc.end, show("rounding", ok))
+    calc.new("ceil(2.1) + floor(2.9) + round(2.6) + trunc(2.9)", calc.end, show("rounding", ok))
 }
 
 constants_case: (ok: ()) {
-    calc.new("+tau / pi", invalid, calc.end, show("constants", ok))
+    calc.new("+tau / pi", calc.end, show("constants", ok))
 }
 
 variable_case: (value: @f64, ok: ()) {
-    calc.new("value ^ 2", invalid, calc.var("value", value) calc.end, show("variable", ok))
+    calc.new("value ^ 2", calc.var("value", value) calc.end, show("variable", ok))
 }
 
 main: () {

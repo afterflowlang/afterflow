@@ -431,59 +431,60 @@ __rgo_7374642f666d74__f64: (value: f64, tail:((((str), (int), (f64)), __rgo_7374
 __rgo_7374642f666d74__end: (value:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), done_case:()){
     __rgo_737464__end(value, done_case)
 }
-_340___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
+_335___rgo_7374642f666d74__new: (){
+    _336: 1
+    @exit(_336)
+}
+_345___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
     __rgo_7374642f666d74__finish(output, invalid, ok)
 }
 
-_336___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
-    _337___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
-    _338: 0
-    _341___rgo_7374642f666d74__new: _340___rgo_7374642f666d74__new(invalid, ok)
-    __rgo_7374642f666d74__parse(l, _337___rgo_7374642f666d74__raw_nth, _338, __rgo_7374642f666d74__empty, invalid, args, _341___rgo_7374642f666d74__new)
+_341___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
+    _342___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
+    _343: 0
+    _346___rgo_7374642f666d74__new: _345___rgo_7374642f666d74__new(invalid, ok)
+    __rgo_7374642f666d74__parse(l, _342___rgo_7374642f666d74__raw_nth, _343, __rgo_7374642f666d74__empty, invalid, args, _346___rgo_7374642f666d74__new)
 }
 
-_334___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
-    _342___rgo_7374642f666d74__new: _336___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
-    @bytes_descriptor_len(source_bytes, _342___rgo_7374642f666d74__new)
+_339___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
+    _347___rgo_7374642f666d74__new: _341___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
+    @bytes_descriptor_len(source_bytes, _347___rgo_7374642f666d74__new)
 }
 
-__rgo_7374642f666d74__new: (template: str!, invalid:()!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
-    _343___rgo_7374642f666d74__new: _334___rgo_7374642f666d74__new(invalid, args, ok)
-    @bytes_from_str(template, _343___rgo_7374642f666d74__new)
+__rgo_7374642f666d74__new: (template: str!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
+    _333: "invalid format"
+    invalid: @compile_error(_333, _335___rgo_7374642f666d74__new)
+    _348___rgo_7374642f666d74__new: _339___rgo_7374642f666d74__new(invalid, args, ok)
+    @bytes_from_str(template, _348___rgo_7374642f666d74__new)
 }
 
 zero: (f:(int, (int)), x: int, ok:(int)){
     ok(x)
 }
-_351_main: (x: int, ok:(int)){
-    _352: 10
-    @add(x, _352, ok)
+_356_main: (x: int, ok:(int)){
+    _357: 10
+    @add(x, _357, ok)
 }
-_359_main: (){
-    _360: 1
-    @exit(_360)
-}
-_365_main: (ok:(), value: str){
+_366_main: (ok:(), value: str){
     @write(value, ok)
 }
-
-_367_main: (){
-    _368: 0
-    @exit(_368)
+_368_main: (){
+    _369: 0
+    @exit(_369)
 }
 
-_364_main: (_332___rgo_7374642f666d74__new: str){
-    _365_main(_367_main, _332___rgo_7374642f666d74__new)
+_365_main: (_332___rgo_7374642f666d74__new: str){
+    _366_main(_368_main, _332___rgo_7374642f666d74__new)
 }
 
-_356_main: (x: int){
-    _357: "result: %"
-    _362___rgo_7374642f666d74__int: __rgo_7374642f666d74__int(x, __rgo_7374642f666d74__end)
-    __rgo_7374642f666d74__new(_357, _359_main, _362___rgo_7374642f666d74__int, _364_main)
+_361_main: (x: int){
+    _362: "result: %"
+    _363___rgo_7374642f666d74__int: __rgo_7374642f666d74__int(x, __rgo_7374642f666d74__end)
+    __rgo_7374642f666d74__new(_362, _363___rgo_7374642f666d74__int, _365_main)
 }
 
 main: (){
-    _354: 0
-    zero(_351_main, _354, _356_main)
+    _359: 0
+    zero(_356_main, _359, _361_main)
 }
 main()

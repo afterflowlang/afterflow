@@ -4,52 +4,6 @@
         path: "/std/math/calc",
         span: ,
     },
-    IdentDef {
-        name: "handle_error",
-        ident: Ident {
-            name: "@compile_error",
-            args: [
-                Arg {
-                    name: None,
-                    term: Lit(
-                        Literal {
-                            value: Str(
-                                "invalid calculation",
-                            ),
-                            span: ,
-                        },
-                    ),
-                    span: ,
-                },
-                Arg {
-                    name: None,
-                    term: Ident(
-                        Ident {
-                            name: "@exit",
-                            args: [
-                                Arg {
-                                    name: None,
-                                    term: Lit(
-                                        Literal {
-                                            value: Int(
-                                                1,
-                                            ),
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                            ],
-                            span: ,
-                        },
-                    ),
-                    span: ,
-                },
-            ],
-            span: ,
-        },
-        span: ,
-    },
     FunctionDef {
         name: "calculated",
         lambda: Lambda {
@@ -189,17 +143,6 @@
                                             value: Str(
                                                 "(price + 2.5) * -tax / 2",
                                             ),
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "handle_error",
-                                            args: [],
                                             span: ,
                                         },
                                     ),
@@ -367,17 +310,6 @@
                                             value: Str(
                                                 "1 + 2",
                                             ),
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "handle_error",
-                                            args: [],
                                             span: ,
                                         },
                                     ),

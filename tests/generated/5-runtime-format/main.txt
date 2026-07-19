@@ -191,17 +191,6 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "invalid",
-                                            args: [],
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
                                             name: "fmt.str",
                                             args: [
                                                 Arg {
@@ -623,17 +612,6 @@
                                                                         name: None,
                                                                         term: Ident(
                                                                             Ident {
-                                                                                name: "invalid",
-                                                                                args: [],
-                                                                                span: ,
-                                                                            },
-                                                                        ),
-                                                                        span: ,
-                                                                    },
-                                                                    Arg {
-                                                                        name: None,
-                                                                        term: Ident(
-                                                                            Ident {
                                                                                 name: "fmt.int",
                                                                                 args: [
                                                                                     Arg {
@@ -938,17 +916,6 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "invalid",
-                                            args: [],
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
                                             name: "fmt.f64",
                                             args: [
                                                 Arg {
@@ -1121,17 +1088,6 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "invalid",
-                                            args: [],
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
                                             name: "fmt.end",
                                             args: [],
                                             span: ,
@@ -1247,17 +1203,6 @@
                                             value: Str(
                                                 "😀 % café\n",
                                             ),
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "invalid",
-                                            args: [],
                                             span: ,
                                         },
                                     ),
@@ -1466,17 +1411,6 @@
                                             value: Str(
                                                 "hello %, you have % messages\n",
                                             ),
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "invalid",
-                                            args: [],
                                             span: ,
                                         },
                                     ),

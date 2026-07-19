@@ -3,7 +3,7 @@ str: @str
 
 int: str // This is the gotcha, int is not str! But this is valid in this language.
 w: (s: int, ok: ()){
-    fmt.new("Gotcha: %", @exit(1), fmt.str(s) fmt.end, @write(ok: ok))
+    fmt.new("Gotcha: %", fmt.str(s) fmt.end, @write(ok: ok))
 }
 main: () {
     w("one", @exit(0))

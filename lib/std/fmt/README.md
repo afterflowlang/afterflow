@@ -5,9 +5,8 @@ format source, its typed argument chain, validation of that combination, and
 production of the resulting `@str`.
 
 The package has one canonical entrypoint: `fmt.new`. Its signature marks the
-template, invalid continuation, and argument chain for compile-time
-consumption, while its final unmarked `@str` continuation receives the runtime
-result.
+template and argument chain for compile-time consumption. Its unmarked `@str`
+continuation receives the completed result.
 
 ## Usage
 
@@ -21,7 +20,6 @@ fmt: /std/fmt
 main: () {
     fmt.new(
         "hello %, count %, price %\n",
-        @compile_error("invalid format", @exit(1)),
         fmt.str("Alice")
         fmt.int(3)
         fmt.f64(12.5)
@@ -48,7 +46,6 @@ fmt: /std/fmt
 main: () {
     fmt.new(
         "hello %, count %\n",
-        @exit(1),
         fmt.str("Alice")
         fmt.int(3)
         fmt.end,
@@ -57,16 +54,12 @@ main: () {
 }
 ```
 
-Apply only the format source and invalid continuation to reuse a builder:
+Apply only the format source to reuse a builder:
 
 ```af
 fmt: /std/fmt
 
-invalid: () {
-    @exit(1)
-}
-
-greeting: fmt.new("hello %, count %", invalid)
+greeting: fmt.new("hello %, count %")
 
 build_greeting: (name: @str, count: @int, ok: (@str)) {
     greeting(
@@ -80,8 +73,8 @@ build_greeting: (name: @str, count: @int, ok: (@str)) {
 
 ## Public contract
 
-- `new` validates a format source and recursive argument chain, materializes
-  the runtime result, then gives the resulting `@str` to its continuation.
+- `new` validates a format source and recursive argument chain, then gives the
+  resulting `@str` to `ok`.
 - `str` supplies an `@str` argument.
 - `int` supplies an `@int` argument.
 - `f64` supplies an `@f64` argument using its shortest round-trippable decimal
@@ -89,16 +82,21 @@ build_greeting: (name: @str, count: @int, ok: (@str)) {
 - `end` closes the recursive argument chain.
 
 A single `%` consumes one argument and `%%` produces a literal percent sign.
-A missing or extra argument, a trailing `%`, allocation failure, or invalid
-UTF-8 enters the invalid continuation.
+A missing or extra argument or a trailing `%` reports `invalid format` during
+compilation. The private byte source is derived from a validated string, so it
+cannot produce invalid UTF-8 or violate its declared length. Allocation failure
+uses the compiler implementation's allocation policy rather than a formatter
+continuation.
 
-`fmt.new(...)` consumes the known format source and argument-chain structure
-during compilation. `fmt.str`, `fmt.int`, and `fmt.f64` leave their payload
+`fmt.new(...)` defines its compile-time diagnostic internally and consumes the
+known format source and argument-chain structure during compilation. `fmt.str`,
+`fmt.int`, and `fmt.f64` leave their payload
 slots unmarked because validation inspects only each node's type and chain
 shape. Each node contributes a deferred runtime source, so the emitted program
 does not parse placeholders or validate the chain again. Payload conversion
 and string construction remain residual runtime work leading into the unmarked
-result continuation.
+result continuation. Payloads may originate from compile-time literals or
+runtime values; they stay unmarked because the planner does not inspect them.
 
 ## Boundary
 

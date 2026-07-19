@@ -9,10 +9,10 @@ int_or_str: ((int), (str))
 foo: (x: int_or_str, ok:()){
     x( 
         (x: int){
-            fmt.new("number: %", @exit(1), fmt.int(x) fmt.end, @write(ok: ok))
+            fmt.new("number: %", fmt.int(x) fmt.end, @write(ok: ok))
         },
         (x: str){
-            fmt.new("x is str: %\n", @exit(1), fmt.str(x) fmt.end, @write(ok: ok))
+            fmt.new("x is str: %\n", fmt.str(x) fmt.end, @write(ok: ok))
         }
     )
 }

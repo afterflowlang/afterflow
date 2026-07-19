@@ -3,7 +3,7 @@ str: @str
 int: @int
 
 greet: (name: str, count: int, ok: ()) {
-    fmt.new("hello %, you have % messages\n", @exit(1),
+    fmt.new("hello %, you have % messages\n",
         fmt.str(name)
         fmt.int(count)
         fmt.end, @write(ok: ok)

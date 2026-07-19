@@ -854,30 +854,6 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "@exit",
-                                            args: [
-                                                Arg {
-                                                    name: None,
-                                                    term: Lit(
-                                                        Literal {
-                                                            value: Int(
-                                                                1,
-                                                            ),
-                                                            span: ,
-                                                        },
-                                                    ),
-                                                    span: ,
-                                                },
-                                            ],
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
                                             name: "fmt.int",
                                             args: [
                                                 Arg {
@@ -1022,30 +998,6 @@
                                         Ident {
                                             name: "_end_0",
                                             args: [],
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "@exit",
-                                            args: [
-                                                Arg {
-                                                    name: None,
-                                                    term: Lit(
-                                                        Literal {
-                                                            value: Int(
-                                                                1,
-                                                            ),
-                                                            span: ,
-                                                        },
-                                                    ),
-                                                    span: ,
-                                                },
-                                            ],
                                             span: ,
                                         },
                                     ),

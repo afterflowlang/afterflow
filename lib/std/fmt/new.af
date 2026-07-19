@@ -1,4 +1,5 @@
-new: (template: @str!, invalid: ()!, args: arg!, ok: (@str)) {
+new: (template: @str!, args: arg!, ok: (@str)) {
+    invalid: @compile_error("invalid format", @exit(1))
     (source_bytes: @bytes) = @bytes_from_str(template)
     (l: @uint) = @bytes_descriptor_len(source_bytes)
     (output: source) = parse(l, raw_nth(source_bytes), 0, empty, invalid, args)

@@ -42,6 +42,7 @@ pub const PROT_READ: i32 = 1;
 pub const PROT_WRITE: i32 = 2;
 pub const MAP_PRIVATE: i32 = 2;
 pub const MAP_ANONYMOUS: i32 = 32;
+pub const ALLOCATION_FAILED_LABEL: &str = "__rgo_allocation_failed";
 
 #[derive(Debug, Default)]
 pub struct Artifacts {
@@ -171,6 +172,10 @@ pub fn write_preamble<W: Write>(out: &mut W) -> Result<(), Error> {
     writeln!(out, "bits 64")?;
     writeln!(out, "default rel")?;
     writeln!(out, "section .text")?;
+    writeln!(out, "{ALLOCATION_FAILED_LABEL}:")?;
+    writeln!(out, "    mov rdi, 1 ; allocation failure exit code")?;
+    writeln!(out, "    mov rax, {SYSCALL_EXIT} ; exit syscall")?;
+    writeln!(out, "    syscall")?;
     Ok(())
 }
 
@@ -1044,10 +1049,7 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
     }
 
     fn emit_bytes_build(&mut self, op: &AirBytesBuild) -> Result<(), Error> {
-        let allocation_failed = self.new_label("bytes_build_allocation_failed");
         self.emit_mmap(WORD_SIZE * 10)?;
-        writeln!(self.out, "    test rax, rax")?;
-        writeln!(self.out, "    js {}", allocation_failed)?;
         writeln!(self.out, "    mov rbx, rax")?;
         self.load_arg_into_reg(
             &AirArg {
@@ -1087,11 +1089,7 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         writeln!(self.out, "    mov rax, [rbx]")?;
         writeln!(self.out, "    leave")?;
         writeln!(self.out, "    jmp rax")?;
-
-        writeln!(self.out, "{}:", allocation_failed)?;
-        self.emit_drop_closure_name(&op.ok_target)?;
-        self.emit_drop_closure_name(&op.source.name)?;
-        self.emit_value_jump(&op.invalid_target, false)
+        Ok(())
     }
 
     fn truncate_fixed(&mut self, reg: &str, bit_width: u16) -> Result<(), Error> {
@@ -1316,28 +1314,17 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         writeln!(self.out, "    xor rdx, rdx ; SEEK_SET")?;
         writeln!(self.out, "    syscall")?;
 
-        writeln!(self.out, "    mov rax, {} ; mmap syscall", SYSCALL_MMAP)?;
-        writeln!(self.out, "    xor rdi, rdi ; addr hint")?;
+        writeln!(self.out, "    mov rsi, r14 ; file size")?;
         writeln!(
             self.out,
-            "    lea rsi, [r14+{}] ; length = size, terminator, and descriptor",
+            "    add rsi, {} ; include terminator and descriptor",
             STRING_DESCRIPTOR_SIZE + 1
         )?;
         writeln!(
             self.out,
-            "    mov rdx, {} ; prot = read/write",
-            PROT_READ | PROT_WRITE
+            "    jc {ALLOCATION_FAILED_LABEL} ; allocation size overflow"
         )?;
-        writeln!(
-            self.out,
-            "    mov r10, {} ; flags: private & anonymous",
-            MAP_PRIVATE | MAP_ANONYMOUS
-        )?;
-        writeln!(self.out, "    mov r8, -1 ; fd = -1")?;
-        writeln!(self.out, "    xor r9, r9 ; offset = 0")?;
-        writeln!(self.out, "    syscall")?;
-        writeln!(self.out, "    test rax, rax")?;
-        writeln!(self.out, "    js {} ; mmap failed", err_close)?;
+        self.emit_dynamic_mmap()?;
         writeln!(self.out, "    mov r15, rax ; keep contents buffer")?;
         writeln!(
             self.out,
@@ -2322,15 +2309,19 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
     }
 
     fn emit_mmap(&mut self, size: usize) -> Result<(), Error> {
-        writeln!(self.out, "    mov rax, {} ; mmap syscall", SYSCALL_MMAP)?;
-        writeln!(
-            self.out,
-            "    xor rdi, rdi ; addr hint for kernel base selection"
-        )?;
         writeln!(
             self.out,
             "    mov rsi, {} ; length for allocation",
             size.max(1)
+        )?;
+        self.emit_dynamic_mmap()
+    }
+
+    fn emit_dynamic_mmap(&mut self) -> Result<(), Error> {
+        writeln!(self.out, "    mov rax, {} ; mmap syscall", SYSCALL_MMAP)?;
+        writeln!(
+            self.out,
+            "    xor rdi, rdi ; addr hint for kernel base selection"
         )?;
         writeln!(
             self.out,
@@ -2345,7 +2336,7 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         writeln!(self.out, "    mov r8, -1 ; fd = -1")?;
         writeln!(self.out, "    xor r9, r9 ; offset = 0")?;
         writeln!(self.out, "    syscall ; allocate env pages")?;
-        Ok(())
+        emit_allocation_failure_check(self.out)
     }
 
     fn prepare_args(&mut self, args: &[AirArg]) -> Result<(), Error> {
@@ -2415,25 +2406,8 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
             self.out,
             "    sub r12, r13 ; env base pointer for clone source"
         )?;
-        writeln!(self.out, "    mov rax, {} ; mmap syscall", SYSCALL_MMAP)?;
-        writeln!(
-            self.out,
-            "    xor rdi, rdi ; addr hint for kernel base selection"
-        )?;
         writeln!(self.out, "    mov rsi, r14 ; length for cloned environment")?;
-        writeln!(
-            self.out,
-            "    mov rdx, {} ; prot = read/write",
-            PROT_READ | PROT_WRITE
-        )?;
-        writeln!(
-            self.out,
-            "    mov r10, {} ; flags: private & anonymous",
-            MAP_PRIVATE | MAP_ANONYMOUS
-        )?;
-        writeln!(self.out, "    mov r8, -1 ; fd = -1")?;
-        writeln!(self.out, "    xor r9, r9 ; offset = 0")?;
-        writeln!(self.out, "    syscall ; allocate cloned env pages")?;
+        self.emit_dynamic_mmap()?;
         writeln!(
             self.out,
             "    mov r15, rax ; cloned closure env base pointer"
@@ -2495,6 +2469,12 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
     }
 }
 
+pub(crate) fn emit_allocation_failure_check<W: Write>(out: &mut W) -> Result<(), Error> {
+    writeln!(out, "    test rax, rax ; negative rax is -errno")?;
+    writeln!(out, "    js {ALLOCATION_FAILED_LABEL} ; mmap failed")?;
+    Ok(())
+}
+
 fn align_to(value: usize, align: usize) -> usize {
     if value == 0 {
         return 0;
@@ -2506,5 +2486,24 @@ fn word_count_from_kind(kind: &SigKind) -> usize {
     match kind {
         SigKind::FixedInt(kind) if kind.bit_width == 128 => 2,
         _ => 1,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn allocation_failure_exits_instead_of_entering_source_control_flow() {
+        let mut output = Vec::new();
+
+        write_preamble(&mut output).expect("preamble should render");
+        emit_allocation_failure_check(&mut output).expect("allocation check should render");
+
+        let assembly = String::from_utf8(output).expect("assembly should be UTF-8");
+        assert!(assembly.contains("__rgo_allocation_failed:\n"));
+        assert!(assembly.contains("mov rdi, 1 ; allocation failure exit code"));
+        assert!(assembly.contains("mov rax, 60 ; exit syscall"));
+        assert!(assembly.contains("js __rgo_allocation_failed ; mmap failed"));
     }
 }

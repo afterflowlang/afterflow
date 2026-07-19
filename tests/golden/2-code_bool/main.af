@@ -8,8 +8,8 @@ false: (x: (), y: ()){
     y()
 }
 if: (cond: ((),()), on_true:()){
-    cond(on_true, fmt.new("does not work\n", @exit(1), fmt.end, @write(ok: @exit(0))))
+    cond(on_true, fmt.new("does not work\n", fmt.end, @write(ok: @exit(0))))
 }
 main: () {
-    if(true, fmt.new("works\n", @exit(1), fmt.end, @write(ok: @exit(0))))
+    if(true, fmt.new("works\n", fmt.end, @write(ok: @exit(0))))
 }

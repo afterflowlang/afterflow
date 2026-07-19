@@ -3,7 +3,7 @@ str: @str
 int: @int
 
 foo: (n:str, s:str, ok:()){
-	fmt.new("The winning number for % is %\n", @exit(1), fmt.str(s) fmt.str(n) fmt.end, @write(ok: ok))
+	fmt.new("The winning number for % is %\n", fmt.str(s) fmt.str(n) fmt.end, @write(ok: ok))
 }
 bar: foo("42")
 baz: foo("43", "Bob")

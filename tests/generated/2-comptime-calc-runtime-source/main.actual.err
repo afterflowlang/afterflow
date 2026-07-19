@@ -1,4 +1,4 @@
 [hir] expected str!, found str
 tests/failing/2-comptime-calc-runtime-source/main.af:8
-    calc.new(source, @exit(1), calc.end, calculated(ok))
+    calc.new(source, calc.end, calculated(ok))
              ^^^^^^

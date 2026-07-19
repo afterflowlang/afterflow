@@ -3,7 +3,7 @@ str: @str
 int: @int
 
 itoa: (n: int, ok:(str)) {
-    fmt.new("%", @exit(1), fmt.int(n) fmt.end, ok)
+    fmt.new("%", fmt.int(n) fmt.end, ok)
 }
 main: () {
     itoa(1, (s: str){ @exit(0) })

@@ -29,7 +29,7 @@ _cons_15: cons(_12, _cons_14)
 _cons_16: cons(_11, _cons_15)
 handler: (n: int, ok:()){
     _handler_0: "%, "
-    fmt.new(_handler_0, @exit(1), fmt.int(n) fmt.end, @write(ok: ok))
+    fmt.new(_handler_0, fmt.int(n) fmt.end, @write(ok: ok))
 }
 
 _end_1: (){
@@ -39,7 +39,7 @@ _end_1: (){
 
 end: (){
     _end_0: "end\n"
-    fmt.new(_end_0, @exit(1), fmt.end, @write(ok: _end_1))
+    fmt.new(_end_0, fmt.end, @write(ok: _end_1))
 }
 mylist: cons(_10, _cons_16)
 main: () {

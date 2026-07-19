@@ -16,7 +16,7 @@ unexpected_rune: (rune) {
 }
 
 test_executable_output: (ok: ()) {
-    fmt.new("A%!\n", invalid, fmt.str("😀") fmt.end, (output: str) {
+    fmt.new("A%!\n", fmt.str("😀") fmt.end, (output: str) {
         output((l: uint, nth: (uint, (), (rune))) {
             @eq_uint(l, 4, () {
                 nth(4, () {
@@ -31,7 +31,7 @@ test_integers: (ok: ()) {
     (negative: int) = @sub(0, 42)
     (negative_max: int) = @sub(0, 9223372036854775807)
     (minimum: int) = @sub(negative_max, 1)
-    fmt.new("% % %\n", invalid,
+    fmt.new("% % %\n",
         fmt.int(0)
         fmt.int(negative)
         fmt.int(minimum)
@@ -42,7 +42,7 @@ test_integers: (ok: ()) {
 }
 
 test_floats: (ok: ()) {
-    fmt.new("% %\n", invalid,
+    fmt.new("% %\n",
         fmt.f64(40.0)
         fmt.f64(12.5)
         fmt.end, (output: str) {
@@ -52,13 +52,13 @@ test_floats: (ok: ()) {
 }
 
 test_percent: (ok: ()) {
-    fmt.new("100%% done\n", invalid, fmt.end, (output: str) {
+    fmt.new("100%% done\n", fmt.end, (output: str) {
         @write(output, ok)
     })
 }
 
 test_unicode: (ok: ()) {
-    fmt.new("😀 % café\n", invalid, fmt.str("世界") fmt.end, (output: str) {
+    fmt.new("😀 % café\n", fmt.str("世界") fmt.end, (output: str) {
         @write(output, ok)
     })
 }
@@ -69,7 +69,6 @@ test_basic: (next: ()) {
     }
     fmt.new(
         "hello %, you have % messages\n",
-        invalid,
         fmt.str(name)
         fmt.int(count)
         fmt.end, ok

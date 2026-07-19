@@ -63,54 +63,6 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "@compile_error",
-                                            args: [
-                                                Arg {
-                                                    name: None,
-                                                    term: Lit(
-                                                        Literal {
-                                                            value: Str(
-                                                                "invalid result",
-                                                            ),
-                                                            span: ,
-                                                        },
-                                                    ),
-                                                    span: ,
-                                                },
-                                                Arg {
-                                                    name: None,
-                                                    term: Ident(
-                                                        Ident {
-                                                            name: "@exit",
-                                                            args: [
-                                                                Arg {
-                                                                    name: None,
-                                                                    term: Lit(
-                                                                        Literal {
-                                                                            value: Int(
-                                                                                1,
-                                                                            ),
-                                                                            span: ,
-                                                                        },
-                                                                    ),
-                                                                    span: ,
-                                                                },
-                                                            ],
-                                                            span: ,
-                                                        },
-                                                    ),
-                                                    span: ,
-                                                },
-                                            ],
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
                                             name: "fmt.f64",
                                             args: [
                                                 Arg {
@@ -199,54 +151,6 @@
                                             value: Str(
                                                 "width + height + width",
                                             ),
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "@compile_error",
-                                            args: [
-                                                Arg {
-                                                    name: None,
-                                                    term: Lit(
-                                                        Literal {
-                                                            value: Str(
-                                                                "invalid calculation",
-                                                            ),
-                                                            span: ,
-                                                        },
-                                                    ),
-                                                    span: ,
-                                                },
-                                                Arg {
-                                                    name: None,
-                                                    term: Ident(
-                                                        Ident {
-                                                            name: "@exit",
-                                                            args: [
-                                                                Arg {
-                                                                    name: None,
-                                                                    term: Lit(
-                                                                        Literal {
-                                                                            value: Int(
-                                                                                1,
-                                                                            ),
-                                                                            span: ,
-                                                                        },
-                                                                    ),
-                                                                    span: ,
-                                                                },
-                                                            ],
-                                                            span: ,
-                                                        },
-                                                    ),
-                                                    span: ,
-                                                },
-                                            ],
                                             span: ,
                                         },
                                     ),

@@ -431,55 +431,57 @@ __rgo_7374642f666d74__f64: (value: f64, tail:((((str), (int), (f64)), __rgo_7374
 __rgo_7374642f666d74__end: (value:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), done_case:()){
     __rgo_737464__end(value, done_case)
 }
-_338___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
+_333___rgo_7374642f666d74__new: (){
+    _334: 1
+    @exit(_334)
+}
+_343___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
     __rgo_7374642f666d74__finish(output, invalid, ok)
 }
 
-_334___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
-    _335___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
-    _336: 0
-    _339___rgo_7374642f666d74__new: _338___rgo_7374642f666d74__new(invalid, ok)
-    __rgo_7374642f666d74__parse(l, _335___rgo_7374642f666d74__raw_nth, _336, __rgo_7374642f666d74__empty, invalid, args, _339___rgo_7374642f666d74__new)
+_339___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
+    _340___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
+    _341: 0
+    _344___rgo_7374642f666d74__new: _343___rgo_7374642f666d74__new(invalid, ok)
+    __rgo_7374642f666d74__parse(l, _340___rgo_7374642f666d74__raw_nth, _341, __rgo_7374642f666d74__empty, invalid, args, _344___rgo_7374642f666d74__new)
 }
 
-_332___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
-    _340___rgo_7374642f666d74__new: _334___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
-    @bytes_descriptor_len(source_bytes, _340___rgo_7374642f666d74__new)
+_337___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
+    _345___rgo_7374642f666d74__new: _339___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
+    @bytes_descriptor_len(source_bytes, _345___rgo_7374642f666d74__new)
 }
 
-__rgo_7374642f666d74__new: (template: str!, invalid:()!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
-    _341___rgo_7374642f666d74__new: _332___rgo_7374642f666d74__new(invalid, args, ok)
-    @bytes_from_str(template, _341___rgo_7374642f666d74__new)
+__rgo_7374642f666d74__new: (template: str!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
+    _331: "invalid format"
+    invalid: @compile_error(_331, _333___rgo_7374642f666d74__new)
+    _346___rgo_7374642f666d74__new: _337___rgo_7374642f666d74__new(invalid, args, ok)
+    @bytes_from_str(template, _346___rgo_7374642f666d74__new)
 }
 
 foo: (f:(str, ()), ok:()){
-    _344: "42"
-    f(_344, ok)
+    _349: "42"
+    f(_349, ok)
 }
-_347_print: (){
-    _348: 1
-    @exit(_348)
-}
-_353_print: (ok:(), value: str){
+_354_print: (ok:(), value: str){
     @write(value, ok)
 }
 
-_352_print: (ok:(), _330___rgo_7374642f666d74__new: str){
-    _353_print(ok, _330___rgo_7374642f666d74__new)
+_353_print: (ok:(), _330___rgo_7374642f666d74__new: str){
+    _354_print(ok, _330___rgo_7374642f666d74__new)
 }
 
 print: (n: str, ok:()){
-    _345: "The winning number is %\n"
-    _350___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(n, __rgo_7374642f666d74__end)
-    _354_print: _352_print(ok)
-    __rgo_7374642f666d74__new(_345, _347_print, _350___rgo_7374642f666d74__str, _354_print)
+    _350: "The winning number is %\n"
+    _351___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(n, __rgo_7374642f666d74__end)
+    _355_print: _353_print(ok)
+    __rgo_7374642f666d74__new(_350, _351___rgo_7374642f666d74__str, _355_print)
 }
-_356_main: (){
-    _357: 0
-    @exit(_357)
+_357_main: (){
+    _358: 0
+    @exit(_358)
 }
 
 main: (){
-    foo(print, _356_main)
+    foo(print, _357_main)
 }
 main()

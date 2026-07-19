@@ -5,7 +5,7 @@ calculated: (ok: (), @f64) {
 }
 
 calculate: (source: @str, ok: ()) {
-    calc.new(source, @exit(1), calc.end, calculated(ok))
+    calc.new(source, calc.end, calculated(ok))
 }
 
 main: () {

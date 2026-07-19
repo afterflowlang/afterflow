@@ -6,7 +6,7 @@ produce: (value: @int, ok: (@int)){
 }
 
 finish: (prefix: str, value: @int){
-    fmt.new("% %\n", @exit(1),
+    fmt.new("% %\n",
         fmt.str(prefix)
         fmt.int(value)
         fmt.end, @write(ok: @exit(0))

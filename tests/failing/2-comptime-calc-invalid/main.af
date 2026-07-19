@@ -3,7 +3,6 @@ calc: /std/math/calc
 main: () {
     calc.new(
         "price + tax",
-        @compile_error("invalid calculation", @exit(1)),
         calc.var("price", 10.0)
         calc.end, (@f64) {
             @exit(0)

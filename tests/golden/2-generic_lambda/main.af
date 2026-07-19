@@ -6,7 +6,7 @@ foo: <T>(x: T, ok:(T)){
     ok(x)
 }
 bar: (x: int){
-    fmt.new("%", @exit(1), fmt.int(x) fmt.end, @write(ok: @exit(0)))
+    fmt.new("%", fmt.int(x) fmt.end, @write(ok: @exit(0)))
 }
 main: () {
     foo(42, bar)

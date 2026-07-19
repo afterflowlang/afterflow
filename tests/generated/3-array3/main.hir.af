@@ -431,139 +431,129 @@ __rgo_7374642f666d74__f64: (value: f64, tail:((((str), (int), (f64)), __rgo_7374
 __rgo_7374642f666d74__end: (value:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), done_case:()){
     __rgo_737464__end(value, done_case)
 }
-_337___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
+_332___rgo_7374642f666d74__new: (){
+    _333: 1
+    @exit(_333)
+}
+_342___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
     __rgo_7374642f666d74__finish(output, invalid, ok)
 }
 
-_333___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
-    _334___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
-    _335: 0
-    _338___rgo_7374642f666d74__new: _337___rgo_7374642f666d74__new(invalid, ok)
-    __rgo_7374642f666d74__parse(l, _334___rgo_7374642f666d74__raw_nth, _335, __rgo_7374642f666d74__empty, invalid, args, _338___rgo_7374642f666d74__new)
+_338___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
+    _339___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
+    _340: 0
+    _343___rgo_7374642f666d74__new: _342___rgo_7374642f666d74__new(invalid, ok)
+    __rgo_7374642f666d74__parse(l, _339___rgo_7374642f666d74__raw_nth, _340, __rgo_7374642f666d74__empty, invalid, args, _343___rgo_7374642f666d74__new)
 }
 
-_331___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
-    _339___rgo_7374642f666d74__new: _333___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
-    @bytes_descriptor_len(source_bytes, _339___rgo_7374642f666d74__new)
+_336___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
+    _344___rgo_7374642f666d74__new: _338___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
+    @bytes_descriptor_len(source_bytes, _344___rgo_7374642f666d74__new)
 }
 
-__rgo_7374642f666d74__new: (template: str!, invalid:()!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
-    _340___rgo_7374642f666d74__new: _331___rgo_7374642f666d74__new(invalid, args, ok)
-    @bytes_from_str(template, _340___rgo_7374642f666d74__new)
+__rgo_7374642f666d74__new: (template: str!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
+    _330: "invalid format"
+    invalid: @compile_error(_330, _332___rgo_7374642f666d74__new)
+    _345___rgo_7374642f666d74__new: _336___rgo_7374642f666d74__new(invalid, args, ok)
+    @bytes_from_str(template, _345___rgo_7374642f666d74__new)
 }
-_349_array3: (one:(str), a: str){
+_354_array3: (one:(str), a: str){
     one(a)
 }
 
-_355_array3: (one:(str), b: str){
+_360_array3: (one:(str), b: str){
     one(b)
 }
 
-_361_array3: (one:(str), c: str){
+_366_array3: (one:(str), c: str){
     one(c)
 }
 
-_358_array3: (index: int, one:(str), c: str, none:()){
-    _359: 2
-    _362_array3: _361_array3(one, c)
-    @eq_int(index, _359, _362_array3, none)
+_363_array3: (index: int, one:(str), c: str, none:()){
+    _364: 2
+    _367_array3: _366_array3(one, c)
+    @eq_int(index, _364, _367_array3, none)
 }
 
-_352_array3: (index: int, one:(str), b: str, c: str, none:()){
-    _353: 1
-    _356_array3: _355_array3(one, b)
-    _363_array3: _358_array3(index, one, c, none)
-    @eq_int(index, _353, _356_array3, _363_array3)
+_357_array3: (index: int, one:(str), b: str, c: str, none:()){
+    _358: 1
+    _361_array3: _360_array3(one, b)
+    _368_array3: _363_array3(index, one, c, none)
+    @eq_int(index, _358, _361_array3, _368_array3)
 }
 
-_346_array3: (a: str, b: str, c: str, index: int, one:(str), none:()){
-    _347: 0
-    _350_array3: _349_array3(one, a)
-    _364_array3: _352_array3(index, one, b, c, none)
-    @eq_int(index, _347, _350_array3, _364_array3)
+_351_array3: (a: str, b: str, c: str, index: int, one:(str), none:()){
+    _352: 0
+    _355_array3: _354_array3(one, a)
+    _369_array3: _357_array3(index, one, b, c, none)
+    @eq_int(index, _352, _355_array3, _369_array3)
 }
 
 array3: (a: str, b: str, c: str, ok:(int, (int, (str), ()))){
-    _342: 3
-    _365_array3: _346_array3(a, b, c)
-    ok(_342, _365_array3)
+    _347: 3
+    _370_array3: _351_array3(a, b, c)
+    ok(_347, _370_array3)
 }
-_375_main: (){
-    _376: 1
-    @exit(_376)
-}
-_381_main: (ok:(), value: str){
+_382_main: (ok:(), value: str){
     @write(value, ok)
 }
 
-_389_main: (){
-    _390: 1
-    @exit(_390)
-}
-
-_395_main: (ok:(), value: str){
+_392_main: (ok:(), value: str){
     @write(value, ok)
 }
-
-_397_main: (){
-    _398: 0
-    @exit(_398)
+_394_main: (){
+    _395: 0
+    @exit(_395)
 }
 
-_394_main: (_329___rgo_7374642f666d74__new: str){
-    _395_main(_397_main, _329___rgo_7374642f666d74__new)
+_391_main: (_329___rgo_7374642f666d74__new: str){
+    _392_main(_394_main, _329___rgo_7374642f666d74__new)
 }
 
-_386_main: (s: str){
-    _387: "element at index 1 is %\n"
-    _392___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(s, __rgo_7374642f666d74__end)
-    __rgo_7374642f666d74__new(_387, _389_main, _392___rgo_7374642f666d74__str, _394_main)
+_387_main: (s: str){
+    _388: "element at index 1 is %\n"
+    _389___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(s, __rgo_7374642f666d74__end)
+    __rgo_7374642f666d74__new(_388, _389___rgo_7374642f666d74__str, _391_main)
 }
 
+_404_main: (ok:(), value: str){
+    @write(value, ok)
+}
 _406_main: (){
-    _407: 1
+    _407: 0
     @exit(_407)
 }
 
-_411_main: (ok:(), value: str){
-    @write(value, ok)
+_403_main: (_329___rgo_7374642f666d74__new: str){
+    _404_main(_406_main, _329___rgo_7374642f666d74__new)
 }
 
-_413_main: (){
-    _414: 0
-    @exit(_414)
+_400_main: (){
+    _401: "index out of bounds\n"
+    __rgo_7374642f666d74__new(_401, __rgo_7374642f666d74__end, _403_main)
 }
 
-_410_main: (_329___rgo_7374642f666d74__new: str){
-    _411_main(_413_main, _329___rgo_7374642f666d74__new)
+_384_main: (nth:(int, (str), ())){
+    _385: 1
+    nth(_385, _387_main, _400_main)
 }
 
-_403_main: (){
-    _404: "index out of bounds\n"
-    __rgo_7374642f666d74__new(_404, _406_main, __rgo_7374642f666d74__end, _410_main)
+_381_main: (nth:(int, (str), ()), _329___rgo_7374642f666d74__new: str){
+    _411_main: _384_main(nth)
+    _382_main(_411_main, _329___rgo_7374642f666d74__new)
 }
 
-_383_main: (nth:(int, (str), ())){
-    _384: 1
-    nth(_384, _386_main, _403_main)
-}
-
-_380_main: (nth:(int, (str), ()), _329___rgo_7374642f666d74__new: str){
-    _418_main: _383_main(nth)
-    _381_main(_418_main, _329___rgo_7374642f666d74__new)
-}
-
-_372_main: (len: int, nth:(int, (str), ())){
-    _373: "array has % elements\n"
-    _378___rgo_7374642f666d74__int: __rgo_7374642f666d74__int(len, __rgo_7374642f666d74__end)
-    _419_main: _380_main(nth)
-    __rgo_7374642f666d74__new(_373, _375_main, _378___rgo_7374642f666d74__int, _419_main)
+_377_main: (len: int, nth:(int, (str), ())){
+    _378: "array has % elements\n"
+    _379___rgo_7374642f666d74__int: __rgo_7374642f666d74__int(len, __rgo_7374642f666d74__end)
+    _412_main: _381_main(nth)
+    __rgo_7374642f666d74__new(_378, _379___rgo_7374642f666d74__int, _412_main)
 }
 
 main: (){
-    _366: "alice"
-    _367: "bob"
-    _368: "charlie"
-    array3(_366, _367, _368, _372_main)
+    _371: "alice"
+    _372: "bob"
+    _373: "charlie"
+    array3(_371, _372, _373, _377_main)
 }
 main()

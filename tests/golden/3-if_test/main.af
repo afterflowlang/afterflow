@@ -13,7 +13,7 @@ if: (cond: ((),()), yes:(), no:()){
 }
 main: () {
     () = if(true, () {
-        fmt.new("works", @exit(1), fmt.end, @write(ok: @exit(0)))
+        fmt.new("works", fmt.end, @write(ok: @exit(0)))
     })
-    fmt.new("doesn't work", @exit(1), fmt.end, @write(ok: @exit(0)))
+    fmt.new("doesn't work", fmt.end, @write(ok: @exit(0)))
 }

@@ -9,7 +9,7 @@ ok_exit: (){
     @exit(0)
 }
 p_handle: (x: int, y: int){
-    fmt.new("got: %, %\n", @exit(1), fmt.int(x) fmt.int(y) fmt.end, @write(ok: ok_exit))
+    fmt.new("got: %, %\n", fmt.int(x) fmt.int(y) fmt.end, @write(ok: ok_exit))
 }
 foo: (p:((int, int))){
     p(p_handle)
