@@ -1,0 +1,13 @@
+calc: /std/math/calc
+
+calculated: (ok: (), @f64) {
+    ok
+}
+
+calculate: (source: @str, ok: ()) {
+    calc.new(source, @exit(1), calc.end, calculated(ok))
+}
+
+main: () {
+    calculate("1 + 2", @exit(0))
+}

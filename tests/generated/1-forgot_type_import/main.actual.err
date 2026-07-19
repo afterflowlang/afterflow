@@ -1,4 +1,4 @@
 [hir] type `int` is not defined
-tests/failing/1-forgot_type_import/main.rgo:11
+tests/failing/1-forgot_type_import/main.af:5
     foo(1)
         ^

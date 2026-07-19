@@ -1,0 +1,9 @@
+accept: (value: ()!, run: (())) {
+    run(value)
+}
+
+main: () {
+    accept(@exit(1), (()) {
+        @write("callable!\n", @exit(0))
+    })
+}

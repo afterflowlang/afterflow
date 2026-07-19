@@ -1,0 +1,19 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+true: (x: (), y: ()){
+    x()
+}
+false: (x: (), y: ()){
+    y()
+}
+if: (cond: ((),()), yes:(), no:()){
+    cond(yes, no)
+}
+main: () {
+    () = if(true, () {
+        fmt.new("works", @exit(1), fmt.end, @write(ok: @exit(0)))
+    })
+    fmt.new("doesn't work", @exit(1), fmt.end, @write(ok: @exit(0)))
+}

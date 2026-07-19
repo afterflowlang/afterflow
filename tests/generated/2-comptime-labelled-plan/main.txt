@@ -1,0 +1,173 @@
+[
+    IdentDef {
+        name: "int",
+        ident: Ident {
+            name: "@int",
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "build",
+        lambda: Lambda {
+            params: Signature {
+                items: [
+                    SigItem {
+                        name: "value",
+                        kind: Ident(
+                            SigIdent {
+                                name: "int",
+                                span: ,
+                            },
+                        ),
+                        is_comptime: true,
+                        span: ,
+                    },
+                    SigItem {
+                        name: "run",
+                        kind: Sig(
+                            Signature {
+                                items: [
+                                    SigItem {
+                                        name: "",
+                                        kind: Ident(
+                                            SigIdent {
+                                                name: "int",
+                                                span: ,
+                                            },
+                                        ),
+                                        is_comptime: false,
+                                        span: ,
+                                    },
+                                ],
+                                span: ,
+                                generics: {},
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                ],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "@add",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "value",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: Int(
+                                                1,
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "run",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "main",
+        lambda: Lambda {
+            params: Signature {
+                items: [],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    IdentDef {
+                        name: "q",
+                        ident: Ident {
+                            name: "build",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: Int(
+                                                2,
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                        span: ,
+                    },
+                    Ident(
+                        Ident {
+                            name: "q",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "@exit",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    Ident(
+        Ident {
+            name: "main",
+            args: [],
+            span: ,
+        },
+    ),
+]

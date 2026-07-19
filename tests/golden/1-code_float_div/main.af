@@ -1,0 +1,9 @@
+str: @str
+float: @f64
+
+x: 1.5
+main: () {
+    @div_f64(x, 2.0, (y: float){
+        @write("result: 1.500000", @exit(0))
+    })
+}

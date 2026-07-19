@@ -1,0 +1,13 @@
+calculation: (ok: (@f64))
+
+consume: (run: (calculation)) {
+    @exit(0)
+}
+
+print: (value: @f64, ok: ()) {
+    @exit(0)
+}
+
+main: () {
+    consume(print(ok: @exit(0)))
+}

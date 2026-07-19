@@ -1,0 +1,13 @@
+fmt: /std/fmt
+
+unused: () {
+    fmt.new(
+        "trailing %",
+        @compile_error("unused staged format is invalid", @exit(1)),
+        fmt.end, @write(ok: @exit(0))
+    )
+}
+
+main: () {
+    @exit(0)
+}

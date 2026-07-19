@@ -1,0 +1,14 @@
+calc: /std/math/calc
+
+main: () {
+    calc.new(
+        "hypot(width, hypot)",
+        @compile_error("invalid calculation", @exit(1)),
+        calc.var("width", 3.0)
+        calc.var("hypot", 4.0)
+        calc.end,
+        (@f64) {
+            @exit(0)
+        }
+    )
+}

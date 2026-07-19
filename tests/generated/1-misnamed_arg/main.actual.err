@@ -1,4 +1,4 @@
 [hir] function 'foo' has no parameter named 'c'
-tests/failing/1-misnamed_arg/main.rgo:11
+tests/failing/1-misnamed_arg/main.af:7
     foo(b: "world", c: "hello")
                     ^

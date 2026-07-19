@@ -1,0 +1,13 @@
+str: @str
+
+foo: (ok:(str)){
+    ok("bob")
+}
+bar: (name0: str, name1: str){
+    @write(name0, () {
+        @write(name1, @exit(0))
+    })
+}
+main: () {
+    foo(bar("alice"))
+}

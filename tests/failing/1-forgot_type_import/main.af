@@ -1,0 +1,6 @@
+foo: (n: int) {  // Error: forgot to import int
+    @write("Number\n", @exit(0))
+}
+main: () {
+    foo(1)
+}

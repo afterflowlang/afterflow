@@ -1,0 +1,12 @@
+calc: /std/math/calc
+
+main: () {
+    calc.new(
+        "sqrt(4, 2)",
+        @compile_error("invalid scientific calculation", @exit(1)),
+        calc.end,
+        (@f64) {
+            @exit(0)
+        }
+    )
+}

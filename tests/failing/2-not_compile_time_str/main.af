@@ -1,0 +1,11 @@
+str: @str
+
+bar: (fmt: str!) {
+    @write(fmt, @exit(0))
+}
+foo: (fmt: str) {
+    bar(fmt)
+}
+main: () {
+    foo("Hi\n")
+}

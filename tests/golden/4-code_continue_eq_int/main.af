@@ -1,0 +1,22 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+foo: (x:int, y:int, ok:(int)){
+    @add(x, y, ok)
+}
+run: (ok:()){
+    f: foo(1) // `f` is now `(y:int, ok:(int))`
+    a: f(2) // `a` is now `(ok:(int))`
+    k: (x:int){
+        fmt.new("number: %", @exit(1), fmt.int(x) fmt.end, @write(ok: ok))
+    }
+    @eq_int(1, 1, () {
+        a(k)
+    }, () {
+        a(k)
+    })
+}
+main: () {
+    run(@exit(0))
+}

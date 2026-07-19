@@ -1,0 +1,21 @@
+accept: (value:()!, run:(())){
+    run(value)
+}
+_3_main: (){
+    _4: 1
+    @exit(_4)
+}
+_12_main: (){
+    _13: 0
+    @exit(_13)
+}
+
+_9_main: (_8_main:()){
+    _10: "callable!\n"
+    @write(_10, _12_main)
+}
+
+main: (){
+    accept(_3_main, _9_main)
+}
+main()

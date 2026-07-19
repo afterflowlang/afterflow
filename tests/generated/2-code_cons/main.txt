@@ -1,9 +1,4 @@
 [
-    Import {
-        label: "stdout",
-        path: "/stdout",
-        span: ,
-    },
     IdentDef {
         name: "str",
         ident: Ident {

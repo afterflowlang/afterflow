@@ -1,21 +1,25 @@
 use crate::compiler::air;
 use crate::compiler::air::{
-    AirAdd, AirAddF64, AirArg, AirBinaryBits, AirCallPtr, AirCallPtrTarget, AirConvertFixed,
-    AirDivBits, AirDivF64, AirDivInt, AirField, AirFunction, AirJump, AirJumpArgs, AirJumpClosure,
-    AirJumpEq, AirJumpGt, AirJumpLt, AirLabel, AirMul, AirMulF64, AirNewClosure, AirOp, AirPin,
-    AirReadFile, AirReturn, AirStmt, AirSub, AirSysExit, AirValue, Lit, SigKind,
+    AirAdd, AirAddF64, AirArg, AirBinaryBits, AirBytesBuild, AirBytesFromStr, AirBytesLen,
+    AirBytesNth, AirCloneDescriptor, AirConvertFixed, AirDivBits, AirDivF64, AirDivInt,
+    AirDropClosure, AirDropDescriptor, AirField, AirFileRead, AirFunction, AirIntToU8, AirJump,
+    AirJumpArgs, AirJumpClosure, AirJumpEq, AirJumpGt, AirJumpLt, AirLabel, AirMoveClosure, AirMul,
+    AirMulF64, AirNativeCall, AirNewClosure, AirOp, AirPin, AirReturn, AirRuneFromU32, AirStmt,
+    AirStrFromUtf8, AirStrRuneLen, AirStrRuneNth, AirSub, AirSubF64, AirSysExit, AirU32FromRune,
+    AirValue, Lit, SigKind,
 };
-use crate::compiler::builtins;
-use crate::compiler::builtins::AirRuntimeHelper;
+use crate::compiler::builtins::{AirRuntimeHelper, NativeScalar};
 use crate::compiler::error::{Code, Error};
 use crate::compiler::hir::FixedIntInterpretation;
 use crate::compiler::runtime;
 use crate::compiler::span::Span;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::io::Write;
 
 const WORD_SIZE: usize = 8;
-const STRING_DESCRIPTOR_SIZE: usize = WORD_SIZE * 2;
+pub const DESCRIPTOR_HEAP_BASE_OFFSET: usize = WORD_SIZE * 2;
+pub const DESCRIPTOR_HEAP_SIZE_OFFSET: usize = WORD_SIZE * 3;
+pub const STRING_DESCRIPTOR_SIZE: usize = WORD_SIZE * 4;
 pub const ENV_METADATA_UNWRAPPER_OFFSET: usize = 0;
 pub const ENV_METADATA_RELEASE_OFFSET: usize = WORD_SIZE;
 pub const ENV_METADATA_DEEP_COPY_OFFSET: usize = WORD_SIZE * 2;
@@ -26,6 +30,7 @@ pub const ENV_METADATA_SIZE: usize = WORD_SIZE * 6;
 pub const CLOSURE_ENV_REG: &str = "r12";
 pub const ARG_REGS: [&str; 6] = ["rdi", "rsi", "rdx", "rcx", "r8", "r9"];
 pub const SYSCALL_READ: i32 = 0;
+pub const SYSCALL_WRITE: i32 = 1;
 pub const SYSCALL_OPEN: i32 = 2;
 pub const SYSCALL_CLOSE: i32 = 3;
 pub const SYSCALL_LSEEK: i32 = 8;
@@ -37,57 +42,32 @@ pub const PROT_READ: i32 = 1;
 pub const PROT_WRITE: i32 = 2;
 pub const MAP_PRIVATE: i32 = 2;
 pub const MAP_ANONYMOUS: i32 = 32;
-pub const FMT_BUFFER_SIZE: usize = 1024;
 
 #[derive(Debug, Default)]
 pub struct Artifacts {
     string_literals: Vec<(String, String)>,
-    pub externs: HashSet<String>,
     builtins_used: HashSet<String>,
+    duplicate_air_labels: HashSet<String>,
+    native_symbols: BTreeSet<&'static str>,
 }
 
 impl Artifacts {
     pub fn collect(air_functions: &[AirFunction]) -> Self {
         let mut artifacts = Artifacts::default();
+        let mut air_label_counts = HashMap::new();
         for function in air_functions {
             for stmt in &function.items {
-                artifacts.process_statement(stmt);
+                if let AirStmt::Label(label) = stmt {
+                    *air_label_counts.entry(label.name.clone()).or_insert(0) += 1;
+                }
+                artifacts.collect_literals_in_stmt(stmt);
             }
         }
+        artifacts.duplicate_air_labels = air_label_counts
+            .into_iter()
+            .filter_map(|(label, count)| (count > 1).then_some(label))
+            .collect();
         artifacts
-    }
-
-    fn process_statement(&mut self, stmt: &AirStmt) {
-        self.collect_literals_in_stmt(stmt);
-        match stmt.as_op() {
-            Some(AirOp::Sprintf(_)) => {
-                self.externs.insert("sprintf".to_string());
-            }
-            Some(AirOp::Write(_)) => {
-                self.externs.insert("write".to_string());
-            }
-            Some(AirOp::ReadFile(_)) => {
-                self.externs
-                    .insert(AirRuntimeHelper::ReleaseHeapPtr.name().to_string());
-            }
-            Some(AirOp::SysExit(_)) => {
-                // Call libc exit instead of raw syscall to ensure proper cleanup and flushing
-                self.externs.insert("exit".to_string());
-            }
-            Some(AirOp::CallPtr(_)) => {
-                self.externs
-                    .insert(AirRuntimeHelper::ReleaseHeapPtr.name().to_string());
-            }
-            Some(AirOp::ReleaseHeap(_)) => {
-                self.externs
-                    .insert(AirRuntimeHelper::ReleaseHeapPtr.name().to_string());
-            }
-            Some(AirOp::CopyField(_)) => {
-                self.externs
-                    .insert(AirRuntimeHelper::DeepCopyHeapPtr.name().to_string());
-            }
-            _ => {}
-        }
     }
 
     fn collect_literals_in_stmt(&mut self, stmt: &AirStmt) {
@@ -118,23 +98,48 @@ impl Artifacts {
             AirOp::JumpClosure(jump) => self.collect_literals_in_args(&jump.args),
             AirOp::NewClosure(closure) => self.collect_literals_in_args(&closure.args),
             AirOp::SetField(set) => self.collect_literals_in_args(std::slice::from_ref(&set.value)),
-            AirOp::JumpEqInt(eq) | AirOp::JumpEqStr(eq) => {
+            AirOp::JumpEqInt(eq)
+            | AirOp::JumpEqStr(eq)
+            | AirOp::JumpEqUInt(eq)
+            | AirOp::JumpEqBits(eq) => {
                 self.collect_literals_in_args(&eq.args);
             }
             AirOp::Add(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
+            AirOp::AddUInt(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
             AirOp::AddBits(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
             AirOp::Sub(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
+            AirOp::SubUInt(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
             AirOp::SubBits(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
             AirOp::Mul(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
             AirOp::MulBits(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
             AirOp::DivInt(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
             AirOp::DivBits(op) => self.collect_literals_in_binary_inputs(&op.input_a, &op.input_b),
+            AirOp::NativeCall(op) => {
+                self.native_symbols.insert(op.function.symbol);
+            }
             AirOp::ConvertFixed(op) => {
                 self.collect_literals_in_args(std::slice::from_ref(&op.input))
             }
-            AirOp::Sprintf(call) => self.collect_literals_in_args(&call.args),
             AirOp::Write(call) => self.collect_literals_in_args(&call.args),
-            AirOp::ReadFile(op) => self.collect_literals_in_args(std::slice::from_ref(&op.path)),
+            AirOp::FileRead(op) => self.collect_literals_in_args(std::slice::from_ref(&op.path)),
+            AirOp::StrRuneLen(op) => self.collect_literals_in_args(std::slice::from_ref(&op.value)),
+            AirOp::StrRuneNth(op) => {
+                self.collect_literals_in_args(&[op.value.clone(), op.idx.clone()])
+            }
+            AirOp::StrFromUtf8(op) => {
+                self.collect_literals_in_args(std::slice::from_ref(&op.value))
+            }
+            AirOp::BytesLen(op) => self.collect_literals_in_args(std::slice::from_ref(&op.value)),
+            AirOp::BytesNth(op) => {
+                self.collect_literals_in_args(&[op.value.clone(), op.idx.clone()])
+            }
+            AirOp::BytesFromStr(op) => {
+                self.collect_literals_in_args(std::slice::from_ref(&op.value))
+            }
+            AirOp::BytesBuild(op) => {
+                self.collect_literals_in_args(std::slice::from_ref(&op.source))
+            }
+            AirOp::IntToU8(op) => self.collect_literals_in_args(std::slice::from_ref(&op.value)),
             AirOp::JumpArgs(call) => self.collect_literals_in_args(&call.args),
             AirOp::SysExit(syscall) => self.collect_literals_in_args(&syscall.args),
             _ => {}
@@ -156,12 +161,23 @@ impl Artifacts {
         self.string_literals
             .push((label.to_string(), value.to_string()));
     }
+
+    pub fn native_symbols(&self) -> &BTreeSet<&'static str> {
+        &self.native_symbols
+    }
 }
 
 pub fn write_preamble<W: Write>(out: &mut W) -> Result<(), Error> {
     writeln!(out, "bits 64")?;
     writeln!(out, "default rel")?;
     writeln!(out, "section .text")?;
+    Ok(())
+}
+
+pub fn emit_native_externs<W: Write>(artifacts: &Artifacts, out: &mut W) -> Result<(), Error> {
+    for symbol in artifacts.native_symbols() {
+        writeln!(out, "extern {symbol}")?;
+    }
     Ok(())
 }
 
@@ -178,7 +194,12 @@ pub fn function<W: Write>(
         return Ok(());
     }
     let frame = FrameLayout::build(&air)?;
-    let mut emitter = FunctionEmitter::new(air.clone(), out, frame);
+    let mut emitter = FunctionEmitter::new(
+        air.clone(),
+        out,
+        frame,
+        artifacts.duplicate_air_labels.clone(),
+    );
     emitter.emit_function()?;
     Ok(())
 }
@@ -190,12 +211,40 @@ fn emit_runtime_helpers<W: Write>(
 ) -> Result<(), Error> {
     let mut needs_release = false;
     let mut needs_deepcopy = false;
+    let mut needs_descriptor_release = false;
+    let mut needs_descriptor_clone = false;
+    let mut needs_utf8_validate = false;
+    let mut needs_bytes_build = false;
     for stmt in &air.items {
         match stmt.as_op() {
             Some(AirOp::ReleaseHeap(_)) => needs_release = true,
-            Some(AirOp::CopyField(_)) => needs_deepcopy = true,
-            Some(AirOp::CallPtr(_)) => needs_release = true,
-            Some(AirOp::ReadFile(_)) => needs_release = true,
+            Some(AirOp::CopyField(field)) => match &field.kind {
+                SigKind::Sig(_) => needs_deepcopy = true,
+                SigKind::Str | SigKind::Bytes => needs_descriptor_clone = true,
+                _ => {}
+            },
+            Some(AirOp::DropClosure(_)) => needs_release = true,
+            Some(AirOp::CloneDescriptor(_)) => needs_descriptor_clone = true,
+            Some(AirOp::DropDescriptor(_))
+            | Some(AirOp::JumpEqStr(_))
+            | Some(AirOp::StrRuneLen(_))
+            | Some(AirOp::StrRuneNth(_))
+            | Some(AirOp::BytesLen(_))
+            | Some(AirOp::BytesNth(_))
+            | Some(AirOp::Write(_)) => needs_descriptor_release = true,
+            Some(AirOp::FileRead(_)) => {
+                needs_release = true;
+                needs_descriptor_release = true;
+            }
+            Some(AirOp::StrFromUtf8(_)) => {
+                needs_utf8_validate = true;
+                needs_descriptor_release = true;
+            }
+            Some(AirOp::BytesBuild(_)) => {
+                needs_release = true;
+                needs_deepcopy = true;
+                needs_bytes_build = true;
+            }
             _ => {}
         }
     }
@@ -206,6 +255,18 @@ fn emit_runtime_helpers<W: Write>(
     if needs_deepcopy {
         emit_runtime_helper_once(AirRuntimeHelper::DeepCopyHeapPtr, artifacts, out)?;
         emit_runtime_helper_once(AirRuntimeHelper::MemcpyHelper, artifacts, out)?;
+    }
+    if needs_descriptor_release {
+        emit_runtime_helper_once(AirRuntimeHelper::ReleaseDescriptorPtr, artifacts, out)?;
+    }
+    if needs_descriptor_clone {
+        emit_runtime_helper_once(AirRuntimeHelper::CloneDescriptorPtr, artifacts, out)?;
+    }
+    if needs_utf8_validate {
+        emit_runtime_helper_once(AirRuntimeHelper::Utf8Validate, artifacts, out)?;
+    }
+    if needs_bytes_build {
+        emit_runtime_helper_once(AirRuntimeHelper::BytesBuild, artifacts, out)?;
     }
     Ok(())
 }
@@ -218,24 +279,15 @@ fn emit_runtime_helper_once<W: Write>(
     if !artifacts.builtins_used.insert(helper.name().to_string()) {
         return Ok(());
     }
-    artifacts.externs.remove(helper.name());
     match helper {
         AirRuntimeHelper::ReleaseHeapPtr => runtime::emit_release_heap_ptr(out),
         AirRuntimeHelper::DeepCopyHeapPtr => runtime::emit_deepcopy_heap_ptr(out),
+        AirRuntimeHelper::ReleaseDescriptorPtr => runtime::emit_release_descriptor_ptr(out),
+        AirRuntimeHelper::CloneDescriptorPtr => runtime::emit_clone_descriptor_ptr(out),
         AirRuntimeHelper::MemcpyHelper => runtime::emit_memcpy_helper(out),
+        AirRuntimeHelper::Utf8Validate => runtime::emit_utf8_validate(out),
+        AirRuntimeHelper::BytesBuild => runtime::emit_bytes_build_helpers(out),
     }
-}
-
-pub fn emit_externs<W: Write>(externs: &HashSet<String>, out: &mut W) -> Result<(), Error> {
-    if externs.is_empty() {
-        return Ok(());
-    }
-    let mut names: Vec<&String> = externs.iter().collect();
-    names.sort();
-    for name in names {
-        writeln!(out, "extern {}", name)?;
-    }
-    Ok(())
 }
 
 pub fn emit_data<W: Write>(string_literals: &[(String, String)], out: &mut W) -> Result<(), Error> {
@@ -247,7 +299,7 @@ pub fn emit_data<W: Write>(string_literals: &[(String, String)], out: &mut W) ->
         writeln!(out, "{}:", label)?;
         writeln!(
             out,
-            "    dq {}_data, {} ; string data pointer and byte length",
+            "    dq {}_data, {}, 0, 0 ; data, byte length, heap base, heap size",
             label,
             literal.len()
         )?;
@@ -314,6 +366,8 @@ fn air_statement_binding_info(stmt: &AirStmt) -> Option<(&str, usize)> {
     match stmt.as_op() {
         Some(AirOp::NewClosure(s)) => Some((&s.name, 1)),
         Some(AirOp::CloneClosure(s)) => Some((&s.dst, 1)),
+        Some(AirOp::CloneDescriptor(s)) => Some((&s.dst, 1)),
+        Some(AirOp::MoveClosure(s)) => Some((&s.dst, 1)),
         Some(AirOp::Field(field)) => {
             Some((field.result.as_str(), word_count_from_kind(&field.kind)))
         }
@@ -324,7 +378,6 @@ fn air_statement_binding_info(stmt: &AirStmt) -> Option<(&str, usize)> {
 
 #[derive(Clone, Copy, Debug)]
 struct ArgSplit {
-    reg_slots: usize,
     stack_bytes: usize,
 }
 
@@ -334,16 +387,23 @@ struct FunctionEmitter<'a, W: Write> {
     frame: FrameLayout,
     terminated: bool,
     label_counter: usize,
+    duplicate_air_labels: HashSet<String>,
 }
 
 impl<'a, W: Write> FunctionEmitter<'a, W> {
-    fn new(air: AirFunction, out: &'a mut W, frame: FrameLayout) -> Self {
+    fn new(
+        air: AirFunction,
+        out: &'a mut W,
+        frame: FrameLayout,
+        duplicate_air_labels: HashSet<String>,
+    ) -> Self {
         Self {
             air,
             out,
             frame,
             terminated: false,
             label_counter: 0,
+            duplicate_air_labels,
         }
     }
 
@@ -470,42 +530,50 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
                 self.emit_clone_closure(clone)?;
                 self.store_binding_value(&clone.dst)
             }
+            AirOp::CloneDescriptor(clone) => self.emit_clone_descriptor(clone),
+            AirOp::MoveClosure(moved) => self.emit_move_closure(moved),
             AirOp::Jump(jump) => self.emit_jump(jump),
             AirOp::JumpEqInt(eq) => self.emit_eq_int_jump(eq),
             AirOp::JumpEqStr(eq) => self.emit_eq_str_jump(eq),
+            AirOp::JumpEqUInt(eq) | AirOp::JumpEqBits(eq) => self.emit_eq_int_jump(eq),
             AirOp::JumpLt(jump) => self.emit_lt_jump(jump),
+            AirOp::JumpLtUInt(jump) => self.emit_lt_uint_jump(jump),
             AirOp::ReleaseHeap(release) => self.emit_release_heap_ptr(&release.name),
             AirOp::Pin(pin) => self.emit_pin(pin),
             AirOp::Field(field) => self.emit_get_field(field),
             AirOp::SetField(set) => self.emit_set_field(set),
             AirOp::CopyField(field) => self.emit_copy_field(field),
             AirOp::Add(op) => self.emit_add(op),
+            AirOp::AddUInt(op) => self.emit_add(op),
             AirOp::AddBits(op) => self.emit_add_bits(op),
             AirOp::Sub(op) => self.emit_sub(op),
+            AirOp::SubUInt(op) => self.emit_sub(op),
             AirOp::SubBits(op) => self.emit_sub_bits(op),
             AirOp::Mul(op) => self.emit_mul(op),
             AirOp::MulBits(op) => self.emit_mul_bits(op),
             AirOp::DivInt(op) => self.emit_div_int(op),
             AirOp::DivBits(op) => self.emit_div_bits(op),
             AirOp::AddF64(op) => self.emit_add_f64(op),
+            AirOp::SubF64(op) => self.emit_sub_f64(op),
             AirOp::MulF64(op) => self.emit_mul_f64(op),
             AirOp::DivF64(op) => self.emit_div_f64(op),
+            AirOp::NativeCall(op) => self.emit_native_call(op),
             AirOp::ConvertFixed(op) => self.emit_convert_fixed(op),
+            AirOp::RuneFromU32(op) => self.emit_rune_from_u32(op),
+            AirOp::U32FromRune(op) => self.emit_u32_from_rune(op),
+            AirOp::StrRuneLen(op) => self.emit_str_rune_len(op),
+            AirOp::StrRuneNth(op) => self.emit_str_rune_nth(op),
+            AirOp::StrFromUtf8(op) => self.emit_str_from_utf8(op),
+            AirOp::BytesLen(op) => self.emit_bytes_len(op),
+            AirOp::BytesNth(op) => self.emit_bytes_nth(op),
+            AirOp::BytesFromStr(op) => self.emit_bytes_from_str(op),
+            AirOp::BytesBuild(op) => self.emit_bytes_build(op),
+            AirOp::IntToU8(op) => self.emit_int_to_u8(op),
             AirOp::JumpGt(jump) => self.emit_gt_jump(jump),
-            AirOp::Sprintf(op) => self.emit_libc_op(
-                builtins::Builtin::Sprintf,
-                &op.args,
-                &op.arg_kinds,
-                &op.target,
-            ),
-            AirOp::Write(op) => self.emit_libc_op(
-                builtins::Builtin::Write,
-                &op.args,
-                &op.arg_kinds,
-                &op.target,
-            ),
-            AirOp::ReadFile(op) => self.emit_read_file(op),
-            AirOp::CallPtr(call) => self.emit_call_ptr(call),
+            AirOp::Write(op) => self.emit_write(&op.args, &op.arg_kinds, &op.target),
+            AirOp::FileRead(op) => self.emit_file_read(op),
+            AirOp::DropClosure(drop) => self.emit_drop_closure(drop),
+            AirOp::DropDescriptor(drop) => self.emit_drop_descriptor(drop),
             AirOp::SysExit(syscall) => self.emit_exit_syscall(syscall),
             AirOp::JumpArgs(call) => self.emit_jump_args(call),
             AirOp::JumpClosure(jump) => self.emit_jump_closure(jump),
@@ -548,6 +616,21 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         Ok(())
     }
 
+    fn emit_move_closure(&mut self, moved: &AirMoveClosure) -> Result<(), Error> {
+        self.load_value_into_reg(&AirValue::Binding(moved.src.clone()), "rax")?;
+        self.store_binding_value(&moved.dst)
+    }
+
+    fn emit_clone_descriptor(&mut self, clone: &AirCloneDescriptor) -> Result<(), Error> {
+        self.load_value_into_reg(&AirValue::Binding(clone.src.clone()), "rdi")?;
+        writeln!(
+            self.out,
+            "    call {} ; clone owned descriptor",
+            AirRuntimeHelper::CloneDescriptorPtr.name()
+        )?;
+        self.store_binding_value(&clone.dst)
+    }
+
     fn store_at(&mut self, base_reg: &str, offset: isize, value_reg: &str) -> Result<(), Error> {
         let addr = self.env_field_operand(base_reg, offset);
         writeln!(
@@ -569,13 +652,22 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
     }
 
     fn emit_eq_int_jump(&mut self, eq: &AirJumpEq) -> Result<(), Error> {
-        self.emit_builtin_int_condition(&eq.args, &eq.target)
+        let target = self.scoped_air_label(&eq.target);
+        self.emit_builtin_int_condition(&eq.args, &target)
     }
 
     fn emit_eq_str_jump(&mut self, eq: &AirJumpEq) -> Result<(), Error> {
+        let equal_label = self.new_label("eqs_equal");
         let false_label = self.new_label("eqs_false");
-        self.emit_builtin_string_condition(&eq.args, &eq.target, &false_label)?;
+        let target = self.scoped_air_label(&eq.target);
+        self.emit_builtin_string_condition(&eq.args, &equal_label, &false_label)?;
+        writeln!(self.out, "{}:", equal_label)?;
+        self.emit_drop_descriptor_arg(&eq.args[0])?;
+        self.emit_drop_descriptor_arg(&eq.args[1])?;
+        writeln!(self.out, "    jmp {}", target)?;
         writeln!(self.out, "{}:", false_label)?;
+        self.emit_drop_descriptor_arg(&eq.args[0])?;
+        self.emit_drop_descriptor_arg(&eq.args[1])?;
         Ok(())
     }
 
@@ -583,7 +675,15 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         self.load_value_into_reg(&jump.left, "rax")?;
         self.load_value_into_reg(&jump.right, "rbx")?;
         writeln!(self.out, "    cmp rax, rbx")?;
-        writeln!(self.out, "    jl {}", jump.target)?;
+        writeln!(self.out, "    jl {}", self.scoped_air_label(&jump.target))?;
+        Ok(())
+    }
+
+    fn emit_lt_uint_jump(&mut self, jump: &AirJumpLt) -> Result<(), Error> {
+        self.load_value_into_reg(&jump.left, "rax")?;
+        self.load_value_into_reg(&jump.right, "rbx")?;
+        writeln!(self.out, "    cmp rax, rbx")?;
+        writeln!(self.out, "    jb {}", self.scoped_air_label(&jump.target))?;
         Ok(())
     }
 
@@ -591,7 +691,7 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         self.load_value_into_reg(&jump.left, "rax")?;
         self.load_value_into_reg(&jump.right, "rbx")?;
         writeln!(self.out, "    cmp rax, rbx")?;
-        writeln!(self.out, "    jg {}", jump.target)?;
+        writeln!(self.out, "    jg {}", self.scoped_air_label(&jump.target))?;
         Ok(())
     }
     fn emit_add(&mut self, op: &AirAdd) -> Result<(), Error> {
@@ -638,7 +738,7 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
             &op.input_a,
             &op.input_b,
             &op.target,
-            "mul",
+            "imul",
             "multiply by multiplier",
             false,
         )
@@ -720,6 +820,280 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         self.emit_fixed_value_jump(&op.target, op.to.bit_width)
     }
 
+    fn emit_rune_from_u32(&mut self, op: &AirRuneFromU32) -> Result<(), Error> {
+        self.load_arg_into_reg(&op.input, "rax")?;
+        let invalid_label = self.new_label("rune_invalid");
+        let ok_label = self.new_label("rune_ok");
+        writeln!(
+            self.out,
+            "    cmp eax, 0x10ffff ; Unicode scalar upper bound"
+        )?;
+        writeln!(self.out, "    ja {}", invalid_label)?;
+        writeln!(
+            self.out,
+            "    cmp eax, 0xd800 ; UTF-16 surrogate lower bound"
+        )?;
+        writeln!(self.out, "    jb {}", ok_label)?;
+        writeln!(
+            self.out,
+            "    cmp eax, 0xdfff ; UTF-16 surrogate upper bound"
+        )?;
+        writeln!(self.out, "    jbe {}", invalid_label)?;
+
+        writeln!(self.out, "{}:", ok_label)?;
+        self.emit_drop_closure_name(&op.invalid_target)?;
+        self.load_arg_into_reg(&op.input, "rax")?;
+        self.emit_value_jump(&op.ok_target, true)?;
+
+        writeln!(self.out, "{}:", invalid_label)?;
+        self.emit_drop_closure_name(&op.ok_target)?;
+        self.emit_value_jump(&op.invalid_target, false)
+    }
+
+    fn emit_u32_from_rune(&mut self, op: &AirU32FromRune) -> Result<(), Error> {
+        self.load_arg_into_reg(&op.input, "rax")?;
+        self.emit_value_jump(&op.target, true)
+    }
+
+    fn emit_str_rune_len(&mut self, op: &AirStrRuneLen) -> Result<(), Error> {
+        let loop_label = self.new_label("str_rune_len_loop");
+        let next_label = self.new_label("str_rune_len_next");
+        let done_label = self.new_label("str_rune_len_done");
+        self.load_arg_into_reg(&op.value, "rbx")?;
+        writeln!(self.out, "    mov rsi, [rbx]")?;
+        writeln!(self.out, "    mov rcx, [rbx+8]")?;
+        writeln!(self.out, "    xor rdx, rdx")?;
+        writeln!(self.out, "    xor rax, rax")?;
+        writeln!(self.out, "{}:", loop_label)?;
+        writeln!(self.out, "    cmp rdx, rcx")?;
+        writeln!(self.out, "    jae {}", done_label)?;
+        writeln!(self.out, "    movzx r8d, byte [rsi+rdx]")?;
+        writeln!(self.out, "    and r8d, 0xc0")?;
+        writeln!(self.out, "    cmp r8d, 0x80")?;
+        writeln!(self.out, "    je {}", next_label)?;
+        writeln!(self.out, "    inc rax")?;
+        writeln!(self.out, "{}:", next_label)?;
+        writeln!(self.out, "    inc rdx")?;
+        writeln!(self.out, "    jmp {}", loop_label)?;
+        writeln!(self.out, "{}:", done_label)?;
+        writeln!(self.out, "    push rax ; preserve rune length")?;
+        self.emit_drop_descriptor_arg(&op.value)?;
+        writeln!(self.out, "    pop rax ; restore rune length")?;
+        self.emit_value_jump(&op.target, true)
+    }
+
+    fn emit_str_rune_nth(&mut self, op: &AirStrRuneNth) -> Result<(), Error> {
+        let loop_label = self.new_label("str_rune_nth_loop");
+        let continuation = self.new_label("str_rune_nth_continuation");
+        let found_label = self.new_label("str_rune_nth_found");
+        let width_two = self.new_label("str_rune_nth_width_two");
+        let width_three = self.new_label("str_rune_nth_width_three");
+        let width_four = self.new_label("str_rune_nth_width_four");
+        let decoded = self.new_label("str_rune_nth_decoded");
+        let empty = self.new_label("str_rune_nth_empty");
+        self.load_arg_into_reg(&op.value, "rbx")?;
+        self.load_arg_into_reg(&op.idx, "r9")?;
+        writeln!(self.out, "    mov rsi, [rbx]")?;
+        writeln!(self.out, "    mov rcx, [rbx+8]")?;
+        writeln!(self.out, "    xor rdx, rdx")?;
+        writeln!(self.out, "    xor r8, r8")?;
+        writeln!(self.out, "{}:", loop_label)?;
+        writeln!(self.out, "    cmp rdx, rcx")?;
+        writeln!(self.out, "    jae {}", empty)?;
+        writeln!(self.out, "    movzx eax, byte [rsi+rdx]")?;
+        writeln!(self.out, "    mov r10d, eax")?;
+        writeln!(self.out, "    and r10d, 0xc0")?;
+        writeln!(self.out, "    cmp r10d, 0x80")?;
+        writeln!(self.out, "    je {}", continuation)?;
+        writeln!(self.out, "    cmp r8, r9")?;
+        writeln!(self.out, "    je {}", found_label)?;
+        writeln!(self.out, "    inc r8")?;
+        writeln!(self.out, "{}:", continuation)?;
+        writeln!(self.out, "    inc rdx")?;
+        writeln!(self.out, "    jmp {}", loop_label)?;
+
+        writeln!(self.out, "{}:", found_label)?;
+        writeln!(self.out, "    movzx eax, byte [rsi+rdx]")?;
+        writeln!(self.out, "    cmp eax, 0x80")?;
+        writeln!(self.out, "    jb {}", decoded)?;
+        writeln!(self.out, "    cmp eax, 0xe0")?;
+        writeln!(self.out, "    jb {}", width_two)?;
+        writeln!(self.out, "    cmp eax, 0xf0")?;
+        writeln!(self.out, "    jb {}", width_three)?;
+        writeln!(self.out, "    jmp {}", width_four)?;
+
+        writeln!(self.out, "{}:", width_two)?;
+        writeln!(self.out, "    and eax, 0x1f")?;
+        writeln!(self.out, "    shl eax, 6")?;
+        writeln!(self.out, "    movzx r10d, byte [rsi+rdx+1]")?;
+        writeln!(self.out, "    and r10d, 0x3f")?;
+        writeln!(self.out, "    or eax, r10d")?;
+        writeln!(self.out, "    jmp {}", decoded)?;
+
+        writeln!(self.out, "{}:", width_three)?;
+        writeln!(self.out, "    and eax, 0x0f")?;
+        writeln!(self.out, "    shl eax, 12")?;
+        writeln!(self.out, "    movzx r10d, byte [rsi+rdx+1]")?;
+        writeln!(self.out, "    and r10d, 0x3f")?;
+        writeln!(self.out, "    shl r10d, 6")?;
+        writeln!(self.out, "    or eax, r10d")?;
+        writeln!(self.out, "    movzx r10d, byte [rsi+rdx+2]")?;
+        writeln!(self.out, "    and r10d, 0x3f")?;
+        writeln!(self.out, "    or eax, r10d")?;
+        writeln!(self.out, "    jmp {}", decoded)?;
+
+        writeln!(self.out, "{}:", width_four)?;
+        writeln!(self.out, "    and eax, 0x07")?;
+        writeln!(self.out, "    shl eax, 18")?;
+        writeln!(self.out, "    movzx r10d, byte [rsi+rdx+1]")?;
+        writeln!(self.out, "    and r10d, 0x3f")?;
+        writeln!(self.out, "    shl r10d, 12")?;
+        writeln!(self.out, "    or eax, r10d")?;
+        writeln!(self.out, "    movzx r10d, byte [rsi+rdx+2]")?;
+        writeln!(self.out, "    and r10d, 0x3f")?;
+        writeln!(self.out, "    shl r10d, 6")?;
+        writeln!(self.out, "    or eax, r10d")?;
+        writeln!(self.out, "    movzx r10d, byte [rsi+rdx+3]")?;
+        writeln!(self.out, "    and r10d, 0x3f")?;
+        writeln!(self.out, "    or eax, r10d")?;
+
+        writeln!(self.out, "{}:", decoded)?;
+        writeln!(self.out, "    push rax")?;
+        self.emit_drop_descriptor_arg(&op.value)?;
+        self.emit_drop_closure_name(&op.empty_target)?;
+        writeln!(self.out, "    pop rax")?;
+        self.emit_value_jump(&op.one_target, true)?;
+
+        writeln!(self.out, "{}:", empty)?;
+        self.emit_drop_descriptor_arg(&op.value)?;
+        self.emit_drop_closure_name(&op.one_target)?;
+        self.emit_value_jump(&op.empty_target, false)
+    }
+
+    fn emit_str_from_utf8(&mut self, op: &AirStrFromUtf8) -> Result<(), Error> {
+        let invalid = self.new_label("str_from_utf8_invalid");
+        self.load_arg_into_reg(&op.value, "rbx")?;
+        writeln!(self.out, "    mov rdi, [rbx]")?;
+        writeln!(self.out, "    mov rsi, [rbx+8]")?;
+        writeln!(
+            self.out,
+            "    call {}",
+            AirRuntimeHelper::Utf8Validate.name()
+        )?;
+        writeln!(self.out, "    test eax, eax")?;
+        writeln!(self.out, "    jz {}", invalid)?;
+        self.emit_drop_closure_name(&op.invalid_target)?;
+        self.load_arg_into_reg(&op.value, "rax")?;
+        self.emit_value_jump(&op.ok_target, true)?;
+
+        writeln!(self.out, "{}:", invalid)?;
+        self.emit_drop_descriptor_arg(&op.value)?;
+        self.emit_drop_closure_name(&op.ok_target)?;
+        self.emit_value_jump(&op.invalid_target, false)
+    }
+
+    fn emit_bytes_len(&mut self, op: &AirBytesLen) -> Result<(), Error> {
+        self.load_arg_into_reg(&op.value, "rbx")?;
+        writeln!(self.out, "    mov rax, [rbx+8]")?;
+        writeln!(self.out, "    push rax ; preserve byte length")?;
+        self.emit_drop_descriptor_arg(&op.value)?;
+        writeln!(self.out, "    pop rax ; restore byte length")?;
+        self.emit_value_jump(&op.target, true)
+    }
+
+    fn emit_bytes_nth(&mut self, op: &AirBytesNth) -> Result<(), Error> {
+        let empty = self.new_label("bytes_nth_empty");
+        self.load_arg_into_reg(&op.value, "rbx")?;
+        self.load_arg_into_reg(&op.idx, "rcx")?;
+        writeln!(self.out, "    cmp rcx, [rbx+8]")?;
+        writeln!(self.out, "    jae {}", empty)?;
+        writeln!(self.out, "    mov rdx, [rbx]")?;
+        writeln!(self.out, "    movzx eax, byte [rdx+rcx]")?;
+        writeln!(self.out, "    push rax")?;
+        self.emit_drop_descriptor_arg(&op.value)?;
+        self.emit_drop_closure_name(&op.empty_target)?;
+        writeln!(self.out, "    pop rax")?;
+        self.emit_value_jump(&op.one_target, true)?;
+
+        writeln!(self.out, "{}:", empty)?;
+        self.emit_drop_descriptor_arg(&op.value)?;
+        self.emit_drop_closure_name(&op.one_target)?;
+        self.emit_value_jump(&op.empty_target, false)
+    }
+
+    fn emit_bytes_from_str(&mut self, op: &AirBytesFromStr) -> Result<(), Error> {
+        self.load_arg_into_reg(&op.value, "rax")?;
+        self.emit_value_jump(&op.target, true)
+    }
+
+    fn emit_int_to_u8(&mut self, op: &AirIntToU8) -> Result<(), Error> {
+        let invalid = self.new_label("u8_from_int_invalid");
+        self.load_arg_into_reg(&op.value, "rax")?;
+        writeln!(self.out, "    test rax, rax")?;
+        writeln!(self.out, "    js {}", invalid)?;
+        writeln!(self.out, "    cmp rax, 255")?;
+        writeln!(self.out, "    ja {}", invalid)?;
+        writeln!(self.out, "    push rax")?;
+        self.emit_drop_closure_name(&op.invalid_target)?;
+        writeln!(self.out, "    pop rax")?;
+        self.emit_value_jump(&op.ok_target, true)?;
+
+        writeln!(self.out, "{}:", invalid)?;
+        self.emit_drop_closure_name(&op.ok_target)?;
+        self.emit_value_jump(&op.invalid_target, false)
+    }
+
+    fn emit_bytes_build(&mut self, op: &AirBytesBuild) -> Result<(), Error> {
+        let allocation_failed = self.new_label("bytes_build_allocation_failed");
+        self.emit_mmap(WORD_SIZE * 10)?;
+        writeln!(self.out, "    test rax, rax")?;
+        writeln!(self.out, "    js {}", allocation_failed)?;
+        writeln!(self.out, "    mov rbx, rax")?;
+        self.load_arg_into_reg(
+            &AirArg {
+                name: op.invalid_target.clone(),
+                kind: SigKind::tuple([]),
+                literal: None,
+            },
+            "rax",
+        )?;
+        writeln!(self.out, "    mov [rbx], rax")?;
+        self.load_arg_into_reg(
+            &AirArg {
+                name: op.ok_target.clone(),
+                kind: SigKind::tuple([SigKind::Bytes]),
+                literal: None,
+            },
+            "rax",
+        )?;
+        writeln!(self.out, "    mov [rbx+8], rax")?;
+        writeln!(self.out, "    lea r12, [rbx+32]")?;
+        writeln!(self.out, "    lea rax, [bytes_build_inspector_unwrapper]")?;
+        writeln!(self.out, "    mov [r12], rax")?;
+        writeln!(
+            self.out,
+            "    lea rax, [bytes_build_inspector_deep_release]"
+        )?;
+        writeln!(self.out, "    mov [r12+8], rax")?;
+        writeln!(self.out, "    lea rax, [bytes_build_inspector_deepcopy]")?;
+        writeln!(self.out, "    mov [r12+16], rax")?;
+        writeln!(self.out, "    mov qword [r12+24], 32")?;
+        writeln!(self.out, "    mov qword [r12+32], 80")?;
+        writeln!(self.out, "    mov qword [r12+40], 2")?;
+        self.load_arg_into_reg(&op.source, "rbx")?;
+        writeln!(self.out, "    mov [rbx-8], r12")?;
+        writeln!(self.out, "    mov qword [rbx+40], 0")?;
+        writeln!(self.out, "    mov rdi, rbx")?;
+        writeln!(self.out, "    mov rax, [rbx]")?;
+        writeln!(self.out, "    leave")?;
+        writeln!(self.out, "    jmp rax")?;
+
+        writeln!(self.out, "{}:", allocation_failed)?;
+        self.emit_drop_closure_name(&op.ok_target)?;
+        self.emit_drop_closure_name(&op.source.name)?;
+        self.emit_value_jump(&op.invalid_target, false)
+    }
+
     fn truncate_fixed(&mut self, reg: &str, bit_width: u16) -> Result<(), Error> {
         match bit_width {
             8 => writeln!(self.out, "    and {reg}, 0xff ; keep low 8 bits")?,
@@ -743,11 +1117,11 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         )?;
         writeln!(self.out, "    jne {}", ok_label)?;
 
-        self.emit_release_heap_ptr(&op.ok_target)?;
+        self.emit_drop_closure_name(&op.ok_target)?;
         self.emit_value_jump(&op.err_target, false)?;
 
         writeln!(self.out, "{}:", ok_label)?;
-        self.emit_release_heap_ptr(&op.err_target)?;
+        self.emit_drop_closure_name(&op.err_target)?;
         self.load_arg_into_reg(&op.input_a, "rax")?;
         self.load_arg_into_reg(&op.input_b, "rbx")?;
         writeln!(self.out, "    cqo ; sign extend dividend")?;
@@ -764,11 +1138,11 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         let ok_label = self.new_label("div_bits_ok");
         writeln!(self.out, "    test rbx, rbx ; check divisor for zero")?;
         writeln!(self.out, "    jne {}", ok_label)?;
-        self.emit_release_heap_ptr(&op.ok_target)?;
+        self.emit_drop_closure_name(&op.ok_target)?;
         self.emit_value_jump(&op.err_target, false)?;
 
         writeln!(self.out, "{}:", ok_label)?;
-        self.emit_release_heap_ptr(&op.err_target)?;
+        self.emit_drop_closure_name(&op.err_target)?;
         self.load_arg_into_reg(&op.input_a, "rax")?;
         self.load_arg_into_reg(&op.input_b, "rbx")?;
         if op.is_signed {
@@ -820,11 +1194,11 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         writeln!(self.out, "    or rax, rdx ; check 128-bit divisor for zero")?;
         let ok_label = self.new_label("div_bits_128_ok");
         writeln!(self.out, "    jne {}", ok_label)?;
-        self.emit_release_heap_ptr(&op.ok_target)?;
+        self.emit_drop_closure_name(&op.ok_target)?;
         self.emit_value_jump(&op.err_target, false)?;
 
         writeln!(self.out, "{}:", ok_label)?;
-        self.emit_release_heap_ptr(&op.err_target)?;
+        self.emit_drop_closure_name(&op.err_target)?;
         self.load_arg_word_into_reg(&op.input_a, 0, "r8")?;
         self.load_arg_word_into_reg(&op.input_a, 1, "r9")?;
         self.load_arg_word_into_reg(&op.input_b, 0, "r10")?;
@@ -907,12 +1281,12 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         Ok(())
     }
 
-    fn emit_read_file(&mut self, op: &AirReadFile) -> Result<(), Error> {
-        let read_loop = self.new_label("readfile_read_loop");
-        let read_done = self.new_label("readfile_read_done");
-        let err_unmap = self.new_label("readfile_err_unmap");
-        let err_close = self.new_label("readfile_err_close");
-        let err = self.new_label("readfile_err");
+    fn emit_file_read(&mut self, op: &AirFileRead) -> Result<(), Error> {
+        let read_loop = self.new_label("file_read_loop");
+        let read_done = self.new_label("file_read_done");
+        let err_unmap = self.new_label("file_read_err_unmap");
+        let err_close = self.new_label("file_read_err_close");
+        let err = self.new_label("file_read_err");
 
         self.load_arg_into_reg(&op.path, "rdi")?;
         writeln!(self.out, "    mov rdi, [rdi] ; path data for open")?;
@@ -920,6 +1294,9 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         writeln!(self.out, "    xor rsi, rsi ; flags = O_RDONLY")?;
         writeln!(self.out, "    xor rdx, rdx ; mode unused")?;
         writeln!(self.out, "    syscall")?;
+        writeln!(self.out, "    push rax ; preserve open result")?;
+        self.emit_drop_descriptor_arg(&op.path)?;
+        writeln!(self.out, "    pop rax ; restore open result")?;
         writeln!(self.out, "    test rax, rax ; negative rax is -errno")?;
         writeln!(self.out, "    js {} ; open failed", err)?;
         writeln!(self.out, "    mov r13, rax ; keep file descriptor")?;
@@ -990,10 +1367,25 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
             self.out,
             "    mov [r12+8], rbx ; store contents byte length"
         )?;
+        writeln!(
+            self.out,
+            "    mov [r12+{}], r15 ; store owned mapping base",
+            DESCRIPTOR_HEAP_BASE_OFFSET
+        )?;
+        writeln!(
+            self.out,
+            "    lea rax, [r14+{}]",
+            STRING_DESCRIPTOR_SIZE + 1
+        )?;
+        writeln!(
+            self.out,
+            "    mov [r12+{}], rax ; store owned mapping size",
+            DESCRIPTOR_HEAP_SIZE_OFFSET
+        )?;
         writeln!(self.out, "    mov rdi, r13 ; fd")?;
         writeln!(self.out, "    mov rax, {} ; close syscall", SYSCALL_CLOSE)?;
         writeln!(self.out, "    syscall")?;
-        self.emit_release_heap_ptr(&op.err_target)?;
+        self.emit_drop_closure_name(&op.err_target)?;
         writeln!(self.out, "    mov rax, r12 ; contents descriptor result")?;
         self.emit_value_jump(&op.ok_target, true)?;
 
@@ -1011,7 +1403,7 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         writeln!(self.out, "    mov rax, {} ; close syscall", SYSCALL_CLOSE)?;
         writeln!(self.out, "    syscall")?;
         writeln!(self.out, "{}:", err)?;
-        self.emit_release_heap_ptr(&op.ok_target)?;
+        self.emit_drop_closure_name(&op.ok_target)?;
         self.emit_value_jump(&op.err_target, false)
     }
 
@@ -1022,6 +1414,16 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
             &op.target,
             "addsd",
             "add second float",
+        )
+    }
+
+    fn emit_sub_f64(&mut self, op: &AirSubF64) -> Result<(), Error> {
+        self.emit_float_binary_op(
+            &op.input_a,
+            &op.input_b,
+            &op.target,
+            "subsd",
+            "subtract second float",
         )
     }
 
@@ -1043,6 +1445,59 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
             "divsd",
             "divide by divisor float",
         )
+    }
+
+    fn emit_native_call(&mut self, op: &AirNativeCall) -> Result<(), Error> {
+        if op.inputs.len() != op.function.params.len() {
+            return Err(Error::new(
+                Code::Codegen,
+                format!(
+                    "{} expects {} native arguments, got {}",
+                    op.function.name,
+                    op.function.params.len(),
+                    op.inputs.len()
+                ),
+                Span::unknown(),
+            ));
+        }
+        let mut integer_index = 0usize;
+        let mut float_index = 0usize;
+        for (input, param) in op.inputs.iter().zip(op.function.params) {
+            match param.kind {
+                NativeScalar::F64 => {
+                    let xmm = format!("xmm{float_index}");
+                    self.load_arg_into_xmm(input, &xmm)?;
+                    float_index += 1;
+                }
+                NativeScalar::I32 | NativeScalar::UInt | NativeScalar::U8 => {
+                    let reg = ARG_REGS.get(integer_index).ok_or_else(|| {
+                        Error::new(
+                            Code::Codegen,
+                            format!("too many integer arguments for {}", op.function.name),
+                            Span::unknown(),
+                        )
+                    })?;
+                    self.load_arg_into_reg(input, reg)?;
+                    integer_index += 1;
+                }
+            }
+        }
+        writeln!(self.out, "    sub rsp, 8 ; align stack for native call")?;
+        writeln!(self.out, "    call {}", op.function.symbol)?;
+        writeln!(self.out, "    add rsp, 8 ; restore stack after native call")?;
+        match op.function.result {
+            NativeScalar::F64 => {
+                writeln!(self.out, "    movq rax, xmm0 ; move float result to rax")?;
+            }
+            NativeScalar::I32 => {
+                writeln!(self.out, "    mov eax, eax ; normalize i32 result")?;
+            }
+            NativeScalar::UInt => {}
+            NativeScalar::U8 => {
+                writeln!(self.out, "    movzx eax, al ; normalize u8 result")?;
+            }
+        }
+        self.emit_value_jump(&op.target, true)
     }
 
     fn emit_binary_op(
@@ -1087,15 +1542,29 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         Ok(())
     }
 
-    fn emit_libc_op(
+    fn emit_write(
         &mut self,
-        builtin: builtins::Builtin,
         args: &[AirArg],
         arg_kinds: &[SigKind],
         target: &str,
     ) -> Result<(), Error> {
-        let has_result = self.emit_libc_call(builtin, args, arg_kinds)?;
-        self.emit_value_jump(target, has_result)?;
+        if args.is_empty() {
+            return Err(Error::new(
+                Code::Codegen,
+                "write requires a buffer before the continuation",
+                Span::unknown(),
+            ));
+        }
+
+        self.prepare_args(args)?;
+        self.move_args_to_registers(arg_kinds)?;
+        writeln!(self.out, "    mov rsi, [rdi] ; string data pointer")?;
+        writeln!(self.out, "    mov rdx, [rdi+8] ; string byte length")?;
+        writeln!(self.out, "    mov rdi, 1 ; stdout fd")?;
+        writeln!(self.out, "    mov rax, {} ; write syscall", SYSCALL_WRITE)?;
+        writeln!(self.out, "    syscall")?;
+        self.emit_drop_descriptor_arg(&args[0])?;
+        self.emit_value_jump(target, false)?;
         Ok(())
     }
 
@@ -1189,7 +1658,6 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
     fn emit_exit_syscall(&mut self, syscall: &AirSysExit) -> Result<(), Error> {
         let (first_comment, _, _) = Self::exit_syscall_comments();
         writeln!(self.out, "    ; {}", first_comment)?;
-        // Call libc exit() instead of raw exit syscall to ensure stdout is flushed
         let code = syscall.args.first().ok_or_else(|| {
             Error::new(
                 Code::Codegen,
@@ -1198,7 +1666,8 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
             )
         })?;
         self.load_arg_into_reg(code, "rdi")?;
-        writeln!(self.out, "    call exit ; call libc exit to flush buffers")?;
+        writeln!(self.out, "    mov rax, {} ; exit syscall", SYSCALL_EXIT)?;
+        writeln!(self.out, "    syscall")?;
         self.terminated = true;
         Ok(())
     }
@@ -1267,10 +1736,15 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
             self.out,
             "    mov rdi, rcx ; copy pointer argument for deepcopy"
         )?;
+        let helper = match &field.kind {
+            SigKind::Sig(_) => AirRuntimeHelper::DeepCopyHeapPtr,
+            SigKind::Str | SigKind::Bytes => AirRuntimeHelper::CloneDescriptorPtr,
+            _ => unreachable!("only owned fields may be copied"),
+        };
         writeln!(
             self.out,
-            "    call {} ; duplicate heap pointer",
-            AirRuntimeHelper::DeepCopyHeapPtr.name()
+            "    call {} ; duplicate owned pointer",
+            helper.name()
         )?;
         writeln!(
             self.out,
@@ -1281,25 +1755,84 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         Ok(())
     }
 
-    fn emit_call_ptr(&mut self, call: &AirCallPtr) -> Result<(), Error> {
-        let AirCallPtrTarget::Binding(name) = &call.target;
-        self.load_value_into_reg(&AirValue::Binding(name.clone()), "rdi")?;
+    fn emit_drop_closure(&mut self, drop: &AirDropClosure) -> Result<(), Error> {
+        self.emit_drop_closure_name(&drop.name)
+    }
+
+    fn emit_drop_descriptor(&mut self, drop: &AirDropDescriptor) -> Result<(), Error> {
+        self.emit_drop_descriptor_name(&drop.name)
+    }
+
+    fn emit_drop_descriptor_arg(&mut self, arg: &AirArg) -> Result<(), Error> {
         writeln!(
             self.out,
-            "    call {} ; release heap pointer",
-            AirRuntimeHelper::ReleaseHeapPtr.name()
+            "    push {} ; preserve current environment",
+            CLOSURE_ENV_REG
+        )?;
+        self.load_arg_into_reg(arg, "rdi")?;
+        writeln!(
+            self.out,
+            "    call {} ; release owned descriptor",
+            AirRuntimeHelper::ReleaseDescriptorPtr.name()
+        )?;
+        writeln!(
+            self.out,
+            "    pop {} ; restore current environment",
+            CLOSURE_ENV_REG
+        )?;
+        Ok(())
+    }
+
+    fn emit_drop_descriptor_name(&mut self, name: &str) -> Result<(), Error> {
+        let arg = AirArg {
+            name: name.to_string(),
+            kind: SigKind::Bytes,
+            literal: None,
+        };
+        self.emit_drop_descriptor_arg(&arg)
+    }
+
+    fn emit_drop_closure_name(&mut self, name: &str) -> Result<(), Error> {
+        writeln!(
+            self.out,
+            "    push {} ; preserve current environment",
+            CLOSURE_ENV_REG
+        )?;
+        self.load_value_into_reg(&AirValue::Binding(name.to_string()), "rdi")?;
+        writeln!(
+            self.out,
+            "    mov rax, [rdi+{}] ; load closure release helper",
+            ENV_METADATA_RELEASE_OFFSET
+        )?;
+        writeln!(self.out, "    call rax ; recursively release closure")?;
+        writeln!(
+            self.out,
+            "    pop {} ; restore current environment",
+            CLOSURE_ENV_REG
         )?;
         Ok(())
     }
 
     fn emit_label(&mut self, label: &AirLabel) -> Result<(), Error> {
-        writeln!(self.out, "{}:", label.name)?;
+        writeln!(self.out, "{}:", self.scoped_air_label(&label.name))?;
         Ok(())
     }
 
     fn emit_jump(&mut self, jump: &AirJump) -> Result<(), Error> {
-        writeln!(self.out, "    jmp {}", jump.target)?;
+        writeln!(self.out, "    jmp {}", self.scoped_air_label(&jump.target))?;
         Ok(())
+    }
+
+    fn scoped_air_label(&self, label: &str) -> String {
+        if self.duplicate_air_labels.contains(label) {
+            format!(
+                "{}_{}",
+                crate::sanitize_function_name(&self.air.sig.name),
+                label
+            )
+        } else {
+            label.to_string()
+        }
     }
 
     fn emit_builtin_int_condition(
@@ -1623,16 +2156,8 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
                 self.load_arg_into_reg(arg, "rax")?;
                 writeln!(
                     self.out,
-                    "    mov {}, rax ; shadow closure env_end pointer",
-                    CLOSURE_ENV_REG
-                )?;
-                writeln!(self.out, "    push rbx ; save env base pointer")?;
-                self.clone_closure_argument()?;
-                writeln!(self.out, "    pop rbx ; restore env base pointer")?;
-                writeln!(
-                    self.out,
-                    "    mov [rbx+{}], {} ; capture cloned closure pointer",
-                    offset_bytes, CLOSURE_ENV_REG
+                    "    mov [rbx+{}], rax ; move closure pointer into environment",
+                    offset_bytes
                 )?;
             } else {
                 for word in 0..kind_words {
@@ -1796,132 +2321,6 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         Ok(())
     }
 
-    fn emit_libc_call(
-        &mut self,
-        builtin: builtins::Builtin,
-        args: &[AirArg],
-        arg_kinds: &[SigKind],
-    ) -> Result<bool, Error> {
-        match builtin {
-            builtins::Builtin::Sprintf => {
-                if args.is_empty() {
-                    return Err(Error::new(
-                        Code::Codegen,
-                        "sprintf requires a format string before the continuation",
-                        Span::unknown(),
-                    ));
-                }
-
-                self.prepare_libc_args(args, arg_kinds)?;
-
-                self.emit_mmap(FMT_BUFFER_SIZE + STRING_DESCRIPTOR_SIZE)?;
-                writeln!(self.out, "    mov rbx, rax ; keep sprintf buffer pointer")?;
-                writeln!(
-                    self.out,
-                    "    lea r15, [rbx+{}] ; descriptor after sprintf buffer",
-                    FMT_BUFFER_SIZE
-                )?;
-                let arg_split = self.move_args_to_registers(arg_kinds)?;
-                if arg_split.reg_slots == ARG_REGS.len() {
-                    return Err(Error::new(
-                        Code::Codegen,
-                        "sprintf requires at least one register slot for the buffer pointer",
-                        Span::unknown(),
-                    ));
-                }
-                for i in (0..arg_split.reg_slots).rev() {
-                    let dest = ARG_REGS[i + 1];
-                    let src = ARG_REGS[i];
-                    writeln!(
-                        self.out,
-                        "    mov {}, {} ; shift sprintf args for buffer insertion",
-                        dest, src
-                    )?;
-                }
-
-                writeln!(
-                    self.out,
-                    "    mov rdi, rbx ; destination buffer for sprintf"
-                )?;
-                writeln!(
-                    self.out,
-                    "    xor eax, eax ; no vector arguments for variadic sprintf"
-                )?;
-                self.emit_variadic_libc_call(builtin.name())?;
-                writeln!(
-                    self.out,
-                    "    mov [r15], rbx ; store formatted data pointer"
-                )?;
-                writeln!(
-                    self.out,
-                    "    mov [r15+8], rax ; store formatted byte length"
-                )?;
-                writeln!(
-                    self.out,
-                    "    mov rax, r15 ; return formatted string descriptor"
-                )?;
-                self.cleanup_libc_stack(arg_split.stack_bytes)?;
-
-                Ok(true)
-            }
-            builtins::Builtin::Write => {
-                if args.is_empty() {
-                    return Err(Error::new(
-                        Code::Codegen,
-                        "write requires a buffer before the continuation",
-                        Span::unknown(),
-                    ));
-                }
-
-                self.prepare_args(args)?;
-                let arg_split = self.move_args_to_registers(arg_kinds)?;
-
-                writeln!(self.out, "    mov rsi, [rdi] ; string data pointer")?;
-                writeln!(self.out, "    mov rdx, [rdi+8] ; string byte length")?;
-                writeln!(self.out, "    mov rdi, 1 ; stdout fd")?;
-
-                writeln!(self.out, "    call write ; invoke libc write")?;
-                self.cleanup_libc_stack(arg_split.stack_bytes)?;
-
-                Ok(false)
-            }
-            _ => Err(Error::new(
-                Code::Codegen,
-                format!("unsupported libc call '{}'", builtin.name()),
-                Span::unknown(),
-            )),
-        }
-    }
-
-    fn cleanup_libc_stack(&mut self, stack_bytes: usize) -> Result<(), Error> {
-        if stack_bytes > 0 {
-            writeln!(
-                self.out,
-                "    add rsp, {} ; pop stack args after libc call",
-                stack_bytes
-            )?;
-        }
-        Ok(())
-    }
-
-    fn emit_variadic_libc_call(&mut self, name: &str) -> Result<(), Error> {
-        writeln!(self.out, "    push rbp ; helper prologue")?;
-        writeln!(self.out, "    mov rbp, rsp")?;
-        writeln!(self.out, "    push r12")?;
-        writeln!(
-            self.out,
-            "    mov rax, rsp ; align stack for variadic {name} call"
-        )?;
-        writeln!(self.out, "    and rax, 15")?;
-        writeln!(self.out, "    mov r12, rax")?;
-        writeln!(self.out, "    sub rsp, r12")?;
-        writeln!(self.out, "    call {} ; invoke libc {name}", name)?;
-        writeln!(self.out, "    add rsp, r12")?;
-        writeln!(self.out, "    pop r12")?;
-        writeln!(self.out, "    pop rbp")?;
-        Ok(())
-    }
-
     fn emit_mmap(&mut self, size: usize) -> Result<(), Error> {
         writeln!(self.out, "    mov rax, {} ; mmap syscall", SYSCALL_MMAP)?;
         writeln!(
@@ -1964,27 +2363,6 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         Ok(())
     }
 
-    fn prepare_libc_args(&mut self, args: &[AirArg], arg_kinds: &[SigKind]) -> Result<(), Error> {
-        for (arg, kind) in args.iter().zip(arg_kinds).rev() {
-            let word_count = word_count_from_kind(kind);
-            for word in (0..word_count).rev() {
-                self.load_arg_word_into_reg(arg, word, "rax")?;
-                if word == 0 && is_string_arg(arg, kind) {
-                    writeln!(
-                        self.out,
-                        "    mov rax, [rax] ; string data pointer for libc"
-                    )?;
-                }
-                if word_count == 1 {
-                    writeln!(self.out, "    push rax ; stack arg")?;
-                } else {
-                    writeln!(self.out, "    push rax ; stack arg word")?;
-                }
-            }
-        }
-        Ok(())
-    }
-
     fn move_args_to_registers(&mut self, params: &[SigKind]) -> Result<ArgSplit, Error> {
         let mut slot = 0usize;
         let mut spilled = false;
@@ -2006,10 +2384,7 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
                 }
             }
         }
-        Ok(ArgSplit {
-            reg_slots: slot,
-            stack_bytes,
-        })
+        Ok(ArgSplit { stack_bytes })
     }
 
     fn emit_clone_env_from_env_end(
@@ -2108,16 +2483,6 @@ impl<'a, W: Write> FunctionEmitter<'a, W> {
         Ok(())
     }
 
-    fn clone_closure_argument(&mut self) -> Result<(), Error> {
-        self.emit_clone_env_from_env_end(CLOSURE_ENV_REG, CLOSURE_ENV_REG)?;
-        writeln!(
-            self.out,
-            "    mov rax, {} ; copy closure env_end to rax",
-            CLOSURE_ENV_REG
-        )?;
-        Ok(())
-    }
-
     fn new_label(&mut self, suffix: &str) -> String {
         let idx = self.label_counter;
         self.label_counter += 1;
@@ -2135,10 +2500,6 @@ fn align_to(value: usize, align: usize) -> usize {
         return 0;
     }
     value.div_ceil(align) * align
-}
-
-fn is_string_arg(arg: &AirArg, kind: &SigKind) -> bool {
-    matches!(kind, SigKind::Str) || matches!(arg.literal, Some(Lit::Str(_)))
 }
 
 fn word_count_from_kind(kind: &SigKind) -> usize {

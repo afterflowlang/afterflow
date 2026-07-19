@@ -1,0 +1,16 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+bar: (){
+    fmt.new("outer bar", @exit(1), fmt.end, @write(ok: @exit(0)))
+}
+foo: (ok:()) {
+    bar: (){
+        fmt.new("inner bar\n", @exit(1), fmt.end, @write(ok: ok))
+    }
+    bar
+}
+main: () {
+    foo(bar)
+}

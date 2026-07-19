@@ -1,4 +1,4 @@
-add: -116 4 -2147483646 4 21 23 128 ok
-sub: -10 246 -10 4294967286 10 10 128 ok
-mul: -56 144 -1794967296 1410065408 110 132 128 ok
-div: -33 66 -10000 400000000 -1000000000 2000000000 128 ok
+add: fixed-width operations ok 128 ok
+sub: fixed-width operations ok 128 ok
+mul: fixed-width operations ok 128 ok
+div: fixed-width operations ok 128 ok

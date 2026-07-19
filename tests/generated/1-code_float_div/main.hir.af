@@ -1,0 +1,18 @@
+str: @str
+float: @f64
+x: 1.5
+_5_main: (){
+    _6: 0
+    @exit(_6)
+}
+
+_2_main: (y: f64){
+    _3: "result: 1.500000"
+    @write(_3, _5_main)
+}
+
+main: (x: f64!){
+    _0: 2
+    @div_f64(x, _0, _2_main)
+}
+main(x)

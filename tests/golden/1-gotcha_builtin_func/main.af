@@ -1,0 +1,11 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+// Builtin package members do not occupy the user namespace until imported.
+write: (n: int, ok: ()){
+    fmt.new("Gotcha: %", @exit(1), fmt.int(n) fmt.end, @write(ok: ok))
+}
+main: () {
+    write(1, @exit(0))
+}

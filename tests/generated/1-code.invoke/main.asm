@@ -7,7 +7,8 @@ _4_foo:
     mov rbp, rsp ; establish new frame base
     ; load exit code
     mov rdi, 0 ; operand literal
-    call exit ; call libc exit to flush buffers
+    mov rax, 60 ; exit syscall
+    syscall
 global release_heap_ptr
 release_heap_ptr:
     push rbp ; save caller frame
@@ -57,6 +58,17 @@ _4_foo_deepcopy:
     leave
     ret
 
+global release_descriptor_ptr
+release_descriptor_ptr:
+    mov rax, [rdi+16] ; load owned mapping base
+    test rax, rax ; static descriptors have no owner
+    jz release_descriptor_ptr_done
+    mov rsi, [rdi+24] ; mapping size
+    mov rdi, rax ; mapping base
+    mov rax, 11 ; munmap syscall
+    syscall
+release_descriptor_ptr_done:
+    ret
 global _1_foo
 _1_foo:
     push rbp ; save executor frame pointer
@@ -91,7 +103,12 @@ _1_foo:
     mov rsi, [rdi] ; string data pointer
     mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
-    call write ; invoke libc write
+    mov rax, 1 ; write syscall
+    syscall
+    push r12 ; preserve current environment
+    lea rdi, [rel _2] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
     mov r12, [rbp-8] ; load continuation env_end pointer
     mov rax, [r12+0] ; load continuation entry point
     mov rdi, r12 ; pass env_end pointer to continuation
@@ -214,10 +231,8 @@ _start:
     mov rbp, rsp ; establish new frame base
     leave ; unwind before named jump
     jmp main
-extern exit
-extern write
 section .rodata
 _2:
-    dq _2_data, 4 ; string data pointer and byte length
+    dq _2_data, 4, 0, 0 ; data, byte length, heap base, heap size
 _2_data:
     db "foo,", 0

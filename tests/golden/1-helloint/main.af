@@ -1,0 +1,8 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+x: 42
+main: () {
+    fmt.new("Hello %!", @exit(1), fmt.int(42) fmt.end, @write(ok: @exit(0)))
+}

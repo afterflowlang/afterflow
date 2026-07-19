@@ -1,0 +1,34 @@
+__rgo_737464__end: (_2___rgo_737464__end: T, ok:()){
+    ok()
+}
+
+__rgo_737464__pipe: (value: T, ok:(T)){
+    ok(value)
+}
+__rgo_737464__print: (value: str, ok:()){
+    @write(value, ok)
+}
+_5___rgo_737464__println: (ok:()){
+    _6: "\n"
+    @write(_6, ok)
+}
+
+__rgo_737464__println: (value: str, ok:()){
+    _7___rgo_737464__println: _5___rgo_737464__println(ok)
+    @write(value, _7___rgo_737464__println)
+}
+unused: (){
+    _8: 1
+    @exit(_8)
+}
+_11_main: (){
+    _12: 0
+    @exit(_12)
+}
+
+main: (){
+    _9: ""
+    _14___rgo_737464__end: __rgo_737464__end(unused, _11_main)
+    __rgo_737464__print(_9, _14___rgo_737464__end)
+}
+main()

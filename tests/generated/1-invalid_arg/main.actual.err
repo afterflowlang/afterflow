@@ -1,4 +1,4 @@
 [hir] expected int, found str!
-tests/failing/1-invalid_arg/main.rgo:12
+tests/failing/1-invalid_arg/main.af:7
     foo("invalid_arg")  // Error: expected int, found str
         ^^^^^^^^^^^^^

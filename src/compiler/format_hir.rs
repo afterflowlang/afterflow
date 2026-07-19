@@ -131,7 +131,9 @@ pub fn format_sig_kind(kind: &hir::SigKind) -> String {
         hir::SigKind::Byte => "byte".to_string(),
         hir::SigKind::Int => "int".to_string(),
         hir::SigKind::UInt => "uint".to_string(),
+        hir::SigKind::Rune => "rune".to_string(),
         hir::SigKind::FixedInt(kind) => kind.name(),
+        hir::SigKind::Bytes => "bytes".to_string(),
         hir::SigKind::Str => "str".to_string(),
         hir::SigKind::F64 => "f64".to_string(),
         hir::SigKind::Sig(inner) => {
@@ -151,7 +153,6 @@ pub fn format_sig_kind(kind: &hir::SigKind) -> String {
             format!("({})", entries)
         }
         hir::SigKind::Ident(ident) => display_name(&ident.name).to_string(),
-        hir::SigKind::Variadic => "...".to_string(),
         hir::SigKind::GenericInst { name, args } => {
             let entries = args
                 .iter()

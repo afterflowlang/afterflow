@@ -1,0 +1,4 @@
+[hir] rune literal must be a Unicode scalar value, found 55296
+tests/failing/1-rune-literal-surrogate/main.af:8
+    accept(55296)
+           ^^^^^

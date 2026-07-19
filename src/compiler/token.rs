@@ -31,7 +31,6 @@ pub enum TokenKind {
     Comma,
     Colon,
     Semicolon,
-    Ellipsis,
     Dot,
     LParen,
     RParen,

@@ -36,8 +36,12 @@ _0_foo_w_deep_release($env_end: int):
     $__num_remaining = @field($__env_end, 5)
     @gt(_0_foo_w_release_skip_0, $__num_remaining, 1)
     $_0_foo_w_release_field_0 = @field($__env_end, -2)
-    @callptr($_0_foo_w_release_field_0)
+    @dropclosure($_0_foo_w_release_field_0)
 _0_foo_w_release_skip_0:
+    @gt(_0_foo_w_release_skip_1, $__num_remaining, 0)
+    $_0_foo_w_release_field_1 = @field($__env_end, -1)
+    @dropdescriptor($_0_foo_w_release_field_1)
+_0_foo_w_release_skip_1:
     @release($__env_end)
     @return()
 
@@ -48,6 +52,9 @@ _0_foo_w_deepcopy($env_end: int):
     @gt(_0_foo_w_deepcopy_skip_0, $num_remaining, 1)
     @deepcopy($_0_foo_w_deepcopy_field_0, $__env_end, -2)
 _0_foo_w_deepcopy_skip_0:
+    @gt(_0_foo_w_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($_0_foo_w_deepcopy_field_1, $__env_end, -1)
+_0_foo_w_deepcopy_skip_1:
     @return()
 
 
@@ -66,9 +73,13 @@ foo_unwrapper($env_end: int):
 foo_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
+    @gt(foo_release_skip_0, $__num_remaining, 1)
+    $foo_release_field_0 = @field($__env_end, -2)
+    @dropdescriptor($foo_release_field_0)
+foo_release_skip_0:
     @gt(foo_release_skip_1, $__num_remaining, 0)
     $foo_release_field_1 = @field($__env_end, -1)
-    @callptr($foo_release_field_1)
+    @dropclosure($foo_release_field_1)
 foo_release_skip_1:
     @release($__env_end)
     @return()
@@ -77,6 +88,9 @@ foo_release_skip_1:
 foo_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
+    @gt(foo_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($foo_deepcopy_field_0, $__env_end, -2)
+foo_deepcopy_skip_0:
     @gt(foo_deepcopy_skip_1, $num_remaining, 0)
     @deepcopy($foo_deepcopy_field_1, $__env_end, -1)
 foo_deepcopy_skip_1:

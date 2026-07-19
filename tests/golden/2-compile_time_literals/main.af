@@ -1,0 +1,13 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+not_const_msg: (fmt: str!, value: int!) {
+    fmt.new(fmt, @exit(1), fmt.int(value) fmt.end, @write(ok: @exit(0)))
+}
+const_msg: (fmt: str!, value: int!) {
+    not_const_msg(fmt, value)
+}
+main: () {
+    const_msg("compile-time value %\n", 7)
+}

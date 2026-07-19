@@ -7,6 +7,7 @@ pub mod air_ast;
 pub mod ast;
 pub mod builtins;
 pub mod codegen;
+pub mod comptime;
 pub mod error;
 pub mod format_air;
 pub mod format_hir;
@@ -43,9 +44,28 @@ pub fn compile<R: BufRead, W: Write>(input: R, target: &str, out: &mut W) -> Res
     let mut items = Vec::new();
     while let Some(item) = parser.next_block_item()? {
         reject_root_execution(&item)?;
+        reject_builtin_override(&item)?;
         items.push(item);
     }
-    compile_items(items, target, hir::Context::new(), false, out)
+    compile_items(items, target, hir::Context::new(), out)
+}
+
+fn reject_builtin_override(item: &ast::BlockItem) -> Result<(), Error> {
+    let name = match item {
+        ast::BlockItem::SigDef { name, .. }
+        | ast::BlockItem::FunctionDef { name, .. }
+        | ast::BlockItem::LitDef { name, .. }
+        | ast::BlockItem::IdentDef { name, .. } => name,
+        _ => return Ok(()),
+    };
+    if name.starts_with('@') {
+        return Err(CompilerError::new(
+            Code::Parse,
+            "builtin overrides are only allowed in the selected _test.af entry source",
+            item.span(),
+        ));
+    }
+    Ok(())
 }
 
 pub fn compile_path<W: Write>(input: &Path, target: &str, out: &mut W) -> Result<(), Error> {
@@ -61,7 +81,7 @@ pub fn compile_path<W: Write>(input: &Path, target: &str, out: &mut W) -> Result
     let mut ctx = hir::Context::new();
     predeclare_package(&mut ctx, &project.items)
         .map_err(|error| source::attach_source(error, &sources))?;
-    compile_items(project.items, &project.target, ctx, true, out)
+    compile_items(project.items, &project.target, ctx, out)
         .map_err(|error| source::attach_source(error, &sources))
 }
 
@@ -69,20 +89,17 @@ fn compile_items<W: Write>(
     items: Vec<ast::BlockItem>,
     target: &str,
     mut hir_ctx: hir::Context,
-    has_package: bool,
     out: &mut W,
 ) -> Result<(), Error> {
     let mut symbols = SymbolRegistry::new();
     let mut air_functions: Vec<air::AirFunction> = Vec::new();
     let mut hir_functions: HashMap<String, hir::Function> = HashMap::new();
+    let mut builtin_aliases: HashMap<String, builtins::Builtin> = HashMap::new();
 
     // Emit preamble (globals, default labels, etc.).
     codegen::write_preamble(out)?;
 
     let mut lowerer = Lowerer::new();
-    if has_package {
-        lowerer.register_package_functions(&items);
-    }
     let mut entry_items: Vec<hir::BlockItem> = Vec::new();
 
     for item in items {
@@ -92,7 +109,20 @@ fn compile_items<W: Write>(
         while let Some(lowered) = lowerer.produce() {
             match lowered {
                 hir::BlockItem::Import { label, path } => {
-                    symbol::register_builtin_import(&label, &path, &mut symbols)?;
+                    if matches!(path.as_str(), "__bytes_len" | "__bytes_len_comptime") {
+                        symbol::register_internal_builtin_import(
+                            &label,
+                            builtins::Builtin::BytesLen,
+                            (path == "__bytes_len_comptime").then_some(1),
+                            &mut symbols,
+                        )?;
+                        builtin_aliases.insert(label, builtins::Builtin::BytesLen);
+                    } else {
+                        symbol::register_builtin_import(&label, &path, &mut symbols)?;
+                        if let Some(builtin) = builtins::function_from_name(&path) {
+                            builtin_aliases.insert(label, builtin);
+                        }
+                    }
                 }
                 hir::BlockItem::SigDef { name, sig } => {
                     symbols.install_type(name.to_string(), air::SigKind::Sig(sig.clone()))?;
@@ -128,6 +158,8 @@ fn compile_items<W: Write>(
         }
     }
 
+    comptime::rewrite(&mut hir_functions, &mut entry_items, &builtin_aliases)?;
+
     let mut function_lowerer = air::FunctionLowerer::new(hir_functions);
     let entry_funcs = air::entry_function(entry_items, &mut symbols, &mut function_lowerer)?;
     let mut generated = function_lowerer.take_generated_functions();
@@ -135,10 +167,10 @@ fn compile_items<W: Write>(
     air_functions.extend(generated);
 
     let mut artifacts = codegen::Artifacts::collect(&air_functions);
+    codegen::emit_native_externs(&artifacts, out)?;
     for func in air_functions {
         codegen::function(func, &mut artifacts, out)?;
     }
-    codegen::emit_externs(&artifacts.externs, out)?;
     codegen::emit_data(artifacts.string_literals(), out)?;
     Ok(())
 }
@@ -147,6 +179,23 @@ pub(crate) fn predeclare_package(
     ctx: &mut hir::Context,
     items: &[ast::BlockItem],
 ) -> Result<(), Error> {
+    for item in items {
+        if let ast::BlockItem::IdentDef {
+            name, ident, span, ..
+        } = item
+        {
+            if name.starts_with('@') {
+                ctx.predeclare(
+                    name,
+                    hir::SigKind::Ident(hir::SigIdent {
+                        name: ident.name.clone(),
+                    }),
+                    false,
+                    *span,
+                )?;
+            }
+        }
+    }
     for item in items {
         match item {
             ast::BlockItem::FunctionDef { name, span, .. }
@@ -164,12 +213,15 @@ pub(crate) fn predeclare_package(
                 let (kind, is_comptime) = match &literal.value {
                     ast::Lit::Str(_) => (hir::SigKind::Str, true),
                     ast::Lit::Int(_) => (hir::SigKind::Int, true),
-                    ast::Lit::F64(_) => (hir::SigKind::F64, false),
+                    ast::Lit::F64(_) => (hir::SigKind::F64, true),
                 };
                 ctx.predeclare(name, kind, is_comptime, *span)?;
             }
+            ast::BlockItem::IdentDef { name, .. } if name.starts_with('@') => {}
             ast::BlockItem::IdentDef { name, ident, span }
-                if ident.args.is_empty() && ident.name.starts_with('@') =>
+                if ident.args.is_empty()
+                    && ident.name.starts_with('@')
+                    && ctx.get(&ident.name).is_none_or(|entry| entry.is_builtin) =>
             {
                 let builtin = ident.name.trim_start_matches('@');
                 hir_context::register_import(ctx, name, builtin, *span)?;

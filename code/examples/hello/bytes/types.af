@@ -1,0 +1,3 @@
+nth: (idx: @uint, empty: (), one: (@u8))
+inspect: (l: @uint, nth: nth)
+source: (inspect)

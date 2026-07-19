@@ -1,0 +1,9 @@
+byte: @byte
+
+print_byte: (value: byte, ok:()) {
+    @write("byte 255\n", ok)
+}
+
+main: () {
+    print_byte(255, @exit(0))
+}

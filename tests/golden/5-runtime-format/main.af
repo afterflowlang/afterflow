@@ -1,0 +1,87 @@
+fmt: /std/fmt
+str: @str
+int: @int
+uint: @uint
+rune: @rune
+
+name: "Alice"
+count: 42
+
+invalid: () {
+    @exit(1)
+}
+
+unexpected_rune: (rune) {
+    @exit(1)
+}
+
+test_executable_output: (ok: ()) {
+    fmt.new("A%!\n", invalid, fmt.str("😀") fmt.end, (output: str) {
+        output((l: uint, nth: (uint, (), (rune))) {
+            @eq_uint(l, 4, () {
+                nth(4, () {
+                    @write(output, ok)
+                }, unexpected_rune)
+            }, invalid)
+        })
+    })
+}
+
+test_integers: (ok: ()) {
+    (negative: int) = @sub(0, 42)
+    (negative_max: int) = @sub(0, 9223372036854775807)
+    (minimum: int) = @sub(negative_max, 1)
+    fmt.new("% % %\n", invalid,
+        fmt.int(0)
+        fmt.int(negative)
+        fmt.int(minimum)
+        fmt.end, (output: str) {
+            @write(output, ok)
+        }
+    )
+}
+
+test_floats: (ok: ()) {
+    fmt.new("% %\n", invalid,
+        fmt.f64(40.0)
+        fmt.f64(12.5)
+        fmt.end, (output: str) {
+            @write(output, ok)
+        }
+    )
+}
+
+test_percent: (ok: ()) {
+    fmt.new("100%% done\n", invalid, fmt.end, (output: str) {
+        @write(output, ok)
+    })
+}
+
+test_unicode: (ok: ()) {
+    fmt.new("😀 % café\n", invalid, fmt.str("世界") fmt.end, (output: str) {
+        @write(output, ok)
+    })
+}
+
+test_basic: (next: ()) {
+    ok: (output: str) {
+        @write(output, next)
+    }
+    fmt.new(
+        "hello %, you have % messages\n",
+        invalid,
+        fmt.str(name)
+        fmt.int(count)
+        fmt.end, ok
+    )
+}
+
+main: () {
+    test_basic
+    test_unicode
+    test_percent
+    test_integers
+    test_floats
+    test_executable_output
+    @exit(0)
+}

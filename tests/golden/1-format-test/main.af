@@ -1,0 +1,7 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+main: () {
+    fmt.new("result: %", @exit(1), fmt.int(3) fmt.end, @write(ok: @exit(0)))
+}

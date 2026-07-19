@@ -1,0 +1,305 @@
+_22_main():
+    @exit($_23: int = 1)
+
+
+_22_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_22_main)
+
+
+_22_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_22_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_37_main():
+    @exit($_38: int = 0)
+
+
+_37_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_37_main)
+
+
+_37_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_37_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_10_unexpected():
+    @exit($_11: int = 1)
+
+
+_10_unexpected_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_10_unexpected)
+
+
+_10_unexpected_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_10_unexpected_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_2_print($ok: ()):
+    @write($_3: str = " valid\n", $ok)
+
+
+_2_print_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $ok = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_2_print, $ok: ())
+
+
+_2_print_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_2_print_release_skip_0, $__num_remaining, 0)
+    $_2_print_release_field_0 = @field($__env_end, -1)
+    @dropclosure($_2_print_release_field_0)
+_2_print_release_skip_0:
+    @release($__env_end)
+    @return()
+
+
+_2_print_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_2_print_deepcopy_skip_0, $num_remaining, 0)
+    @deepcopy($_2_print_deepcopy_field_0, $__env_end, -1)
+_2_print_deepcopy_skip_0:
+    @return()
+
+
+_7_unexpected($scalar: u32):
+    $_10_unexpected = @newclosure<>(_10_unexpected)
+    $__comptime_5 = @newclosure<()>(_2_print, $_10_unexpected: ())
+    @write($__comptime_4: str = "unexpected", $__comptime_5)
+
+
+_7_unexpected_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $scalar = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_7_unexpected, $scalar: u32)
+
+
+_7_unexpected_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_7_unexpected_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+unexpected($value: rune):
+    $_7_unexpected = @newclosure<u32>(_7_unexpected)
+    @u32_from_rune($value: rune, $_7_unexpected)
+
+
+unexpected_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(unexpected, $value: rune)
+
+
+unexpected_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+unexpected_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_34_main():
+    $_37_main = @newclosure<>(_37_main)
+    $unexpected = @newclosure<rune>(unexpected)
+    @rune_from_u32(unexpected, _37_main, $_35: u32 = 1114112)
+
+
+_34_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_34_main)
+
+
+_34_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_34_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_31_main():
+    $_34_main = @newclosure<>(_34_main)
+    $unexpected = @newclosure<rune>(unexpected)
+    @rune_from_u32(unexpected, _34_main, $_32: u32 = 55296)
+
+
+_31_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_31_main)
+
+
+_31_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_31_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_28_main($roundtrip: u32):
+    $_31_main = @newclosure<>(_31_main)
+    $__comptime_3 = @newclosure<()>(_2_print, $_31_main: ())
+    @write($__comptime_2: str = "runtime", $__comptime_3)
+
+
+_28_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $roundtrip = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_28_main, $roundtrip: u32)
+
+
+_28_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_28_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_26_main($value: rune):
+    $_28_main = @newclosure<u32>(_28_main)
+    @u32_from_rune($value: rune, $_28_main)
+
+
+_26_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_26_main, $value: rune)
+
+
+_26_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_26_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_19_main():
+    $_22_main = @newclosure<>(_22_main)
+    $_26_main = @newclosure<rune>(_26_main)
+    @rune_from_u32(_26_main, _22_main, $_20: u32 = 128512)
+
+
+_19_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_19_main)
+
+
+_19_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_19_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_16_main($literal: u32):
+    $_19_main = @newclosure<>(_19_main)
+    $__comptime_1 = @newclosure<()>(_2_print, $_19_main: ())
+    @write($__comptime_0: str = "literal", $__comptime_1)
+
+
+_16_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $literal = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_16_main, $literal: u32)
+
+
+_16_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_16_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+main():
+    @jumpargs(_16_main, $__comptime_6: u32 = 128512)
+
+
+main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(main)
+
+
+main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_start():
+    @jumpargs(main)
+

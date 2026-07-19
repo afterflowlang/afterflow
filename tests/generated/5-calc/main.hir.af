@@ -1,0 +1,2142 @@
+__rgo_7374642f6d6174682f63616c63__nth: (uint, (), (u8))
+__rgo_7374642f6d6174682f63616c63__calculation: ((f64))
+__rgo_7374642f6d6174682f63616c63__binding: ((str, f64))
+__rgo_7374642f6d6174682f63616c63__arg: ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())
+_160_lambda: (){
+    _161: 1
+    @exit(_161)
+}
+_158: "invalid calculation"
+__rgo_7374642f6d617468__to_degrees: (radians: f64, ok:(f64)){
+    _164: 57.29577951308232
+    @mul_f64(radians, _164, ok)
+}
+__rgo_7374642f6d617468__to_radians: (degrees: f64, ok:(f64)){
+    _166: 0.017453292519943295
+    @mul_f64(degrees, _166, ok)
+}
+__rgo_7374642f6d617468__exp: (value: f64, ok:(f64)){
+    @exp_f64(value, ok)
+}
+__rgo_7374642f6d617468__exp2: (value: f64, ok:(f64)){
+    @exp2_f64(value, ok)
+}
+__rgo_7374642f6d617468__exp_m1: (value: f64, ok:(f64)){
+    @expm1_f64(value, ok)
+}
+__rgo_7374642f6d617468__abs: (value: f64, ok:(f64)){
+    @fabs_f64(value, ok)
+}
+__rgo_7374642f6d617468__copy_sign: (magnitude: f64, sign: f64, ok:(f64)){
+    @copysign_f64(magnitude, sign, ok)
+}
+__rgo_7374642f6d617468__dim: (a: f64, b: f64, ok:(f64)){
+    @fdim_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__max_f64: (a: f64, b: f64, ok:(f64)){
+    @fmax_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__min_f64: (a: f64, b: f64, ok:(f64)){
+    @fmin_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__mod: (dividend: f64, divisor: f64, ok:(f64)){
+    @fmod_f64(dividend, divisor, ok)
+}
+__rgo_7374642f6d617468__remainder: (dividend: f64, divisor: f64, ok:(f64)){
+    @remainder_f64(dividend, divisor, ok)
+}
+__rgo_7374642f6d617468__next_after: (value: f64, toward: f64, ok:(f64)){
+    @nextafter_f64(value, toward, ok)
+}
+__rgo_7374642f6d617468__ldexp: (value: f64, exponent: i32, ok:(f64)){
+    @ldexp_f64_i32(value, exponent, ok)
+}
+__rgo_7374642f6d617468__sinh: (value: f64, ok:(f64)){
+    @sinh_f64(value, ok)
+}
+__rgo_7374642f6d617468__cosh: (value: f64, ok:(f64)){
+    @cosh_f64(value, ok)
+}
+__rgo_7374642f6d617468__tanh: (value: f64, ok:(f64)){
+    @tanh_f64(value, ok)
+}
+__rgo_7374642f6d617468__asinh: (value: f64, ok:(f64)){
+    @asinh_f64(value, ok)
+}
+__rgo_7374642f6d617468__acosh: (value: f64, ok:(f64)){
+    @acosh_f64(value, ok)
+}
+__rgo_7374642f6d617468__atanh: (value: f64, ok:(f64)){
+    @atanh_f64(value, ok)
+}
+__rgo_7374642f6d617468__ln: (value: f64, ok:(f64)){
+    @log_f64(value, ok)
+}
+_190___rgo_7374642f6d617468__log: (value_logarithm: f64, ok:(f64), base_logarithm: f64){
+    @div_f64(value_logarithm, base_logarithm, ok)
+}
+
+_188___rgo_7374642f6d617468__log: (base: f64, ok:(f64), value_logarithm: f64){
+    _191___rgo_7374642f6d617468__log: _190___rgo_7374642f6d617468__log(value_logarithm, ok)
+    @log_f64(base, _191___rgo_7374642f6d617468__log)
+}
+
+__rgo_7374642f6d617468__log: (value: f64, base: f64, ok:(f64)){
+    _192___rgo_7374642f6d617468__log: _188___rgo_7374642f6d617468__log(base, ok)
+    @log_f64(value, _192___rgo_7374642f6d617468__log)
+}
+__rgo_7374642f6d617468__log2: (value: f64, ok:(f64)){
+    @log2_f64(value, ok)
+}
+__rgo_7374642f6d617468__log10: (value: f64, ok:(f64)){
+    @log10_f64(value, ok)
+}
+__rgo_7374642f6d617468__ln_1p: (value: f64, ok:(f64)){
+    @log1p_f64(value, ok)
+}
+_198___rgo_7374642f6d617468__min: (ok:(int), a: int){
+    ok(a)
+}
+
+_201___rgo_7374642f6d617468__min: (ok:(int), b: int){
+    ok(b)
+}
+
+__rgo_7374642f6d617468__min: (a: int, b: int, ok:(int)){
+    _199___rgo_7374642f6d617468__min: _198___rgo_7374642f6d617468__min(ok, a)
+    _202___rgo_7374642f6d617468__min: _201___rgo_7374642f6d617468__min(ok, b)
+    @lt(a, b, _199___rgo_7374642f6d617468__min, _202___rgo_7374642f6d617468__min)
+}
+_205___rgo_7374642f6d617468__max: (ok:(int), b: int){
+    ok(b)
+}
+
+_208___rgo_7374642f6d617468__max: (ok:(int), a: int){
+    ok(a)
+}
+
+__rgo_7374642f6d617468__max: (a: int, b: int, ok:(int)){
+    _206___rgo_7374642f6d617468__max: _205___rgo_7374642f6d617468__max(ok, b)
+    _209___rgo_7374642f6d617468__max: _208___rgo_7374642f6d617468__max(ok, a)
+    @lt(a, b, _206___rgo_7374642f6d617468__max, _209___rgo_7374642f6d617468__max)
+}
+__rgo_7374642f6d617468__pow: (base: f64, exponent: f64, ok:(f64)){
+    @pow_f64(base, exponent, ok)
+}
+__rgo_7374642f6d617468__sqrt: (value: f64, ok:(f64)){
+    @sqrt_f64(value, ok)
+}
+__rgo_7374642f6d617468__cbrt: (value: f64, ok:(f64)){
+    @cbrt_f64(value, ok)
+}
+__rgo_7374642f6d617468__hypot: (x: f64, y: f64, ok:(f64)){
+    @hypot_f64(x, y, ok)
+}
+__rgo_7374642f6d617468__ceil: (value: f64, ok:(f64)){
+    @ceil_f64(value, ok)
+}
+__rgo_7374642f6d617468__floor: (value: f64, ok:(f64)){
+    @floor_f64(value, ok)
+}
+__rgo_7374642f6d617468__round: (value: f64, ok:(f64)){
+    @round_f64(value, ok)
+}
+__rgo_7374642f6d617468__trunc: (value: f64, ok:(f64)){
+    @trunc_f64(value, ok)
+}
+__rgo_7374642f6d617468__sin: (radians: f64, ok:(f64)){
+    @sin_f64(radians, ok)
+}
+__rgo_7374642f6d617468__cos: (radians: f64, ok:(f64)){
+    @cos_f64(radians, ok)
+}
+__rgo_7374642f6d617468__tan: (radians: f64, ok:(f64)){
+    @tan_f64(radians, ok)
+}
+__rgo_7374642f6d617468__asin: (value: f64, ok:(f64)){
+    @asin_f64(value, ok)
+}
+__rgo_7374642f6d617468__acos: (value: f64, ok:(f64)){
+    @acos_f64(value, ok)
+}
+__rgo_7374642f6d617468__atan: (value: f64, ok:(f64)){
+    @atan_f64(value, ok)
+}
+__rgo_7374642f6d617468__atan2: (y: f64, x: f64, ok:(f64)){
+    @atan2_f64(y, x, ok)
+}
+
+__rgo_737464__end: (_225___rgo_737464__end: T, ok:()){
+    ok()
+}
+
+__rgo_737464__pipe: (value: T, ok:(T)){
+    ok(value)
+}
+__rgo_737464__print: (value: str, ok:()){
+    @write(value, ok)
+}
+_228___rgo_737464__println: (ok:()){
+    _229: "\n"
+    @write(_229, ok)
+}
+
+__rgo_737464__println: (value: str, ok:()){
+    _230___rgo_737464__println: _228___rgo_737464__println(ok)
+    @write(value, _230___rgo_737464__println)
+}
+
+__rgo_7374642f6d6174682f63616c63__as_var: (name: str, value: f64, placeholder_case:(str, f64)){
+    placeholder_case(name, value)
+}
+
+__rgo_7374642f6d6174682f63616c63__contains_name: (args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), name: str, found:(), missing:()){
+    _233___rgo_7374642f6d6174682f63616c63__contains_name_item: __rgo_7374642f6d6174682f63616c63__contains_name_item(name, found, missing)
+    _234___rgo_7374642f6d6174682f63616c63__contains_name_done: __rgo_7374642f6d6174682f63616c63__contains_name_done(missing)
+    args(_233___rgo_7374642f6d6174682f63616c63__contains_name_item, _234___rgo_7374642f6d6174682f63616c63__contains_name_done)
+}
+_242___rgo_7374642f6d6174682f63616c63__source_contains: (__rgo_7374642f6d6174682f63616c63__range_equals_name:((uint, (), (u8)), uint, uint, str, (), ()), source_nth:(uint, (), (u8)), idx: uint, name: str, found:(), __rgo_7374642f6d6174682f63616c63__source_contains:(uint, (uint, (), (u8)), uint, str, (), (), ())!, source_l: uint, invalid:(), missing:(), end: uint){
+    _243___rgo_7374642f6d6174682f63616c63__source_contains: __rgo_7374642f6d6174682f63616c63__source_contains(source_l, source_nth, end, name, invalid, found, missing)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, idx, end, name, found, _243___rgo_7374642f6d6174682f63616c63__source_contains)
+}
+
+_240___rgo_7374642f6d6174682f63616c63__source_contains: (__rgo_7374642f6d6174682f63616c63__identifier_end:(uint, (uint, (), (u8)), uint, (uint)), source_l: uint, source_nth:(uint, (), (u8)), idx: uint, __rgo_7374642f6d6174682f63616c63__range_equals_name:((uint, (), (u8)), uint, uint, str, (), ()), name: str, found:(), __rgo_7374642f6d6174682f63616c63__source_contains:(uint, (uint, (), (u8)), uint, str, (), (), ())!, invalid:(), missing:()){
+    _244___rgo_7374642f6d6174682f63616c63__source_contains: _242___rgo_7374642f6d6174682f63616c63__source_contains(__rgo_7374642f6d6174682f63616c63__range_equals_name, source_nth, idx, name, found, __rgo_7374642f6d6174682f63616c63__source_contains, source_l, invalid, missing)
+    __rgo_7374642f6d6174682f63616c63__identifier_end(source_l, source_nth, idx, _244___rgo_7374642f6d6174682f63616c63__source_contains)
+}
+_250___rgo_7374642f6d6174682f63616c63__source_contains: (__rgo_7374642f6d6174682f63616c63__source_contains:(uint, (uint, (), (u8)), uint, str, (), (), ())!, source_l: uint, source_nth:(uint, (), (u8)), name: str, invalid:(), found:(), missing:(), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__source_contains(source_l, source_nth, next_idx, name, invalid, found, missing)
+}
+
+_247___rgo_7374642f6d6174682f63616c63__source_contains: (idx: uint, __rgo_7374642f6d6174682f63616c63__source_contains:(uint, (uint, (), (u8)), uint, str, (), (), ())!, source_l: uint, source_nth:(uint, (), (u8)), name: str, invalid:(), found:(), missing:()){
+    _248: 1
+    _251___rgo_7374642f6d6174682f63616c63__source_contains: _250___rgo_7374642f6d6174682f63616c63__source_contains(__rgo_7374642f6d6174682f63616c63__source_contains, source_l, source_nth, name, invalid, found, missing)
+    @add_uint(idx, _248, _251___rgo_7374642f6d6174682f63616c63__source_contains)
+}
+
+_238___rgo_7374642f6d6174682f63616c63__source_contains: (__rgo_7374642f6d6174682f63616c63__is_identifier_byte:(u8, (), ()), __rgo_7374642f6d6174682f63616c63__identifier_end:(uint, (uint, (), (u8)), uint, (uint)), source_l: uint, source_nth:(uint, (), (u8)), idx: uint, __rgo_7374642f6d6174682f63616c63__range_equals_name:((uint, (), (u8)), uint, uint, str, (), ()), name: str, found:(), __rgo_7374642f6d6174682f63616c63__source_contains:(uint, (uint, (), (u8)), uint, str, (), (), ())!, invalid:(), missing:(), value: u8){
+    _245___rgo_7374642f6d6174682f63616c63__source_contains: _240___rgo_7374642f6d6174682f63616c63__source_contains(__rgo_7374642f6d6174682f63616c63__identifier_end, source_l, source_nth, idx, __rgo_7374642f6d6174682f63616c63__range_equals_name, name, found, __rgo_7374642f6d6174682f63616c63__source_contains, invalid, missing)
+    _252___rgo_7374642f6d6174682f63616c63__source_contains: _247___rgo_7374642f6d6174682f63616c63__source_contains(idx, __rgo_7374642f6d6174682f63616c63__source_contains, source_l, source_nth, name, invalid, found, missing)
+    __rgo_7374642f6d6174682f63616c63__is_identifier_byte(value, _245___rgo_7374642f6d6174682f63616c63__source_contains, _252___rgo_7374642f6d6174682f63616c63__source_contains)
+}
+
+_236___rgo_7374642f6d6174682f63616c63__source_contains: (source_nth:(uint, (), (u8)), idx: uint, missing:(), __rgo_7374642f6d6174682f63616c63__is_identifier_byte:(u8, (), ()), __rgo_7374642f6d6174682f63616c63__identifier_end:(uint, (uint, (), (u8)), uint, (uint)), source_l: uint, __rgo_7374642f6d6174682f63616c63__range_equals_name:((uint, (), (u8)), uint, uint, str, (), ()), name: str, found:(), __rgo_7374642f6d6174682f63616c63__source_contains:(uint, (uint, (), (u8)), uint, str, (), (), ())!, invalid:()){
+    _253___rgo_7374642f6d6174682f63616c63__source_contains: _238___rgo_7374642f6d6174682f63616c63__source_contains(__rgo_7374642f6d6174682f63616c63__is_identifier_byte, __rgo_7374642f6d6174682f63616c63__identifier_end, source_l, source_nth, idx, __rgo_7374642f6d6174682f63616c63__range_equals_name, name, found, __rgo_7374642f6d6174682f63616c63__source_contains, invalid, missing)
+    source_nth(idx, missing, _253___rgo_7374642f6d6174682f63616c63__source_contains)
+}
+
+__rgo_7374642f6d6174682f63616c63__source_contains: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, name: str, invalid:(), found:(), missing:()){
+    _254___rgo_7374642f6d6174682f63616c63__source_contains: _236___rgo_7374642f6d6174682f63616c63__source_contains(source_nth, idx, missing, __rgo_7374642f6d6174682f63616c63__is_identifier_byte, __rgo_7374642f6d6174682f63616c63__identifier_end, source_l, __rgo_7374642f6d6174682f63616c63__range_equals_name, name, found, __rgo_7374642f6d6174682f63616c63__source_contains, invalid)
+    @lt_uint(idx, source_l, _254___rgo_7374642f6d6174682f63616c63__source_contains, missing)
+}
+
+__rgo_7374642f6d6174682f63616c63__validate_args: (source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:()){
+    _255___rgo_7374642f6d6174682f63616c63__validate_item: __rgo_7374642f6d6174682f63616c63__validate_item(source_l, source_nth, invalid, ok)
+    _256___rgo_7374642f6d6174682f63616c63__validate_done: __rgo_7374642f6d6174682f63616c63__validate_done(ok)
+    args(_255___rgo_7374642f6d6174682f63616c63__validate_item, _256___rgo_7374642f6d6174682f63616c63__validate_done)
+}
+
+__rgo_7374642f6d6174682f63616c63__lookup: (args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), source_nth:(uint, (), (u8)), start: uint, end: uint, invalid:(), ok:(((f64)))){
+    _258___rgo_7374642f6d6174682f63616c63__lookup_item: __rgo_7374642f6d6174682f63616c63__lookup_item(source_nth, start, end, invalid, ok)
+    _259___rgo_7374642f6d6174682f63616c63__lookup_done: __rgo_7374642f6d6174682f63616c63__lookup_done(invalid)
+    args(_258___rgo_7374642f6d6174682f63616c63__lookup_item, _259___rgo_7374642f6d6174682f63616c63__lookup_done)
+}
+
+__rgo_7374642f6d6174682f63616c63__contains_name_done: (missing:()){
+    missing()
+}
+_263___rgo_7374642f6d6174682f63616c63__contains_name_item: (name: str, found:(), tail:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), missing:(), candidate: str, _262___rgo_7374642f6d6174682f63616c63__contains_name_item: f64){
+    _264___rgo_7374642f6d6174682f63616c63__contains_name: __rgo_7374642f6d6174682f63616c63__contains_name(tail, name, found, missing)
+    @eq_str(candidate, name, found, _264___rgo_7374642f6d6174682f63616c63__contains_name)
+}
+
+__rgo_7374642f6d6174682f63616c63__contains_name_item: (name: str, found:(), missing:(), item:((str, f64)), tail:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())){
+    _265___rgo_7374642f6d6174682f63616c63__contains_name_item: _263___rgo_7374642f6d6174682f63616c63__contains_name_item(name, found, tail, missing)
+    item(_265___rgo_7374642f6d6174682f63616c63__contains_name_item)
+}
+
+__rgo_7374642f6d6174682f63616c63__validate_done: (ok:()){
+    ok()
+}
+
+_276___rgo_7374642f6d6174682f63616c63__validate_item: (source_l: uint, source_nth:(uint, (), (u8)), tail:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), ok:()){
+    __rgo_7374642f6d6174682f63616c63__validate_args(source_l, source_nth, tail, invalid, ok)
+}
+
+_273___rgo_7374642f6d6174682f63616c63__validate_item: (source_l: uint, source_nth:(uint, (), (u8)), name: str, invalid:(), tail:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ok:()){
+    _274: 0
+    _277___rgo_7374642f6d6174682f63616c63__validate_item: _276___rgo_7374642f6d6174682f63616c63__validate_item(source_l, source_nth, tail, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__source_contains(source_l, source_nth, _274, name, invalid, _277___rgo_7374642f6d6174682f63616c63__validate_item, invalid)
+}
+
+_271___rgo_7374642f6d6174682f63616c63__validate_item: (tail:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), name: str, invalid:(), source_l: uint, source_nth:(uint, (), (u8)), ok:()){
+    _278___rgo_7374642f6d6174682f63616c63__validate_item: _273___rgo_7374642f6d6174682f63616c63__validate_item(source_l, source_nth, name, invalid, tail, ok)
+    __rgo_7374642f6d6174682f63616c63__contains_name(tail, name, invalid, _278___rgo_7374642f6d6174682f63616c63__validate_item)
+}
+
+_269___rgo_7374642f6d6174682f63616c63__validate_item: (__rgo_7374642f6d6174682f63616c63__valid_placeholder_name:(str, (), ()), invalid:(), tail:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), source_l: uint, source_nth:(uint, (), (u8)), ok:(), name: str, _268___rgo_7374642f6d6174682f63616c63__validate_item: f64){
+    _279___rgo_7374642f6d6174682f63616c63__validate_item: _271___rgo_7374642f6d6174682f63616c63__validate_item(tail, name, invalid, source_l, source_nth, ok)
+    __rgo_7374642f6d6174682f63616c63__valid_placeholder_name(name, invalid, _279___rgo_7374642f6d6174682f63616c63__validate_item)
+}
+
+__rgo_7374642f6d6174682f63616c63__validate_item: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(), item:((str, f64)), tail:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())){
+    _280___rgo_7374642f6d6174682f63616c63__validate_item: _269___rgo_7374642f6d6174682f63616c63__validate_item(__rgo_7374642f6d6174682f63616c63__valid_placeholder_name, invalid, tail, source_l, source_nth, ok)
+    item(_280___rgo_7374642f6d6174682f63616c63__validate_item)
+}
+
+__rgo_7374642f6d6174682f63616c63__lookup_done: (invalid:()){
+    invalid()
+}
+
+_283___rgo_7374642f6d6174682f63616c63__lookup_item: (__rgo_7374642f6d6174682f63616c63__range_equals_name:((uint, (), (u8)), uint, uint, str, (), ()), source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__constant:(f64, (f64)), tail:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), candidate: str, value: f64){
+    _284___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(value)
+    _285_ok: ok(_284___rgo_7374642f6d6174682f63616c63__constant)
+    _286___rgo_7374642f6d6174682f63616c63__lookup: __rgo_7374642f6d6174682f63616c63__lookup(tail, source_nth, start, end, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, candidate, _285_ok, _286___rgo_7374642f6d6174682f63616c63__lookup)
+}
+
+__rgo_7374642f6d6174682f63616c63__lookup_item: (source_nth:(uint, (), (u8)), start: uint, end: uint, invalid:(), ok:(((f64))), item:((str, f64)), tail:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())){
+    _287___rgo_7374642f6d6174682f63616c63__lookup_item: _283___rgo_7374642f6d6174682f63616c63__lookup_item(__rgo_7374642f6d6174682f63616c63__range_equals_name, source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__constant, tail, invalid)
+    item(_287___rgo_7374642f6d6174682f63616c63__lookup_item)
+}
+_291___rgo_7374642f6d6174682f63616c63__eq_byte: (a_bits: b8, yes:(), no:(), b_bits: b8){
+    @eq_b8(a_bits, b_bits, yes, no)
+}
+
+_289___rgo_7374642f6d6174682f63616c63__eq_byte: (b: u8, yes:(), no:(), a_bits: b8){
+    _292___rgo_7374642f6d6174682f63616c63__eq_byte: _291___rgo_7374642f6d6174682f63616c63__eq_byte(a_bits, yes, no)
+    @b8_from_u8(b, _292___rgo_7374642f6d6174682f63616c63__eq_byte)
+}
+
+__rgo_7374642f6d6174682f63616c63__eq_byte: (a: u8, b: u8, yes:(), no:()){
+    _293___rgo_7374642f6d6174682f63616c63__eq_byte: _289___rgo_7374642f6d6174682f63616c63__eq_byte(b, yes, no)
+    @b8_from_u8(a, _293___rgo_7374642f6d6174682f63616c63__eq_byte)
+}
+__rgo_7374642f6d6174682f63616c63__raw_nth: (value: bytes, idx: uint, empty:(), one:(u8)){
+    @bytes_nth(value, idx, empty, one)
+}
+_303___rgo_7374642f6d6174682f63616c63__contains_byte: (__rgo_7374642f6d6174682f63616c63__contains_byte:(uint, (uint, (), (u8)), uint, u8, (), ())!, l: uint, nth_value:(uint, (), (u8)), expected: u8, found:(), missing:(), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__contains_byte(l, nth_value, next_idx, expected, found, missing)
+}
+
+_300___rgo_7374642f6d6174682f63616c63__contains_byte: (idx: uint, __rgo_7374642f6d6174682f63616c63__contains_byte:(uint, (uint, (), (u8)), uint, u8, (), ())!, l: uint, nth_value:(uint, (), (u8)), expected: u8, found:(), missing:()){
+    _301: 1
+    _304___rgo_7374642f6d6174682f63616c63__contains_byte: _303___rgo_7374642f6d6174682f63616c63__contains_byte(__rgo_7374642f6d6174682f63616c63__contains_byte, l, nth_value, expected, found, missing)
+    @add_uint(idx, _301, _304___rgo_7374642f6d6174682f63616c63__contains_byte)
+}
+
+_298___rgo_7374642f6d6174682f63616c63__contains_byte: (expected: u8, found:(), idx: uint, __rgo_7374642f6d6174682f63616c63__contains_byte:(uint, (uint, (), (u8)), uint, u8, (), ())!, l: uint, nth_value:(uint, (), (u8)), missing:(), value: u8){
+    _305___rgo_7374642f6d6174682f63616c63__contains_byte: _300___rgo_7374642f6d6174682f63616c63__contains_byte(idx, __rgo_7374642f6d6174682f63616c63__contains_byte, l, nth_value, expected, found, missing)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, expected, found, _305___rgo_7374642f6d6174682f63616c63__contains_byte)
+}
+
+_296___rgo_7374642f6d6174682f63616c63__contains_byte: (nth_value:(uint, (), (u8)), idx: uint, missing:(), expected: u8, found:(), __rgo_7374642f6d6174682f63616c63__contains_byte:(uint, (uint, (), (u8)), uint, u8, (), ())!, l: uint){
+    _306___rgo_7374642f6d6174682f63616c63__contains_byte: _298___rgo_7374642f6d6174682f63616c63__contains_byte(expected, found, idx, __rgo_7374642f6d6174682f63616c63__contains_byte, l, nth_value, missing)
+    nth_value(idx, missing, _306___rgo_7374642f6d6174682f63616c63__contains_byte)
+}
+
+__rgo_7374642f6d6174682f63616c63__contains_byte: (l: uint, nth_value:(uint, (), (u8)), idx: uint, expected: u8, found:(), missing:()){
+    _307___rgo_7374642f6d6174682f63616c63__contains_byte: _296___rgo_7374642f6d6174682f63616c63__contains_byte(nth_value, idx, missing, expected, found, __rgo_7374642f6d6174682f63616c63__contains_byte, l)
+    @lt_uint(idx, l, _307___rgo_7374642f6d6174682f63616c63__contains_byte, missing)
+}
+_311___rgo_7374642f6d6174682f63616c63__is_identifier_byte: (letters: bytes, value: u8, yes:(), no:(), letters_l: uint){
+    _312___rgo_7374642f6d6174682f63616c63__raw_nth: __rgo_7374642f6d6174682f63616c63__raw_nth(letters)
+    _313: 0
+    __rgo_7374642f6d6174682f63616c63__contains_byte(letters_l, _312___rgo_7374642f6d6174682f63616c63__raw_nth, _313, value, yes, no)
+}
+
+_309___rgo_7374642f6d6174682f63616c63__is_identifier_byte: (value: u8, yes:(), no:(), letters: bytes){
+    _314___rgo_7374642f6d6174682f63616c63__is_identifier_byte: _311___rgo_7374642f6d6174682f63616c63__is_identifier_byte(letters, value, yes, no)
+    @bytes_descriptor_len(letters, _314___rgo_7374642f6d6174682f63616c63__is_identifier_byte)
+}
+
+__rgo_7374642f6d6174682f63616c63__is_identifier_byte: (value: u8, yes:(), no:()){
+    letters_value: "abcdefghijklmnopqrstuvwxyz"
+    _315___rgo_7374642f6d6174682f63616c63__is_identifier_byte: _309___rgo_7374642f6d6174682f63616c63__is_identifier_byte(value, yes, no)
+    @bytes_from_str(letters_value, _315___rgo_7374642f6d6174682f63616c63__is_identifier_byte)
+}
+
+_319___rgo_7374642f6d6174682f63616c63__is_identifier_tail_byte: (yes:(), _318___rgo_7374642f6d6174682f63616c63__is_identifier_tail_byte: f64){
+    yes()
+}
+
+__rgo_7374642f6d6174682f63616c63__is_identifier_tail_byte: (value: u8, yes:(), no:()){
+    _320___rgo_7374642f6d6174682f63616c63__is_identifier_tail_byte: _319___rgo_7374642f6d6174682f63616c63__is_identifier_tail_byte(yes)
+    _321___rgo_7374642f6d6174682f63616c63__digit: __rgo_7374642f6d6174682f63616c63__digit(value, no, _320___rgo_7374642f6d6174682f63616c63__is_identifier_tail_byte)
+    __rgo_7374642f6d6174682f63616c63__is_identifier_byte(value, yes, _321___rgo_7374642f6d6174682f63616c63__digit)
+}
+_332___rgo_7374642f6d6174682f63616c63__identifier_end: (__rgo_7374642f6d6174682f63616c63__identifier_end:(uint, (uint, (), (u8)), uint, (uint))!, source_l: uint, source_nth:(uint, (), (u8)), ok:(uint), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__identifier_end(source_l, source_nth, next_idx, ok)
+}
+
+_329___rgo_7374642f6d6174682f63616c63__identifier_end: (idx: uint, __rgo_7374642f6d6174682f63616c63__identifier_end:(uint, (uint, (), (u8)), uint, (uint))!, source_l: uint, source_nth:(uint, (), (u8)), ok:(uint)){
+    _330: 1
+    _333___rgo_7374642f6d6174682f63616c63__identifier_end: _332___rgo_7374642f6d6174682f63616c63__identifier_end(__rgo_7374642f6d6174682f63616c63__identifier_end, source_l, source_nth, ok)
+    @add_uint(idx, _330, _333___rgo_7374642f6d6174682f63616c63__identifier_end)
+}
+
+_327___rgo_7374642f6d6174682f63616c63__identifier_end: (idx: uint, __rgo_7374642f6d6174682f63616c63__identifier_end:(uint, (uint, (), (u8)), uint, (uint))!, source_l: uint, source_nth:(uint, (), (u8)), ok:(uint), value: u8){
+    _334___rgo_7374642f6d6174682f63616c63__identifier_end: _329___rgo_7374642f6d6174682f63616c63__identifier_end(idx, __rgo_7374642f6d6174682f63616c63__identifier_end, source_l, source_nth, ok)
+    _335_ok: ok(idx)
+    __rgo_7374642f6d6174682f63616c63__is_identifier_tail_byte(value, _334___rgo_7374642f6d6174682f63616c63__identifier_end, _335_ok)
+}
+
+_324___rgo_7374642f6d6174682f63616c63__identifier_end: (source_nth:(uint, (), (u8)), idx: uint, ok:(uint), __rgo_7374642f6d6174682f63616c63__identifier_end:(uint, (uint, (), (u8)), uint, (uint))!, source_l: uint){
+    _325_ok: ok(idx)
+    _336___rgo_7374642f6d6174682f63616c63__identifier_end: _327___rgo_7374642f6d6174682f63616c63__identifier_end(idx, __rgo_7374642f6d6174682f63616c63__identifier_end, source_l, source_nth, ok)
+    source_nth(idx, _325_ok, _336___rgo_7374642f6d6174682f63616c63__identifier_end)
+}
+
+__rgo_7374642f6d6174682f63616c63__identifier_end: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, ok:(uint)){
+    _337___rgo_7374642f6d6174682f63616c63__identifier_end: _324___rgo_7374642f6d6174682f63616c63__identifier_end(source_nth, idx, ok, __rgo_7374642f6d6174682f63616c63__identifier_end, source_l)
+    _338_ok: ok(idx)
+    @lt_uint(idx, source_l, _337___rgo_7374642f6d6174682f63616c63__identifier_end, _338_ok)
+}
+_347___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: (__rgo_7374642f6d6174682f63616c63__validate_identifier_bytes:(uint, (uint, (), (u8)), uint, (), ())!, name_l: uint, name_nth:(uint, (), (u8)), invalid:(), ok:(), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__validate_identifier_bytes(name_l, name_nth, next_idx, invalid, ok)
+}
+
+_344___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: (idx: uint, __rgo_7374642f6d6174682f63616c63__validate_identifier_bytes:(uint, (uint, (), (u8)), uint, (), ())!, name_l: uint, name_nth:(uint, (), (u8)), invalid:(), ok:()){
+    _345: 1
+    _348___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: _347___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes(__rgo_7374642f6d6174682f63616c63__validate_identifier_bytes, name_l, name_nth, invalid, ok)
+    @add_uint(idx, _345, _348___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes)
+}
+
+_342___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: (idx: uint, __rgo_7374642f6d6174682f63616c63__validate_identifier_bytes:(uint, (uint, (), (u8)), uint, (), ())!, name_l: uint, name_nth:(uint, (), (u8)), invalid:(), ok:(), value: u8){
+    _349___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: _344___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes(idx, __rgo_7374642f6d6174682f63616c63__validate_identifier_bytes, name_l, name_nth, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__is_identifier_byte(value, _349___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes, invalid)
+}
+
+_340___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: (name_nth:(uint, (), (u8)), idx: uint, invalid:(), __rgo_7374642f6d6174682f63616c63__validate_identifier_bytes:(uint, (uint, (), (u8)), uint, (), ())!, name_l: uint, ok:()){
+    _350___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: _342___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes(idx, __rgo_7374642f6d6174682f63616c63__validate_identifier_bytes, name_l, name_nth, invalid, ok)
+    name_nth(idx, invalid, _350___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes)
+}
+
+__rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: (name_l: uint, name_nth:(uint, (), (u8)), idx: uint, invalid:(), ok:()){
+    _351___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes: _340___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes(name_nth, idx, invalid, __rgo_7374642f6d6174682f63616c63__validate_identifier_bytes, name_l, ok)
+    @lt_uint(idx, name_l, _351___rgo_7374642f6d6174682f63616c63__validate_identifier_bytes, ok)
+}
+_362___rgo_7374642f6d6174682f63616c63__valid_placeholder_name: (__rgo_7374642f6d6174682f63616c63__reserved_name:((uint, (), (u8)), uint, uint, (), ()), name_bytes: bytes, name_l: uint, invalid:(), ok:()){
+    _363___rgo_7374642f6d6174682f63616c63__raw_nth: __rgo_7374642f6d6174682f63616c63__raw_nth(name_bytes)
+    _364: 0
+    __rgo_7374642f6d6174682f63616c63__reserved_name(_363___rgo_7374642f6d6174682f63616c63__raw_nth, _364, name_l, invalid, ok)
+}
+
+_358___rgo_7374642f6d6174682f63616c63__valid_placeholder_name: (name_l: uint, name_bytes: bytes, invalid:(), __rgo_7374642f6d6174682f63616c63__reserved_name:((uint, (), (u8)), uint, uint, (), ()), ok:()){
+    _359___rgo_7374642f6d6174682f63616c63__raw_nth: __rgo_7374642f6d6174682f63616c63__raw_nth(name_bytes)
+    _360: 0
+    _365___rgo_7374642f6d6174682f63616c63__valid_placeholder_name: _362___rgo_7374642f6d6174682f63616c63__valid_placeholder_name(__rgo_7374642f6d6174682f63616c63__reserved_name, name_bytes, name_l, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__validate_identifier_bytes(name_l, _359___rgo_7374642f6d6174682f63616c63__raw_nth, _360, invalid, _365___rgo_7374642f6d6174682f63616c63__valid_placeholder_name)
+}
+
+_355___rgo_7374642f6d6174682f63616c63__valid_placeholder_name: (name_bytes: bytes, invalid:(), __rgo_7374642f6d6174682f63616c63__reserved_name:((uint, (), (u8)), uint, uint, (), ()), ok:(), name_l: uint){
+    _356: 0
+    _366___rgo_7374642f6d6174682f63616c63__valid_placeholder_name: _358___rgo_7374642f6d6174682f63616c63__valid_placeholder_name(name_l, name_bytes, invalid, __rgo_7374642f6d6174682f63616c63__reserved_name, ok)
+    @lt_uint(_356, name_l, _366___rgo_7374642f6d6174682f63616c63__valid_placeholder_name, invalid)
+}
+
+_353___rgo_7374642f6d6174682f63616c63__valid_placeholder_name: (invalid:(), __rgo_7374642f6d6174682f63616c63__reserved_name:((uint, (), (u8)), uint, uint, (), ()), ok:(), name_bytes: bytes){
+    _367___rgo_7374642f6d6174682f63616c63__valid_placeholder_name: _355___rgo_7374642f6d6174682f63616c63__valid_placeholder_name(name_bytes, invalid, __rgo_7374642f6d6174682f63616c63__reserved_name, ok)
+    @bytes_descriptor_len(name_bytes, _367___rgo_7374642f6d6174682f63616c63__valid_placeholder_name)
+}
+
+__rgo_7374642f6d6174682f63616c63__valid_placeholder_name: (name: str, invalid:(), ok:()){
+    _368___rgo_7374642f6d6174682f63616c63__valid_placeholder_name: _353___rgo_7374642f6d6174682f63616c63__valid_placeholder_name(invalid, __rgo_7374642f6d6174682f63616c63__reserved_name, ok)
+    @bytes_from_str(name, _368___rgo_7374642f6d6174682f63616c63__valid_placeholder_name)
+}
+_381___rgo_7374642f6d6174682f63616c63__range_equals_loop: (__rgo_7374642f6d6174682f63616c63__range_equals_loop:((uint, (), (u8)), uint, (uint, (), (u8)), uint, uint, (), ())!, source_nth:(uint, (), (u8)), start: uint, name_nth:(uint, (), (u8)), l: uint, equal:(), different:(), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__range_equals_loop(source_nth, start, name_nth, next_idx, l, equal, different)
+}
+
+_378___rgo_7374642f6d6174682f63616c63__range_equals_loop: (idx: uint, __rgo_7374642f6d6174682f63616c63__range_equals_loop:((uint, (), (u8)), uint, (uint, (), (u8)), uint, uint, (), ())!, source_nth:(uint, (), (u8)), start: uint, name_nth:(uint, (), (u8)), l: uint, equal:(), different:()){
+    _379: 1
+    _382___rgo_7374642f6d6174682f63616c63__range_equals_loop: _381___rgo_7374642f6d6174682f63616c63__range_equals_loop(__rgo_7374642f6d6174682f63616c63__range_equals_loop, source_nth, start, name_nth, l, equal, different)
+    @add_uint(idx, _379, _382___rgo_7374642f6d6174682f63616c63__range_equals_loop)
+}
+
+_376___rgo_7374642f6d6174682f63616c63__range_equals_loop: (source_value: u8, idx: uint, __rgo_7374642f6d6174682f63616c63__range_equals_loop:((uint, (), (u8)), uint, (uint, (), (u8)), uint, uint, (), ())!, source_nth:(uint, (), (u8)), start: uint, name_nth:(uint, (), (u8)), l: uint, equal:(), different:(), name_value: u8){
+    _383___rgo_7374642f6d6174682f63616c63__range_equals_loop: _378___rgo_7374642f6d6174682f63616c63__range_equals_loop(idx, __rgo_7374642f6d6174682f63616c63__range_equals_loop, source_nth, start, name_nth, l, equal, different)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(source_value, name_value, _383___rgo_7374642f6d6174682f63616c63__range_equals_loop, different)
+}
+
+_374___rgo_7374642f6d6174682f63616c63__range_equals_loop: (name_nth:(uint, (), (u8)), idx: uint, different:(), __rgo_7374642f6d6174682f63616c63__range_equals_loop:((uint, (), (u8)), uint, (uint, (), (u8)), uint, uint, (), ())!, source_nth:(uint, (), (u8)), start: uint, l: uint, equal:(), source_value: u8){
+    _384___rgo_7374642f6d6174682f63616c63__range_equals_loop: _376___rgo_7374642f6d6174682f63616c63__range_equals_loop(source_value, idx, __rgo_7374642f6d6174682f63616c63__range_equals_loop, source_nth, start, name_nth, l, equal, different)
+    name_nth(idx, different, _384___rgo_7374642f6d6174682f63616c63__range_equals_loop)
+}
+
+_372___rgo_7374642f6d6174682f63616c63__range_equals_loop: (source_nth:(uint, (), (u8)), different:(), name_nth:(uint, (), (u8)), idx: uint, __rgo_7374642f6d6174682f63616c63__range_equals_loop:((uint, (), (u8)), uint, (uint, (), (u8)), uint, uint, (), ())!, start: uint, l: uint, equal:(), source_idx: uint){
+    _385___rgo_7374642f6d6174682f63616c63__range_equals_loop: _374___rgo_7374642f6d6174682f63616c63__range_equals_loop(name_nth, idx, different, __rgo_7374642f6d6174682f63616c63__range_equals_loop, source_nth, start, l, equal)
+    source_nth(source_idx, different, _385___rgo_7374642f6d6174682f63616c63__range_equals_loop)
+}
+
+_370___rgo_7374642f6d6174682f63616c63__range_equals_loop: (start: uint, idx: uint, source_nth:(uint, (), (u8)), different:(), name_nth:(uint, (), (u8)), __rgo_7374642f6d6174682f63616c63__range_equals_loop:((uint, (), (u8)), uint, (uint, (), (u8)), uint, uint, (), ())!, l: uint, equal:()){
+    _386___rgo_7374642f6d6174682f63616c63__range_equals_loop: _372___rgo_7374642f6d6174682f63616c63__range_equals_loop(source_nth, different, name_nth, idx, __rgo_7374642f6d6174682f63616c63__range_equals_loop, start, l, equal)
+    @add_uint(start, idx, _386___rgo_7374642f6d6174682f63616c63__range_equals_loop)
+}
+
+__rgo_7374642f6d6174682f63616c63__range_equals_loop: (source_nth:(uint, (), (u8)), start: uint, name_nth:(uint, (), (u8)), idx: uint, l: uint, equal:(), different:()){
+    _387___rgo_7374642f6d6174682f63616c63__range_equals_loop: _370___rgo_7374642f6d6174682f63616c63__range_equals_loop(start, idx, source_nth, different, name_nth, __rgo_7374642f6d6174682f63616c63__range_equals_loop, l, equal)
+    @lt_uint(idx, l, _387___rgo_7374642f6d6174682f63616c63__range_equals_loop, equal)
+}
+_393___rgo_7374642f6d6174682f63616c63__range_equals_name: (source_l: uint, source_nth:(uint, (), (u8)), start: uint, name_bytes: bytes, equal:(), different:(), name_l: uint){
+    _394___rgo_7374642f6d6174682f63616c63__raw_nth: __rgo_7374642f6d6174682f63616c63__raw_nth(name_bytes)
+    _395: 0
+    _396___rgo_7374642f6d6174682f63616c63__range_equals_loop: __rgo_7374642f6d6174682f63616c63__range_equals_loop(source_nth, start, _394___rgo_7374642f6d6174682f63616c63__raw_nth, _395, source_l, equal, different)
+    @eq_uint(source_l, name_l, _396___rgo_7374642f6d6174682f63616c63__range_equals_loop, different)
+}
+
+_391___rgo_7374642f6d6174682f63616c63__range_equals_name: (source_l: uint, source_nth:(uint, (), (u8)), start: uint, equal:(), different:(), name_bytes: bytes){
+    _397___rgo_7374642f6d6174682f63616c63__range_equals_name: _393___rgo_7374642f6d6174682f63616c63__range_equals_name(source_l, source_nth, start, name_bytes, equal, different)
+    @bytes_descriptor_len(name_bytes, _397___rgo_7374642f6d6174682f63616c63__range_equals_name)
+}
+
+_389___rgo_7374642f6d6174682f63616c63__range_equals_name: (name: str, source_nth:(uint, (), (u8)), start: uint, equal:(), different:(), source_l: uint){
+    _398___rgo_7374642f6d6174682f63616c63__range_equals_name: _391___rgo_7374642f6d6174682f63616c63__range_equals_name(source_l, source_nth, start, equal, different)
+    @bytes_from_str(name, _398___rgo_7374642f6d6174682f63616c63__range_equals_name)
+}
+
+__rgo_7374642f6d6174682f63616c63__range_equals_name: (source_nth:(uint, (), (u8)), start: uint, end: uint, name: str, equal:(), different:()){
+    _399___rgo_7374642f6d6174682f63616c63__range_equals_name: _389___rgo_7374642f6d6174682f63616c63__range_equals_name(name, source_nth, start, equal, different)
+    @sub_uint(end, start, _399___rgo_7374642f6d6174682f63616c63__range_equals_name)
+}
+
+__rgo_7374642f6d6174682f63616c63__complete: (value:((f64)), args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), ready:(((f64)))){
+    _401___rgo_7374642f6d6174682f63616c63__complete_item: __rgo_7374642f6d6174682f63616c63__complete_item(value, ready)
+    _402___rgo_7374642f6d6174682f63616c63__complete_done: __rgo_7374642f6d6174682f63616c63__complete_done(value, ready)
+    args(_401___rgo_7374642f6d6174682f63616c63__complete_item, _402___rgo_7374642f6d6174682f63616c63__complete_done)
+}
+_408___rgo_7374642f6d6174682f63616c63__calculate: (source_l: uint, args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ready:(((f64))), invalid:(), idx: uint, value:((f64))){
+    _409___rgo_7374642f6d6174682f63616c63__complete: __rgo_7374642f6d6174682f63616c63__complete(value, args, ready)
+    @eq_uint(idx, source_l, _409___rgo_7374642f6d6174682f63616c63__complete, invalid)
+}
+
+_405___rgo_7374642f6d6174682f63616c63__calculate: (__rgo_7374642f6d6174682f63616c63__parse_expression:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ready:(((f64)))){
+    _406: 0
+    _410___rgo_7374642f6d6174682f63616c63__calculate: _408___rgo_7374642f6d6174682f63616c63__calculate(source_l, args, ready, invalid)
+    __rgo_7374642f6d6174682f63616c63__parse_expression(source_l, source_nth, _406, args, invalid, _410___rgo_7374642f6d6174682f63616c63__calculate)
+}
+
+__rgo_7374642f6d6174682f63616c63__calculate: (source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ready:(((f64)))){
+    _411___rgo_7374642f6d6174682f63616c63__calculate: _405___rgo_7374642f6d6174682f63616c63__calculate(__rgo_7374642f6d6174682f63616c63__parse_expression, source_l, source_nth, args, invalid, ready)
+    __rgo_7374642f6d6174682f63616c63__validate_args(source_l, source_nth, args, invalid, _411___rgo_7374642f6d6174682f63616c63__calculate)
+}
+
+__rgo_7374642f6d6174682f63616c63__constant: (value: f64, ok:(f64)){
+    ok(value)
+}
+_417___rgo_7374642f6d6174682f63616c63__add: (a_value: f64, ok:(f64), b_value: f64){
+    @add_f64(a_value, b_value, ok)
+}
+
+_415___rgo_7374642f6d6174682f63616c63__add: (b:((f64)), ok:(f64), a_value: f64){
+    _418___rgo_7374642f6d6174682f63616c63__add: _417___rgo_7374642f6d6174682f63616c63__add(a_value, ok)
+    b(_418___rgo_7374642f6d6174682f63616c63__add)
+}
+
+__rgo_7374642f6d6174682f63616c63__add: (a:((f64)), b:((f64)), ok:(f64)){
+    _419___rgo_7374642f6d6174682f63616c63__add: _415___rgo_7374642f6d6174682f63616c63__add(b, ok)
+    a(_419___rgo_7374642f6d6174682f63616c63__add)
+}
+_422___rgo_7374642f6d6174682f63616c63__negate: (ok:(f64), number: f64){
+    _423: 0
+    @sub_f64(_423, number, ok)
+}
+
+__rgo_7374642f6d6174682f63616c63__negate: (value:((f64)), ok:(f64)){
+    _424___rgo_7374642f6d6174682f63616c63__negate: _422___rgo_7374642f6d6174682f63616c63__negate(ok)
+    value(_424___rgo_7374642f6d6174682f63616c63__negate)
+}
+_429___rgo_7374642f6d6174682f63616c63__subtract: (a_value: f64, ok:(f64), b_value: f64){
+    @sub_f64(a_value, b_value, ok)
+}
+
+_427___rgo_7374642f6d6174682f63616c63__subtract: (b:((f64)), ok:(f64), a_value: f64){
+    _430___rgo_7374642f6d6174682f63616c63__subtract: _429___rgo_7374642f6d6174682f63616c63__subtract(a_value, ok)
+    b(_430___rgo_7374642f6d6174682f63616c63__subtract)
+}
+
+__rgo_7374642f6d6174682f63616c63__subtract: (a:((f64)), b:((f64)), ok:(f64)){
+    _431___rgo_7374642f6d6174682f63616c63__subtract: _427___rgo_7374642f6d6174682f63616c63__subtract(b, ok)
+    a(_431___rgo_7374642f6d6174682f63616c63__subtract)
+}
+_436___rgo_7374642f6d6174682f63616c63__multiply: (a_value: f64, ok:(f64), b_value: f64){
+    @mul_f64(a_value, b_value, ok)
+}
+
+_434___rgo_7374642f6d6174682f63616c63__multiply: (b:((f64)), ok:(f64), a_value: f64){
+    _437___rgo_7374642f6d6174682f63616c63__multiply: _436___rgo_7374642f6d6174682f63616c63__multiply(a_value, ok)
+    b(_437___rgo_7374642f6d6174682f63616c63__multiply)
+}
+
+__rgo_7374642f6d6174682f63616c63__multiply: (a:((f64)), b:((f64)), ok:(f64)){
+    _438___rgo_7374642f6d6174682f63616c63__multiply: _434___rgo_7374642f6d6174682f63616c63__multiply(b, ok)
+    a(_438___rgo_7374642f6d6174682f63616c63__multiply)
+}
+_443___rgo_7374642f6d6174682f63616c63__divide: (a_value: f64, ok:(f64), b_value: f64){
+    @div_f64(a_value, b_value, ok)
+}
+
+_441___rgo_7374642f6d6174682f63616c63__divide: (b:((f64)), ok:(f64), a_value: f64){
+    _444___rgo_7374642f6d6174682f63616c63__divide: _443___rgo_7374642f6d6174682f63616c63__divide(a_value, ok)
+    b(_444___rgo_7374642f6d6174682f63616c63__divide)
+}
+
+__rgo_7374642f6d6174682f63616c63__divide: (a:((f64)), b:((f64)), ok:(f64)){
+    _445___rgo_7374642f6d6174682f63616c63__divide: _441___rgo_7374642f6d6174682f63616c63__divide(b, ok)
+    a(_445___rgo_7374642f6d6174682f63616c63__divide)
+}
+
+_450___rgo_7374642f6d6174682f63616c63__power: (a_value: f64, ok:(f64), b_value: f64){
+    __rgo_7374642f6d617468__pow(a_value, b_value, ok)
+}
+
+_448___rgo_7374642f6d6174682f63616c63__power: (b:((f64)), ok:(f64), a_value: f64){
+    _451___rgo_7374642f6d6174682f63616c63__power: _450___rgo_7374642f6d6174682f63616c63__power(a_value, ok)
+    b(_451___rgo_7374642f6d6174682f63616c63__power)
+}
+
+__rgo_7374642f6d6174682f63616c63__power: (a:((f64)), b:((f64)), ok:(f64)){
+    _452___rgo_7374642f6d6174682f63616c63__power: _448___rgo_7374642f6d6174682f63616c63__power(b, ok)
+    a(_452___rgo_7374642f6d6174682f63616c63__power)
+}
+_458___rgo_7374642f6d6174682f63616c63__append_digit: (digit: f64, ok:(f64), shifted: f64){
+    @add_f64(shifted, digit, ok)
+}
+
+_455___rgo_7374642f6d6174682f63616c63__append_digit: (digit: f64, ok:(f64), prefix_value: f64){
+    _456: 10
+    _459___rgo_7374642f6d6174682f63616c63__append_digit: _458___rgo_7374642f6d6174682f63616c63__append_digit(digit, ok)
+    @mul_f64(prefix_value, _456, _459___rgo_7374642f6d6174682f63616c63__append_digit)
+}
+
+__rgo_7374642f6d6174682f63616c63__append_digit: (prefix:((f64)), digit: f64, ok:(f64)){
+    _460___rgo_7374642f6d6174682f63616c63__append_digit: _455___rgo_7374642f6d6174682f63616c63__append_digit(digit, ok)
+    prefix(_460___rgo_7374642f6d6174682f63616c63__append_digit)
+}
+
+__rgo_7374642f6d6174682f63616c63__complete_item: (value:((f64)), ready:(((f64))), _462___rgo_7374642f6d6174682f63616c63__complete_item:((str, f64)), tail:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())){
+    __rgo_7374642f6d6174682f63616c63__complete(value, tail, ready)
+}
+
+__rgo_7374642f6d6174682f63616c63__complete_done: (value:((f64)), ready:(((f64)))){
+    ready(value)
+}
+
+_509___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _510: 57
+    _511: 9
+    _512_ok: ok(_511)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _510, _512_ok, not_digit)
+}
+
+_504___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _505: 56
+    _506: 8
+    _507_ok: ok(_506)
+    _513___rgo_7374642f6d6174682f63616c63__digit: _509___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _505, _507_ok, _513___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+_499___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _500: 55
+    _501: 7
+    _502_ok: ok(_501)
+    _514___rgo_7374642f6d6174682f63616c63__digit: _504___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _500, _502_ok, _514___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+_494___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _495: 54
+    _496: 6
+    _497_ok: ok(_496)
+    _515___rgo_7374642f6d6174682f63616c63__digit: _499___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _495, _497_ok, _515___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+_489___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _490: 53
+    _491: 5
+    _492_ok: ok(_491)
+    _516___rgo_7374642f6d6174682f63616c63__digit: _494___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _490, _492_ok, _516___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+_484___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _485: 52
+    _486: 4
+    _487_ok: ok(_486)
+    _517___rgo_7374642f6d6174682f63616c63__digit: _489___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _485, _487_ok, _517___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+_479___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _480: 51
+    _481: 3
+    _482_ok: ok(_481)
+    _518___rgo_7374642f6d6174682f63616c63__digit: _484___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _480, _482_ok, _518___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+_474___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _475: 50
+    _476: 2
+    _477_ok: ok(_476)
+    _519___rgo_7374642f6d6174682f63616c63__digit: _479___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _475, _477_ok, _519___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+_469___rgo_7374642f6d6174682f63616c63__digit: (value: u8, ok:(f64), not_digit:()){
+    _470: 49
+    _471: 1
+    _472_ok: ok(_471)
+    _520___rgo_7374642f6d6174682f63616c63__digit: _474___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _470, _472_ok, _520___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+__rgo_7374642f6d6174682f63616c63__digit: (value: u8, not_digit:(), ok:(f64)){
+    _465: 48
+    _466: 0
+    _467_ok: ok(_466)
+    _521___rgo_7374642f6d6174682f63616c63__digit: _469___rgo_7374642f6d6174682f63616c63__digit(value, ok, not_digit)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _465, _467_ok, _521___rgo_7374642f6d6174682f63616c63__digit)
+}
+
+__rgo_7374642f6d6174682f63616c63__positive_exponent: (mantissa:((f64)), exponent:((f64)), ok:(((f64)))){
+    _523: 10
+    _524___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(_523)
+    _525___rgo_7374642f6d6174682f63616c63__power: __rgo_7374642f6d6174682f63616c63__power(_524___rgo_7374642f6d6174682f63616c63__constant, exponent)
+    _526___rgo_7374642f6d6174682f63616c63__multiply: __rgo_7374642f6d6174682f63616c63__multiply(mantissa, _525___rgo_7374642f6d6174682f63616c63__power)
+    ok(_526___rgo_7374642f6d6174682f63616c63__multiply)
+}
+
+__rgo_7374642f6d6174682f63616c63__negative_exponent: (mantissa:((f64)), exponent:((f64)), ok:(((f64)))){
+    _528: 10
+    _529___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(_528)
+    _530___rgo_7374642f6d6174682f63616c63__negate: __rgo_7374642f6d6174682f63616c63__negate(exponent)
+    _531___rgo_7374642f6d6174682f63616c63__power: __rgo_7374642f6d6174682f63616c63__power(_529___rgo_7374642f6d6174682f63616c63__constant, _530___rgo_7374642f6d6174682f63616c63__negate)
+    _532___rgo_7374642f6d6174682f63616c63__multiply: __rgo_7374642f6d6174682f63616c63__multiply(mantissa, _531___rgo_7374642f6d6174682f63616c63__power)
+    ok(_532___rgo_7374642f6d6174682f63616c63__multiply)
+}
+_546___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (ok:(uint, ((f64))), idx: uint, result:((f64))){
+    ok(idx, result)
+}
+
+_544___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (finish:(((f64)), ((f64)), (((f64)))), mantissa:((f64)), exponent:((f64)), ok:(uint, ((f64))), idx: uint){
+    _547___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: _546___rgo_7374642f6d6174682f63616c63__parse_exponent_digits(ok, idx)
+    finish(mantissa, exponent, _547___rgo_7374642f6d6174682f63616c63__parse_exponent_digits)
+}
+_553___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (exponent:((f64)), digit_value: f64, __rgo_7374642f6d6174682f63616c63__parse_exponent_digits:(uint, (uint, (), (u8)), uint, ((f64)), ((f64)), (((f64)), ((f64)), (((f64)))), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), finish:(((f64)), ((f64)), (((f64)))), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    next_exponent: __rgo_7374642f6d6174682f63616c63__append_digit(exponent, digit_value)
+    __rgo_7374642f6d6174682f63616c63__parse_exponent_digits(source_l, source_nth, next_idx, mantissa, next_exponent, finish, invalid, ok)
+}
+
+_550___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (idx: uint, exponent:((f64)), __rgo_7374642f6d6174682f63616c63__parse_exponent_digits:(uint, (uint, (), (u8)), uint, ((f64)), ((f64)), (((f64)), ((f64)), (((f64)))), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), finish:(((f64)), ((f64)), (((f64)))), invalid:(), ok:(uint, ((f64))), digit_value: f64){
+    _551: 1
+    _554___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: _553___rgo_7374642f6d6174682f63616c63__parse_exponent_digits(exponent, digit_value, __rgo_7374642f6d6174682f63616c63__parse_exponent_digits, source_l, source_nth, mantissa, finish, invalid, ok)
+    @add_uint(idx, _551, _554___rgo_7374642f6d6174682f63616c63__parse_exponent_digits)
+}
+
+_542___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (finish:(((f64)), ((f64)), (((f64)))), mantissa:((f64)), exponent:((f64)), ok:(uint, ((f64))), idx: uint, __rgo_7374642f6d6174682f63616c63__parse_exponent_digits:(uint, (uint, (), (u8)), uint, ((f64)), ((f64)), (((f64)), ((f64)), (((f64)))), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), value: u8){
+    _548___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: _544___rgo_7374642f6d6174682f63616c63__parse_exponent_digits(finish, mantissa, exponent, ok, idx)
+    _555___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: _550___rgo_7374642f6d6174682f63616c63__parse_exponent_digits(idx, exponent, __rgo_7374642f6d6174682f63616c63__parse_exponent_digits, source_l, source_nth, mantissa, finish, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__digit(value, _548___rgo_7374642f6d6174682f63616c63__parse_exponent_digits, _555___rgo_7374642f6d6174682f63616c63__parse_exponent_digits)
+}
+
+_540___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), finish:(((f64)), ((f64)), (((f64)))), mantissa:((f64)), exponent:((f64)), ok:(uint, ((f64))), __rgo_7374642f6d6174682f63616c63__parse_exponent_digits:(uint, (uint, (), (u8)), uint, ((f64)), ((f64)), (((f64)), ((f64)), (((f64)))), (), (uint, ((f64))))!, source_l: uint){
+    _556___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: _542___rgo_7374642f6d6174682f63616c63__parse_exponent_digits(finish, mantissa, exponent, ok, idx, __rgo_7374642f6d6174682f63616c63__parse_exponent_digits, source_l, source_nth, invalid)
+    source_nth(idx, invalid, _556___rgo_7374642f6d6174682f63616c63__parse_exponent_digits)
+}
+
+_561___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (ok:(uint, ((f64))), idx: uint, result:((f64))){
+    ok(idx, result)
+}
+
+_559___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (finish:(((f64)), ((f64)), (((f64)))), mantissa:((f64)), exponent:((f64)), ok:(uint, ((f64))), idx: uint){
+    _562___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: _561___rgo_7374642f6d6174682f63616c63__parse_exponent_digits(ok, idx)
+    finish(mantissa, exponent, _562___rgo_7374642f6d6174682f63616c63__parse_exponent_digits)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_exponent_digits: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, mantissa:((f64)), exponent:((f64)), finish:(((f64)), ((f64)), (((f64)))), invalid:(), ok:(uint, ((f64)))){
+    _557___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: _540___rgo_7374642f6d6174682f63616c63__parse_exponent_digits(source_nth, idx, invalid, finish, mantissa, exponent, ok, __rgo_7374642f6d6174682f63616c63__parse_exponent_digits, source_l)
+    _563___rgo_7374642f6d6174682f63616c63__parse_exponent_digits: _559___rgo_7374642f6d6174682f63616c63__parse_exponent_digits(finish, mantissa, exponent, ok, idx)
+    @lt_uint(idx, source_l, _557___rgo_7374642f6d6174682f63616c63__parse_exponent_digits, _563___rgo_7374642f6d6174682f63616c63__parse_exponent_digits)
+}
+_578___rgo_7374642f6d6174682f63616c63__parse_exponent_value: (source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), digit_value: f64, finish:(((f64)), ((f64)), (((f64)))), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    _579___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(digit_value)
+    __rgo_7374642f6d6174682f63616c63__parse_exponent_digits(source_l, source_nth, next_idx, mantissa, _579___rgo_7374642f6d6174682f63616c63__constant, finish, invalid, ok)
+}
+
+_575___rgo_7374642f6d6174682f63616c63__parse_exponent_value: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), finish:(((f64)), ((f64)), (((f64)))), invalid:(), ok:(uint, ((f64))), digit_value: f64){
+    _576: 1
+    _580___rgo_7374642f6d6174682f63616c63__parse_exponent_value: _578___rgo_7374642f6d6174682f63616c63__parse_exponent_value(source_l, source_nth, mantissa, digit_value, finish, invalid, ok)
+    @add_uint(idx, _576, _580___rgo_7374642f6d6174682f63616c63__parse_exponent_value)
+}
+
+_573___rgo_7374642f6d6174682f63616c63__parse_exponent_value: (invalid:(), idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), finish:(((f64)), ((f64)), (((f64)))), ok:(uint, ((f64))), value: u8){
+    _581___rgo_7374642f6d6174682f63616c63__parse_exponent_value: _575___rgo_7374642f6d6174682f63616c63__parse_exponent_value(idx, source_l, source_nth, mantissa, finish, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__digit(value, invalid, _581___rgo_7374642f6d6174682f63616c63__parse_exponent_value)
+}
+
+_571___rgo_7374642f6d6174682f63616c63__parse_exponent_value: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), source_l: uint, mantissa:((f64)), finish:(((f64)), ((f64)), (((f64)))), ok:(uint, ((f64)))){
+    _582___rgo_7374642f6d6174682f63616c63__parse_exponent_value: _573___rgo_7374642f6d6174682f63616c63__parse_exponent_value(invalid, idx, source_l, source_nth, mantissa, finish, ok)
+    source_nth(idx, invalid, _582___rgo_7374642f6d6174682f63616c63__parse_exponent_value)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_exponent_value: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, mantissa:((f64)), finish:(((f64)), ((f64)), (((f64)))), invalid:(), ok:(uint, ((f64)))){
+    _583___rgo_7374642f6d6174682f63616c63__parse_exponent_value: _571___rgo_7374642f6d6174682f63616c63__parse_exponent_value(source_nth, idx, invalid, source_l, mantissa, finish, ok)
+    @lt_uint(idx, source_l, _583___rgo_7374642f6d6174682f63616c63__parse_exponent_value, invalid)
+}
+_595___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: (source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_exponent_value(source_l, source_nth, next_idx, mantissa, __rgo_7374642f6d6174682f63616c63__positive_exponent, invalid, ok)
+}
+
+_592___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _593: 1
+    _596___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: _595___rgo_7374642f6d6174682f63616c63__parse_exponent_sign(source_l, source_nth, mantissa, invalid, ok)
+    @add_uint(idx, _593, _596___rgo_7374642f6d6174682f63616c63__parse_exponent_sign)
+}
+_605___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: (source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_exponent_value(source_l, source_nth, next_idx, mantissa, __rgo_7374642f6d6174682f63616c63__negative_exponent, invalid, ok)
+}
+
+_602___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _603: 1
+    _606___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: _605___rgo_7374642f6d6174682f63616c63__parse_exponent_sign(source_l, source_nth, mantissa, invalid, ok)
+    @add_uint(idx, _603, _606___rgo_7374642f6d6174682f63616c63__parse_exponent_sign)
+}
+
+_599___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: (value: u8, idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _600: 45
+    _607___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: _602___rgo_7374642f6d6174682f63616c63__parse_exponent_sign(idx, source_l, source_nth, mantissa, invalid, ok)
+    _608___rgo_7374642f6d6174682f63616c63__parse_exponent_value: __rgo_7374642f6d6174682f63616c63__parse_exponent_value(source_l, source_nth, idx, mantissa, __rgo_7374642f6d6174682f63616c63__positive_exponent, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _600, _607___rgo_7374642f6d6174682f63616c63__parse_exponent_sign, _608___rgo_7374642f6d6174682f63616c63__parse_exponent_value)
+}
+
+_589___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64))), value: u8){
+    _590: 43
+    _597___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: _592___rgo_7374642f6d6174682f63616c63__parse_exponent_sign(idx, source_l, source_nth, mantissa, invalid, ok)
+    _609___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: _599___rgo_7374642f6d6174682f63616c63__parse_exponent_sign(value, idx, source_l, source_nth, mantissa, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _590, _597___rgo_7374642f6d6174682f63616c63__parse_exponent_sign, _609___rgo_7374642f6d6174682f63616c63__parse_exponent_sign)
+}
+
+_587___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), source_l: uint, mantissa:((f64)), ok:(uint, ((f64)))){
+    _610___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: _589___rgo_7374642f6d6174682f63616c63__parse_exponent_sign(idx, source_l, source_nth, mantissa, invalid, ok)
+    source_nth(idx, invalid, _610___rgo_7374642f6d6174682f63616c63__parse_exponent_sign)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_exponent_sign: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, mantissa:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _611___rgo_7374642f6d6174682f63616c63__parse_exponent_sign: _587___rgo_7374642f6d6174682f63616c63__parse_exponent_sign(source_nth, idx, invalid, source_l, mantissa, ok)
+    @lt_uint(idx, source_l, _611___rgo_7374642f6d6174682f63616c63__parse_exponent_sign, invalid)
+}
+_623___rgo_7374642f6d6174682f63616c63__parse_exponent: (source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_exponent_sign(source_l, source_nth, next_idx, mantissa, invalid, ok)
+}
+
+_620___rgo_7374642f6d6174682f63616c63__parse_exponent: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _621: 1
+    _624___rgo_7374642f6d6174682f63616c63__parse_exponent: _623___rgo_7374642f6d6174682f63616c63__parse_exponent(source_l, source_nth, mantissa, invalid, ok)
+    @add_uint(idx, _621, _624___rgo_7374642f6d6174682f63616c63__parse_exponent)
+}
+_633___rgo_7374642f6d6174682f63616c63__parse_exponent: (source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_exponent_sign(source_l, source_nth, next_idx, mantissa, invalid, ok)
+}
+
+_630___rgo_7374642f6d6174682f63616c63__parse_exponent: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _631: 1
+    _634___rgo_7374642f6d6174682f63616c63__parse_exponent: _633___rgo_7374642f6d6174682f63616c63__parse_exponent(source_l, source_nth, mantissa, invalid, ok)
+    @add_uint(idx, _631, _634___rgo_7374642f6d6174682f63616c63__parse_exponent)
+}
+
+_627___rgo_7374642f6d6174682f63616c63__parse_exponent: (value: u8, idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _628: 69
+    _635___rgo_7374642f6d6174682f63616c63__parse_exponent: _630___rgo_7374642f6d6174682f63616c63__parse_exponent(idx, source_l, source_nth, mantissa, invalid, ok)
+    _636_ok: ok(idx, mantissa)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _628, _635___rgo_7374642f6d6174682f63616c63__parse_exponent, _636_ok)
+}
+
+_617___rgo_7374642f6d6174682f63616c63__parse_exponent: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), mantissa:((f64)), invalid:(), ok:(uint, ((f64))), value: u8){
+    _618: 101
+    _625___rgo_7374642f6d6174682f63616c63__parse_exponent: _620___rgo_7374642f6d6174682f63616c63__parse_exponent(idx, source_l, source_nth, mantissa, invalid, ok)
+    _637___rgo_7374642f6d6174682f63616c63__parse_exponent: _627___rgo_7374642f6d6174682f63616c63__parse_exponent(value, idx, source_l, source_nth, mantissa, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _618, _625___rgo_7374642f6d6174682f63616c63__parse_exponent, _637___rgo_7374642f6d6174682f63616c63__parse_exponent)
+}
+
+_615___rgo_7374642f6d6174682f63616c63__parse_exponent: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), source_l: uint, mantissa:((f64)), ok:(uint, ((f64)))){
+    _638___rgo_7374642f6d6174682f63616c63__parse_exponent: _617___rgo_7374642f6d6174682f63616c63__parse_exponent(idx, source_l, source_nth, mantissa, invalid, ok)
+    source_nth(idx, invalid, _638___rgo_7374642f6d6174682f63616c63__parse_exponent)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_exponent: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, mantissa:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _639___rgo_7374642f6d6174682f63616c63__parse_exponent: _615___rgo_7374642f6d6174682f63616c63__parse_exponent(source_nth, idx, invalid, source_l, mantissa, ok)
+    _640_ok: ok(idx, mantissa)
+    @lt_uint(idx, source_l, _639___rgo_7374642f6d6174682f63616c63__parse_exponent, _640_ok)
+}
+_656___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (__rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), a:((f64)), invalid:(), ok:(uint, ((f64))), following_idx: uint, b:((f64))){
+    _657___rgo_7374642f6d6174682f63616c63__add: __rgo_7374642f6d6174682f63616c63__add(a, b)
+    __rgo_7374642f6d6174682f63616c63__parse_sum_tail(source_l, source_nth, following_idx, args, _657___rgo_7374642f6d6174682f63616c63__add, invalid, ok)
+}
+
+_654___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (__rgo_7374642f6d6174682f63616c63__parse_product:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64))), operand_idx: uint){
+    _658___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _656___rgo_7374642f6d6174682f63616c63__parse_sum_tail(__rgo_7374642f6d6174682f63616c63__parse_sum_tail, source_l, source_nth, args, a, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_product(source_l, source_nth, operand_idx, args, invalid, _658___rgo_7374642f6d6174682f63616c63__parse_sum_tail)
+}
+
+_651___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_product:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64)))){
+    _652: 1
+    _659___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _654___rgo_7374642f6d6174682f63616c63__parse_sum_tail(__rgo_7374642f6d6174682f63616c63__parse_product, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_sum_tail, a, ok)
+    @add_uint(next_idx, _652, _659___rgo_7374642f6d6174682f63616c63__parse_sum_tail)
+}
+_670___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (__rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ((f64)), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ())), ()), a:((f64)), invalid:(), ok:(uint, ((f64))), following_idx: uint, b:((f64))){
+    _671___rgo_7374642f6d6174682f63616c63__subtract: __rgo_7374642f6d6174682f63616c63__subtract(a, b)
+    __rgo_7374642f6d6174682f63616c63__parse_sum_tail(source_l, source_nth, following_idx, args, _671___rgo_7374642f6d6174682f63616c63__subtract, invalid, ok)
+}
+
+_668___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (__rgo_7374642f6d6174682f63616c63__parse_product:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64))), operand_idx: uint){
+    _672___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _670___rgo_7374642f6d6174682f63616c63__parse_sum_tail(__rgo_7374642f6d6174682f63616c63__parse_sum_tail, source_l, source_nth, args, a, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_product(source_l, source_nth, operand_idx, args, invalid, _672___rgo_7374642f6d6174682f63616c63__parse_sum_tail)
+}
+
+_665___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_product:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64)))){
+    _666: 1
+    _673___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _668___rgo_7374642f6d6174682f63616c63__parse_sum_tail(__rgo_7374642f6d6174682f63616c63__parse_product, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_sum_tail, a, ok)
+    @add_uint(next_idx, _666, _673___rgo_7374642f6d6174682f63616c63__parse_sum_tail)
+}
+
+_662___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (operator: u8, next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_product:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64)))){
+    _663: 45
+    _674___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _665___rgo_7374642f6d6174682f63616c63__parse_sum_tail(next_idx, __rgo_7374642f6d6174682f63616c63__parse_product, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_sum_tail, a, ok)
+    _675_ok: ok(next_idx, a)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(operator, _663, _674___rgo_7374642f6d6174682f63616c63__parse_sum_tail, _675_ok)
+}
+
+_648___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_product:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64))), operator: u8){
+    _649: 43
+    _660___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _651___rgo_7374642f6d6174682f63616c63__parse_sum_tail(next_idx, __rgo_7374642f6d6174682f63616c63__parse_product, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_sum_tail, a, ok)
+    _676___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _662___rgo_7374642f6d6174682f63616c63__parse_sum_tail(operator, next_idx, __rgo_7374642f6d6174682f63616c63__parse_product, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_sum_tail, a, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(operator, _649, _660___rgo_7374642f6d6174682f63616c63__parse_sum_tail, _676___rgo_7374642f6d6174682f63616c63__parse_sum_tail)
+}
+
+_646___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (source_nth:(uint, (), (u8)), next_idx: uint, invalid:(), __rgo_7374642f6d6174682f63616c63__parse_product:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), __rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64)))){
+    _677___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _648___rgo_7374642f6d6174682f63616c63__parse_sum_tail(next_idx, __rgo_7374642f6d6174682f63616c63__parse_product, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_sum_tail, a, ok)
+    source_nth(next_idx, invalid, _677___rgo_7374642f6d6174682f63616c63__parse_sum_tail)
+}
+
+_644___rgo_7374642f6d6174682f63616c63__parse_sum_tail: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_product:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), __rgo_7374642f6d6174682f63616c63__parse_sum_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64))), next_idx: uint){
+    _678___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _646___rgo_7374642f6d6174682f63616c63__parse_sum_tail(source_nth, next_idx, invalid, __rgo_7374642f6d6174682f63616c63__parse_product, source_l, args, __rgo_7374642f6d6174682f63616c63__parse_sum_tail, a, ok)
+    _679_ok: ok(next_idx, a)
+    @lt_uint(next_idx, source_l, _678___rgo_7374642f6d6174682f63616c63__parse_sum_tail, _679_ok)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_sum_tail: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), a:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _680___rgo_7374642f6d6174682f63616c63__parse_sum_tail: _644___rgo_7374642f6d6174682f63616c63__parse_sum_tail(source_l, source_nth, invalid, __rgo_7374642f6d6174682f63616c63__parse_product, args, __rgo_7374642f6d6174682f63616c63__parse_sum_tail, a, ok)
+    __rgo_7374642f6d6174682f63616c63__skip_whitespace(source_l, source_nth, idx, _680___rgo_7374642f6d6174682f63616c63__parse_sum_tail)
+}
+
+_684___rgo_7374642f6d6174682f63616c63__parse_expression: (source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), next_idx: uint, value:((f64))){
+    __rgo_7374642f6d6174682f63616c63__parse_sum_tail(source_l, source_nth, next_idx, args, value, invalid, ok)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_expression: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(uint, ((f64)))){
+    _685___rgo_7374642f6d6174682f63616c63__parse_expression: _684___rgo_7374642f6d6174682f63616c63__parse_expression(source_l, source_nth, args, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_product(source_l, source_nth, idx, args, invalid, _685___rgo_7374642f6d6174682f63616c63__parse_expression)
+}
+
+_826___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _827: "trunc"
+    _828___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__trunc, value)
+    _829_ok: ok(_828___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _827, _829_ok, invalid)
+}
+
+_821___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _822: "tanh"
+    _823___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__tanh, value)
+    _824_ok: ok(_823___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _830___rgo_7374642f6d6174682f63616c63__apply_unary_function: _826___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _822, _824_ok, _830___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_816___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _817: "tan"
+    _818___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__tan, value)
+    _819_ok: ok(_818___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _831___rgo_7374642f6d6174682f63616c63__apply_unary_function: _821___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _817, _819_ok, _831___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_811___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _812: "sqrt"
+    _813___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__sqrt, value)
+    _814_ok: ok(_813___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _832___rgo_7374642f6d6174682f63616c63__apply_unary_function: _816___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _812, _814_ok, _832___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_806___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _807: "sinh"
+    _808___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__sinh, value)
+    _809_ok: ok(_808___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _833___rgo_7374642f6d6174682f63616c63__apply_unary_function: _811___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _807, _809_ok, _833___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_801___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _802: "sin"
+    _803___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__sin, value)
+    _804_ok: ok(_803___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _834___rgo_7374642f6d6174682f63616c63__apply_unary_function: _806___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _802, _804_ok, _834___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_796___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _797: "round"
+    _798___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__round, value)
+    _799_ok: ok(_798___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _835___rgo_7374642f6d6174682f63616c63__apply_unary_function: _801___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _797, _799_ok, _835___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_791___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _792: "rad"
+    _793___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__to_radians, value)
+    _794_ok: ok(_793___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _836___rgo_7374642f6d6174682f63616c63__apply_unary_function: _796___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _792, _794_ok, _836___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_786___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _787: "log2"
+    _788___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__log2, value)
+    _789_ok: ok(_788___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _837___rgo_7374642f6d6174682f63616c63__apply_unary_function: _791___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _787, _789_ok, _837___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_781___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _782: "log10"
+    _783___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__log10, value)
+    _784_ok: ok(_783___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _838___rgo_7374642f6d6174682f63616c63__apply_unary_function: _786___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _782, _784_ok, _838___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_776___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _777: "log"
+    _778___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__log10, value)
+    _779_ok: ok(_778___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _839___rgo_7374642f6d6174682f63616c63__apply_unary_function: _781___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _777, _779_ok, _839___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_771___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _772: "ln1p"
+    _773___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__ln_1p, value)
+    _774_ok: ok(_773___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _840___rgo_7374642f6d6174682f63616c63__apply_unary_function: _776___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _772, _774_ok, _840___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_766___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _767: "ln"
+    _768___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__ln, value)
+    _769_ok: ok(_768___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _841___rgo_7374642f6d6174682f63616c63__apply_unary_function: _771___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _767, _769_ok, _841___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_761___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _762: "floor"
+    _763___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__floor, value)
+    _764_ok: ok(_763___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _842___rgo_7374642f6d6174682f63616c63__apply_unary_function: _766___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _762, _764_ok, _842___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_756___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _757: "expm1"
+    _758___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__exp_m1, value)
+    _759_ok: ok(_758___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _843___rgo_7374642f6d6174682f63616c63__apply_unary_function: _761___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _757, _759_ok, _843___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_751___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _752: "exp2"
+    _753___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__exp2, value)
+    _754_ok: ok(_753___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _844___rgo_7374642f6d6174682f63616c63__apply_unary_function: _756___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _752, _754_ok, _844___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_746___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _747: "exp"
+    _748___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__exp, value)
+    _749_ok: ok(_748___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _845___rgo_7374642f6d6174682f63616c63__apply_unary_function: _751___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _747, _749_ok, _845___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_741___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _742: "deg"
+    _743___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__to_degrees, value)
+    _744_ok: ok(_743___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _846___rgo_7374642f6d6174682f63616c63__apply_unary_function: _746___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _742, _744_ok, _846___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_736___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _737: "cosh"
+    _738___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__cosh, value)
+    _739_ok: ok(_738___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _847___rgo_7374642f6d6174682f63616c63__apply_unary_function: _741___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _737, _739_ok, _847___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_731___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _732: "cos"
+    _733___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__cos, value)
+    _734_ok: ok(_733___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _848___rgo_7374642f6d6174682f63616c63__apply_unary_function: _736___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _732, _734_ok, _848___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_726___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _727: "ceil"
+    _728___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__ceil, value)
+    _729_ok: ok(_728___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _849___rgo_7374642f6d6174682f63616c63__apply_unary_function: _731___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _727, _729_ok, _849___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_721___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _722: "cbrt"
+    _723___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__cbrt, value)
+    _724_ok: ok(_723___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _850___rgo_7374642f6d6174682f63616c63__apply_unary_function: _726___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _722, _724_ok, _850___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_716___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _717: "atanh"
+    _718___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__atanh, value)
+    _719_ok: ok(_718___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _851___rgo_7374642f6d6174682f63616c63__apply_unary_function: _721___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _717, _719_ok, _851___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_711___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _712: "atan"
+    _713___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__atan, value)
+    _714_ok: ok(_713___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _852___rgo_7374642f6d6174682f63616c63__apply_unary_function: _716___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _712, _714_ok, _852___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_706___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _707: "asinh"
+    _708___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__asinh, value)
+    _709_ok: ok(_708___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _853___rgo_7374642f6d6174682f63616c63__apply_unary_function: _711___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _707, _709_ok, _853___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_701___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _702: "asin"
+    _703___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__asin, value)
+    _704_ok: ok(_703___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _854___rgo_7374642f6d6174682f63616c63__apply_unary_function: _706___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _702, _704_ok, _854___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_696___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _697: "acosh"
+    _698___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__acosh, value)
+    _699_ok: ok(_698___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _855___rgo_7374642f6d6174682f63616c63__apply_unary_function: _701___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _697, _699_ok, _855___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_691___rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_unary_operation:((f64, (f64)), ((f64)), (f64)), value:((f64)), invalid:()){
+    _692: "acos"
+    _693___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__acos, value)
+    _694_ok: ok(_693___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _856___rgo_7374642f6d6174682f63616c63__apply_unary_function: _696___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _692, _694_ok, _856___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+__rgo_7374642f6d6174682f63616c63__apply_unary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, value:((f64)), invalid:(), ok:(((f64)))){
+    _687: "abs"
+    _688___rgo_7374642f6d6174682f63616c63__apply_unary_operation: __rgo_7374642f6d6174682f63616c63__apply_unary_operation(__rgo_7374642f6d617468__abs, value)
+    _689_ok: ok(_688___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+    _857___rgo_7374642f6d6174682f63616c63__apply_unary_function: _691___rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_unary_operation, value, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _687, _689_ok, _857___rgo_7374642f6d6174682f63616c63__apply_unary_function)
+}
+
+_893___rgo_7374642f6d6174682f63616c63__apply_binary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_binary_operation:((f64, f64, (f64)), ((f64)), ((f64)), (f64)), a:((f64)), b:((f64)), invalid:()){
+    _894: "remainder"
+    _895___rgo_7374642f6d6174682f63616c63__apply_binary_operation: __rgo_7374642f6d6174682f63616c63__apply_binary_operation(__rgo_7374642f6d617468__remainder, a, b)
+    _896_ok: ok(_895___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _894, _896_ok, invalid)
+}
+
+_888___rgo_7374642f6d6174682f63616c63__apply_binary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), a:((f64)), b:((f64)), __rgo_7374642f6d6174682f63616c63__apply_binary_operation:((f64, f64, (f64)), ((f64)), ((f64)), (f64)), invalid:()){
+    _889: "pow"
+    _890___rgo_7374642f6d6174682f63616c63__power: __rgo_7374642f6d6174682f63616c63__power(a, b)
+    _891_ok: ok(_890___rgo_7374642f6d6174682f63616c63__power)
+    _897___rgo_7374642f6d6174682f63616c63__apply_binary_function: _893___rgo_7374642f6d6174682f63616c63__apply_binary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_binary_operation, a, b, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _889, _891_ok, _897___rgo_7374642f6d6174682f63616c63__apply_binary_function)
+}
+
+_883___rgo_7374642f6d6174682f63616c63__apply_binary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_binary_operation:((f64, f64, (f64)), ((f64)), ((f64)), (f64)), a:((f64)), b:((f64)), invalid:()){
+    _884: "mod"
+    _885___rgo_7374642f6d6174682f63616c63__apply_binary_operation: __rgo_7374642f6d6174682f63616c63__apply_binary_operation(__rgo_7374642f6d617468__mod, a, b)
+    _886_ok: ok(_885___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+    _898___rgo_7374642f6d6174682f63616c63__apply_binary_function: _888___rgo_7374642f6d6174682f63616c63__apply_binary_function(source_nth, start, end, ok, a, b, __rgo_7374642f6d6174682f63616c63__apply_binary_operation, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _884, _886_ok, _898___rgo_7374642f6d6174682f63616c63__apply_binary_function)
+}
+
+_878___rgo_7374642f6d6174682f63616c63__apply_binary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_binary_operation:((f64, f64, (f64)), ((f64)), ((f64)), (f64)), a:((f64)), b:((f64)), invalid:()){
+    _879: "min"
+    _880___rgo_7374642f6d6174682f63616c63__apply_binary_operation: __rgo_7374642f6d6174682f63616c63__apply_binary_operation(__rgo_7374642f6d617468__min_f64, a, b)
+    _881_ok: ok(_880___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+    _899___rgo_7374642f6d6174682f63616c63__apply_binary_function: _883___rgo_7374642f6d6174682f63616c63__apply_binary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_binary_operation, a, b, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _879, _881_ok, _899___rgo_7374642f6d6174682f63616c63__apply_binary_function)
+}
+
+_873___rgo_7374642f6d6174682f63616c63__apply_binary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_binary_operation:((f64, f64, (f64)), ((f64)), ((f64)), (f64)), a:((f64)), b:((f64)), invalid:()){
+    _874: "max"
+    _875___rgo_7374642f6d6174682f63616c63__apply_binary_operation: __rgo_7374642f6d6174682f63616c63__apply_binary_operation(__rgo_7374642f6d617468__max_f64, a, b)
+    _876_ok: ok(_875___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+    _900___rgo_7374642f6d6174682f63616c63__apply_binary_function: _878___rgo_7374642f6d6174682f63616c63__apply_binary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_binary_operation, a, b, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _874, _876_ok, _900___rgo_7374642f6d6174682f63616c63__apply_binary_function)
+}
+
+_868___rgo_7374642f6d6174682f63616c63__apply_binary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_binary_operation:((f64, f64, (f64)), ((f64)), ((f64)), (f64)), a:((f64)), b:((f64)), invalid:()){
+    _869: "log"
+    _870___rgo_7374642f6d6174682f63616c63__apply_binary_operation: __rgo_7374642f6d6174682f63616c63__apply_binary_operation(__rgo_7374642f6d617468__log, a, b)
+    _871_ok: ok(_870___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+    _901___rgo_7374642f6d6174682f63616c63__apply_binary_function: _873___rgo_7374642f6d6174682f63616c63__apply_binary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_binary_operation, a, b, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _869, _871_ok, _901___rgo_7374642f6d6174682f63616c63__apply_binary_function)
+}
+
+_863___rgo_7374642f6d6174682f63616c63__apply_binary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), __rgo_7374642f6d6174682f63616c63__apply_binary_operation:((f64, f64, (f64)), ((f64)), ((f64)), (f64)), a:((f64)), b:((f64)), invalid:()){
+    _864: "hypot"
+    _865___rgo_7374642f6d6174682f63616c63__apply_binary_operation: __rgo_7374642f6d6174682f63616c63__apply_binary_operation(__rgo_7374642f6d617468__hypot, a, b)
+    _866_ok: ok(_865___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+    _902___rgo_7374642f6d6174682f63616c63__apply_binary_function: _868___rgo_7374642f6d6174682f63616c63__apply_binary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_binary_operation, a, b, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _864, _866_ok, _902___rgo_7374642f6d6174682f63616c63__apply_binary_function)
+}
+
+__rgo_7374642f6d6174682f63616c63__apply_binary_function: (source_nth:(uint, (), (u8)), start: uint, end: uint, a:((f64)), b:((f64)), invalid:(), ok:(((f64)))){
+    _859: "atan2"
+    _860___rgo_7374642f6d6174682f63616c63__apply_binary_operation: __rgo_7374642f6d6174682f63616c63__apply_binary_operation(__rgo_7374642f6d617468__atan2, a, b)
+    _861_ok: ok(_860___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+    _903___rgo_7374642f6d6174682f63616c63__apply_binary_function: _863___rgo_7374642f6d6174682f63616c63__apply_binary_function(source_nth, start, end, ok, __rgo_7374642f6d6174682f63616c63__apply_binary_operation, a, b, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _859, _861_ok, _903___rgo_7374642f6d6174682f63616c63__apply_binary_function)
+}
+
+_1008___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _1009: "trunc"
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _1009, reserved, available)
+}
+
+_1005___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _1006: "tanh"
+    _1010___rgo_7374642f6d6174682f63616c63__reserved_function_name: _1008___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _1006, reserved, _1010___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_1002___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _1003: "tan"
+    _1011___rgo_7374642f6d6174682f63616c63__reserved_function_name: _1005___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _1003, reserved, _1011___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_999___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _1000: "sqrt"
+    _1012___rgo_7374642f6d6174682f63616c63__reserved_function_name: _1002___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _1000, reserved, _1012___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_996___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _997: "sinh"
+    _1013___rgo_7374642f6d6174682f63616c63__reserved_function_name: _999___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _997, reserved, _1013___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_993___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _994: "sin"
+    _1014___rgo_7374642f6d6174682f63616c63__reserved_function_name: _996___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _994, reserved, _1014___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_990___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _991: "round"
+    _1015___rgo_7374642f6d6174682f63616c63__reserved_function_name: _993___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _991, reserved, _1015___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_987___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _988: "remainder"
+    _1016___rgo_7374642f6d6174682f63616c63__reserved_function_name: _990___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _988, reserved, _1016___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_984___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _985: "rad"
+    _1017___rgo_7374642f6d6174682f63616c63__reserved_function_name: _987___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _985, reserved, _1017___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_981___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _982: "pow"
+    _1018___rgo_7374642f6d6174682f63616c63__reserved_function_name: _984___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _982, reserved, _1018___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_978___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _979: "mod"
+    _1019___rgo_7374642f6d6174682f63616c63__reserved_function_name: _981___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _979, reserved, _1019___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_975___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _976: "min"
+    _1020___rgo_7374642f6d6174682f63616c63__reserved_function_name: _978___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _976, reserved, _1020___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_972___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _973: "max"
+    _1021___rgo_7374642f6d6174682f63616c63__reserved_function_name: _975___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _973, reserved, _1021___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_969___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _970: "log2"
+    _1022___rgo_7374642f6d6174682f63616c63__reserved_function_name: _972___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _970, reserved, _1022___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_966___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _967: "log10"
+    _1023___rgo_7374642f6d6174682f63616c63__reserved_function_name: _969___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _967, reserved, _1023___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_963___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _964: "log"
+    _1024___rgo_7374642f6d6174682f63616c63__reserved_function_name: _966___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _964, reserved, _1024___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_960___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _961: "ln1p"
+    _1025___rgo_7374642f6d6174682f63616c63__reserved_function_name: _963___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _961, reserved, _1025___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_957___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _958: "ln"
+    _1026___rgo_7374642f6d6174682f63616c63__reserved_function_name: _960___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _958, reserved, _1026___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_954___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _955: "hypot"
+    _1027___rgo_7374642f6d6174682f63616c63__reserved_function_name: _957___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _955, reserved, _1027___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_951___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _952: "floor"
+    _1028___rgo_7374642f6d6174682f63616c63__reserved_function_name: _954___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _952, reserved, _1028___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_948___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _949: "expm1"
+    _1029___rgo_7374642f6d6174682f63616c63__reserved_function_name: _951___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _949, reserved, _1029___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_945___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _946: "exp2"
+    _1030___rgo_7374642f6d6174682f63616c63__reserved_function_name: _948___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _946, reserved, _1030___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_942___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _943: "exp"
+    _1031___rgo_7374642f6d6174682f63616c63__reserved_function_name: _945___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _943, reserved, _1031___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_939___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _940: "deg"
+    _1032___rgo_7374642f6d6174682f63616c63__reserved_function_name: _942___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _940, reserved, _1032___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_936___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _937: "cosh"
+    _1033___rgo_7374642f6d6174682f63616c63__reserved_function_name: _939___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _937, reserved, _1033___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_933___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _934: "cos"
+    _1034___rgo_7374642f6d6174682f63616c63__reserved_function_name: _936___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _934, reserved, _1034___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_930___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _931: "ceil"
+    _1035___rgo_7374642f6d6174682f63616c63__reserved_function_name: _933___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _931, reserved, _1035___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_927___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _928: "cbrt"
+    _1036___rgo_7374642f6d6174682f63616c63__reserved_function_name: _930___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _928, reserved, _1036___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_924___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _925: "atanh"
+    _1037___rgo_7374642f6d6174682f63616c63__reserved_function_name: _927___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _925, reserved, _1037___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_921___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _922: "atan2"
+    _1038___rgo_7374642f6d6174682f63616c63__reserved_function_name: _924___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _922, reserved, _1038___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_918___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _919: "atan"
+    _1039___rgo_7374642f6d6174682f63616c63__reserved_function_name: _921___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _919, reserved, _1039___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_915___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _916: "asinh"
+    _1040___rgo_7374642f6d6174682f63616c63__reserved_function_name: _918___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _916, reserved, _1040___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_912___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _913: "asin"
+    _1041___rgo_7374642f6d6174682f63616c63__reserved_function_name: _915___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _913, reserved, _1041___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_909___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _910: "acosh"
+    _1042___rgo_7374642f6d6174682f63616c63__reserved_function_name: _912___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _910, reserved, _1042___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_906___rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _907: "acos"
+    _1043___rgo_7374642f6d6174682f63616c63__reserved_function_name: _909___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _907, reserved, _1043___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+__rgo_7374642f6d6174682f63616c63__reserved_function_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _904: "abs"
+    _1044___rgo_7374642f6d6174682f63616c63__reserved_function_name: _906___rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _904, reserved, _1044___rgo_7374642f6d6174682f63616c63__reserved_function_name)
+}
+
+_1059___rgo_7374642f6d6174682f63616c63__reserved_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved_function:()!, available:()){
+    __rgo_7374642f6d6174682f63616c63__reserved_function_name(name_nth, start, end, reserved_function, available)
+}
+
+_1056___rgo_7374642f6d6174682f63616c63__reserved_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved_constant:()!, reserved_function:()!, available:()){
+    _1057: "tau"
+    _1060___rgo_7374642f6d6174682f63616c63__reserved_name: _1059___rgo_7374642f6d6174682f63616c63__reserved_name(name_nth, start, end, reserved_function, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _1057, reserved_constant, _1060___rgo_7374642f6d6174682f63616c63__reserved_name)
+}
+
+_1053___rgo_7374642f6d6174682f63616c63__reserved_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved_constant:()!, reserved_function:()!, available:()){
+    _1054: "pi"
+    _1061___rgo_7374642f6d6174682f63616c63__reserved_name: _1056___rgo_7374642f6d6174682f63616c63__reserved_name(name_nth, start, end, reserved_constant, reserved_function, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _1054, reserved_constant, _1061___rgo_7374642f6d6174682f63616c63__reserved_name)
+}
+
+_1050___rgo_7374642f6d6174682f63616c63__reserved_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved_future:()!, reserved_constant:()!, reserved_function:()!, available:()){
+    _1051: "i"
+    _1062___rgo_7374642f6d6174682f63616c63__reserved_name: _1053___rgo_7374642f6d6174682f63616c63__reserved_name(name_nth, start, end, reserved_constant, reserved_function, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _1051, reserved_future, _1062___rgo_7374642f6d6174682f63616c63__reserved_name)
+}
+
+__rgo_7374642f6d6174682f63616c63__reserved_name: (name_nth:(uint, (), (u8)), start: uint, end: uint, reserved:(), available:()){
+    _1045: "calc.var name conflicts with a calculation constant"
+    _1046: "calc.var name is reserved for future calculation syntax"
+    _1047: "calc.var name conflicts with a calculation function"
+    _1048: "e"
+    reserved_constant: @compile_error(_1045, reserved)
+    reserved_future: @compile_error(_1046, reserved)
+    reserved_function: @compile_error(_1047, reserved)
+    _1063___rgo_7374642f6d6174682f63616c63__reserved_name: _1050___rgo_7374642f6d6174682f63616c63__reserved_name(name_nth, start, end, reserved_future, reserved_constant, reserved_function, available)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(name_nth, start, end, _1048, reserved_constant, _1063___rgo_7374642f6d6174682f63616c63__reserved_name)
+}
+_1076___rgo_7374642f6d6174682f63616c63__parse_fraction_digits: (numerator:((f64)), digit_value: f64, denominator:((f64)), __rgo_7374642f6d6174682f63616c63__parse_fraction_digits:(uint, (uint, (), (u8)), uint, ((f64)), ((f64)), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    _1077: 0
+    next_numerator: __rgo_7374642f6d6174682f63616c63__append_digit(numerator, digit_value)
+    next_denominator: __rgo_7374642f6d6174682f63616c63__append_digit(denominator, _1077)
+    __rgo_7374642f6d6174682f63616c63__parse_fraction_digits(source_l, source_nth, next_idx, next_numerator, next_denominator, invalid, ok)
+}
+
+_1073___rgo_7374642f6d6174682f63616c63__parse_fraction_digits: (idx: uint, numerator:((f64)), denominator:((f64)), __rgo_7374642f6d6174682f63616c63__parse_fraction_digits:(uint, (uint, (), (u8)), uint, ((f64)), ((f64)), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(uint, ((f64))), digit_value: f64){
+    _1074: 1
+    _1078___rgo_7374642f6d6174682f63616c63__parse_fraction_digits: _1076___rgo_7374642f6d6174682f63616c63__parse_fraction_digits(numerator, digit_value, denominator, __rgo_7374642f6d6174682f63616c63__parse_fraction_digits, source_l, source_nth, invalid, ok)
+    @add_uint(idx, _1074, _1078___rgo_7374642f6d6174682f63616c63__parse_fraction_digits)
+}
+
+_1069___rgo_7374642f6d6174682f63616c63__parse_fraction_digits: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, numerator:((f64)), denominator:((f64)), invalid:(), ok:(uint, ((f64))), __rgo_7374642f6d6174682f63616c63__parse_fraction_digits:(uint, (uint, (), (u8)), uint, ((f64)), ((f64)), (), (uint, ((f64))))!, value: u8){
+    _1070___rgo_7374642f6d6174682f63616c63__divide: __rgo_7374642f6d6174682f63616c63__divide(numerator, denominator)
+    _1071___rgo_7374642f6d6174682f63616c63__parse_exponent: __rgo_7374642f6d6174682f63616c63__parse_exponent(source_l, source_nth, idx, _1070___rgo_7374642f6d6174682f63616c63__divide, invalid, ok)
+    _1079___rgo_7374642f6d6174682f63616c63__parse_fraction_digits: _1073___rgo_7374642f6d6174682f63616c63__parse_fraction_digits(idx, numerator, denominator, __rgo_7374642f6d6174682f63616c63__parse_fraction_digits, source_l, source_nth, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__digit(value, _1071___rgo_7374642f6d6174682f63616c63__parse_exponent, _1079___rgo_7374642f6d6174682f63616c63__parse_fraction_digits)
+}
+
+_1067___rgo_7374642f6d6174682f63616c63__parse_fraction_digits: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), source_l: uint, numerator:((f64)), denominator:((f64)), ok:(uint, ((f64))), __rgo_7374642f6d6174682f63616c63__parse_fraction_digits:(uint, (uint, (), (u8)), uint, ((f64)), ((f64)), (), (uint, ((f64))))!){
+    _1080___rgo_7374642f6d6174682f63616c63__parse_fraction_digits: _1069___rgo_7374642f6d6174682f63616c63__parse_fraction_digits(source_l, source_nth, idx, numerator, denominator, invalid, ok, __rgo_7374642f6d6174682f63616c63__parse_fraction_digits)
+    source_nth(idx, invalid, _1080___rgo_7374642f6d6174682f63616c63__parse_fraction_digits)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_fraction_digits: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, numerator:((f64)), denominator:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1081___rgo_7374642f6d6174682f63616c63__parse_fraction_digits: _1067___rgo_7374642f6d6174682f63616c63__parse_fraction_digits(source_nth, idx, invalid, source_l, numerator, denominator, ok, __rgo_7374642f6d6174682f63616c63__parse_fraction_digits)
+    _1082___rgo_7374642f6d6174682f63616c63__divide: __rgo_7374642f6d6174682f63616c63__divide(numerator, denominator)
+    _1083___rgo_7374642f6d6174682f63616c63__parse_exponent: __rgo_7374642f6d6174682f63616c63__parse_exponent(source_l, source_nth, idx, _1082___rgo_7374642f6d6174682f63616c63__divide, invalid, ok)
+    @lt_uint(idx, source_l, _1081___rgo_7374642f6d6174682f63616c63__parse_fraction_digits, _1083___rgo_7374642f6d6174682f63616c63__parse_exponent)
+}
+_1094___rgo_7374642f6d6174682f63616c63__parse_fraction: (numerator:((f64)), digit_value: f64, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    next_numerator: __rgo_7374642f6d6174682f63616c63__append_digit(numerator, digit_value)
+    _1095: 10
+    _1096___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(_1095)
+    __rgo_7374642f6d6174682f63616c63__parse_fraction_digits(source_l, source_nth, next_idx, next_numerator, _1096___rgo_7374642f6d6174682f63616c63__constant, invalid, ok)
+}
+
+_1091___rgo_7374642f6d6174682f63616c63__parse_fraction: (idx: uint, numerator:((f64)), source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(uint, ((f64))), digit_value: f64){
+    _1092: 1
+    _1097___rgo_7374642f6d6174682f63616c63__parse_fraction: _1094___rgo_7374642f6d6174682f63616c63__parse_fraction(numerator, digit_value, source_l, source_nth, invalid, ok)
+    @add_uint(idx, _1092, _1097___rgo_7374642f6d6174682f63616c63__parse_fraction)
+}
+
+_1089___rgo_7374642f6d6174682f63616c63__parse_fraction: (invalid:(), idx: uint, numerator:((f64)), source_l: uint, source_nth:(uint, (), (u8)), ok:(uint, ((f64))), value: u8){
+    _1098___rgo_7374642f6d6174682f63616c63__parse_fraction: _1091___rgo_7374642f6d6174682f63616c63__parse_fraction(idx, numerator, source_l, source_nth, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__digit(value, invalid, _1098___rgo_7374642f6d6174682f63616c63__parse_fraction)
+}
+
+_1087___rgo_7374642f6d6174682f63616c63__parse_fraction: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), numerator:((f64)), source_l: uint, ok:(uint, ((f64)))){
+    _1099___rgo_7374642f6d6174682f63616c63__parse_fraction: _1089___rgo_7374642f6d6174682f63616c63__parse_fraction(invalid, idx, numerator, source_l, source_nth, ok)
+    source_nth(idx, invalid, _1099___rgo_7374642f6d6174682f63616c63__parse_fraction)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_fraction: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, numerator:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1100___rgo_7374642f6d6174682f63616c63__parse_fraction: _1087___rgo_7374642f6d6174682f63616c63__parse_fraction(source_nth, idx, invalid, numerator, source_l, ok)
+    @lt_uint(idx, source_l, _1100___rgo_7374642f6d6174682f63616c63__parse_fraction, invalid)
+}
+_1114___rgo_7374642f6d6174682f63616c63__parse_number_tail: (source_l: uint, source_nth:(uint, (), (u8)), number:((f64)), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_fraction(source_l, source_nth, next_idx, number, invalid, ok)
+}
+
+_1111___rgo_7374642f6d6174682f63616c63__parse_number_tail: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), number:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1112: 1
+    _1115___rgo_7374642f6d6174682f63616c63__parse_number_tail: _1114___rgo_7374642f6d6174682f63616c63__parse_number_tail(source_l, source_nth, number, invalid, ok)
+    @add_uint(idx, _1112, _1115___rgo_7374642f6d6174682f63616c63__parse_number_tail)
+}
+
+_1108___rgo_7374642f6d6174682f63616c63__parse_number_tail: (value: u8, idx: uint, source_l: uint, source_nth:(uint, (), (u8)), number:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1109: 46
+    _1116___rgo_7374642f6d6174682f63616c63__parse_number_tail: _1111___rgo_7374642f6d6174682f63616c63__parse_number_tail(idx, source_l, source_nth, number, invalid, ok)
+    _1117___rgo_7374642f6d6174682f63616c63__parse_exponent: __rgo_7374642f6d6174682f63616c63__parse_exponent(source_l, source_nth, idx, number, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1109, _1116___rgo_7374642f6d6174682f63616c63__parse_number_tail, _1117___rgo_7374642f6d6174682f63616c63__parse_exponent)
+}
+_1123___rgo_7374642f6d6174682f63616c63__parse_number_tail: (number:((f64)), digit_value: f64, __rgo_7374642f6d6174682f63616c63__parse_number_tail:(uint, (uint, (), (u8)), uint, ((f64)), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    next_number: __rgo_7374642f6d6174682f63616c63__append_digit(number, digit_value)
+    __rgo_7374642f6d6174682f63616c63__parse_number_tail(source_l, source_nth, next_idx, next_number, invalid, ok)
+}
+
+_1120___rgo_7374642f6d6174682f63616c63__parse_number_tail: (idx: uint, number:((f64)), __rgo_7374642f6d6174682f63616c63__parse_number_tail:(uint, (uint, (), (u8)), uint, ((f64)), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(uint, ((f64))), digit_value: f64){
+    _1121: 1
+    _1124___rgo_7374642f6d6174682f63616c63__parse_number_tail: _1123___rgo_7374642f6d6174682f63616c63__parse_number_tail(number, digit_value, __rgo_7374642f6d6174682f63616c63__parse_number_tail, source_l, source_nth, invalid, ok)
+    @add_uint(idx, _1121, _1124___rgo_7374642f6d6174682f63616c63__parse_number_tail)
+}
+
+_1106___rgo_7374642f6d6174682f63616c63__parse_number_tail: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), number:((f64)), invalid:(), ok:(uint, ((f64))), __rgo_7374642f6d6174682f63616c63__parse_number_tail:(uint, (uint, (), (u8)), uint, ((f64)), (), (uint, ((f64))))!, value: u8){
+    _1118___rgo_7374642f6d6174682f63616c63__parse_number_tail: _1108___rgo_7374642f6d6174682f63616c63__parse_number_tail(value, idx, source_l, source_nth, number, invalid, ok)
+    _1125___rgo_7374642f6d6174682f63616c63__parse_number_tail: _1120___rgo_7374642f6d6174682f63616c63__parse_number_tail(idx, number, __rgo_7374642f6d6174682f63616c63__parse_number_tail, source_l, source_nth, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__digit(value, _1118___rgo_7374642f6d6174682f63616c63__parse_number_tail, _1125___rgo_7374642f6d6174682f63616c63__parse_number_tail)
+}
+
+_1104___rgo_7374642f6d6174682f63616c63__parse_number_tail: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), source_l: uint, number:((f64)), ok:(uint, ((f64))), __rgo_7374642f6d6174682f63616c63__parse_number_tail:(uint, (uint, (), (u8)), uint, ((f64)), (), (uint, ((f64))))!){
+    _1126___rgo_7374642f6d6174682f63616c63__parse_number_tail: _1106___rgo_7374642f6d6174682f63616c63__parse_number_tail(idx, source_l, source_nth, number, invalid, ok, __rgo_7374642f6d6174682f63616c63__parse_number_tail)
+    source_nth(idx, invalid, _1126___rgo_7374642f6d6174682f63616c63__parse_number_tail)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_number_tail: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, number:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1127___rgo_7374642f6d6174682f63616c63__parse_number_tail: _1104___rgo_7374642f6d6174682f63616c63__parse_number_tail(source_nth, idx, invalid, source_l, number, ok, __rgo_7374642f6d6174682f63616c63__parse_number_tail)
+    _1128___rgo_7374642f6d6174682f63616c63__parse_exponent: __rgo_7374642f6d6174682f63616c63__parse_exponent(source_l, source_nth, idx, number, invalid, ok)
+    @lt_uint(idx, source_l, _1127___rgo_7374642f6d6174682f63616c63__parse_number_tail, _1128___rgo_7374642f6d6174682f63616c63__parse_exponent)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_number: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, first_digit: f64, invalid:(), ok:(uint, ((f64)))){
+    _1131___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(first_digit)
+    __rgo_7374642f6d6174682f63616c63__parse_number_tail(source_l, source_nth, idx, _1131___rgo_7374642f6d6174682f63616c63__constant, invalid, ok)
+}
+
+_1137___rgo_7374642f6d6174682f63616c63__apply_unary_operation: (operation:(f64, (f64)), ok:(f64), number: f64){
+    operation(number, ok)
+}
+
+__rgo_7374642f6d6174682f63616c63__apply_unary_operation: (operation:(f64, (f64)), value:((f64)), ok:(f64)){
+    _1138___rgo_7374642f6d6174682f63616c63__apply_unary_operation: _1137___rgo_7374642f6d6174682f63616c63__apply_unary_operation(operation, ok)
+    value(_1138___rgo_7374642f6d6174682f63616c63__apply_unary_operation)
+}
+
+_1147___rgo_7374642f6d6174682f63616c63__apply_binary_operation: (operation:(f64, f64, (f64)), a_value: f64, ok:(f64), b_value: f64){
+    operation(a_value, b_value, ok)
+}
+
+_1145___rgo_7374642f6d6174682f63616c63__apply_binary_operation: (b:((f64)), operation:(f64, f64, (f64)), ok:(f64), a_value: f64){
+    _1148___rgo_7374642f6d6174682f63616c63__apply_binary_operation: _1147___rgo_7374642f6d6174682f63616c63__apply_binary_operation(operation, a_value, ok)
+    b(_1148___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+}
+
+__rgo_7374642f6d6174682f63616c63__apply_binary_operation: (operation:(f64, f64, (f64)), a:((f64)), b:((f64)), ok:(f64)){
+    _1149___rgo_7374642f6d6174682f63616c63__apply_binary_operation: _1145___rgo_7374642f6d6174682f63616c63__apply_binary_operation(b, operation, ok)
+    a(_1149___rgo_7374642f6d6174682f63616c63__apply_binary_operation)
+}
+_1167___rgo_7374642f6d6174682f63616c63__parse_power: (ok:(uint, ((f64))), base:((f64)), following_idx: uint, exponent:((f64))){
+    _1168___rgo_7374642f6d6174682f63616c63__power: __rgo_7374642f6d6174682f63616c63__power(base, exponent)
+    ok(following_idx, _1168___rgo_7374642f6d6174682f63616c63__power)
+}
+
+_1165___rgo_7374642f6d6174682f63616c63__parse_power: (__rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), base:((f64)), operand_idx: uint){
+    _1169___rgo_7374642f6d6174682f63616c63__parse_power: _1167___rgo_7374642f6d6174682f63616c63__parse_power(ok, base)
+    __rgo_7374642f6d6174682f63616c63__parse_unary(source_l, source_nth, operand_idx, args, invalid, _1169___rgo_7374642f6d6174682f63616c63__parse_power)
+}
+
+_1162___rgo_7374642f6d6174682f63616c63__parse_power: (operator_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), base:((f64))){
+    _1163: 1
+    _1170___rgo_7374642f6d6174682f63616c63__parse_power: _1165___rgo_7374642f6d6174682f63616c63__parse_power(__rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok, base)
+    @add_uint(operator_idx, _1163, _1170___rgo_7374642f6d6174682f63616c63__parse_power)
+}
+
+_1159___rgo_7374642f6d6174682f63616c63__parse_power: (operator_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), base:((f64)), operator: u8){
+    _1160: 94
+    _1171___rgo_7374642f6d6174682f63616c63__parse_power: _1162___rgo_7374642f6d6174682f63616c63__parse_power(operator_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok, base)
+    _1172_ok: ok(operator_idx, base)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(operator, _1160, _1171___rgo_7374642f6d6174682f63616c63__parse_power, _1172_ok)
+}
+
+_1157___rgo_7374642f6d6174682f63616c63__parse_power: (source_nth:(uint, (), (u8)), operator_idx: uint, invalid:(), __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64))), base:((f64))){
+    _1173___rgo_7374642f6d6174682f63616c63__parse_power: _1159___rgo_7374642f6d6174682f63616c63__parse_power(operator_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok, base)
+    source_nth(operator_idx, invalid, _1173___rgo_7374642f6d6174682f63616c63__parse_power)
+}
+
+_1155___rgo_7374642f6d6174682f63616c63__parse_power: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64))), base:((f64)), operator_idx: uint){
+    _1174___rgo_7374642f6d6174682f63616c63__parse_power: _1157___rgo_7374642f6d6174682f63616c63__parse_power(source_nth, operator_idx, invalid, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, args, ok, base)
+    _1175_ok: ok(operator_idx, base)
+    @lt_uint(operator_idx, source_l, _1174___rgo_7374642f6d6174682f63616c63__parse_power, _1175_ok)
+}
+
+_1153___rgo_7374642f6d6174682f63616c63__parse_power: (__rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint)), source_l: uint, source_nth:(uint, (), (u8)), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64))), next_idx: uint, base:((f64))){
+    _1176___rgo_7374642f6d6174682f63616c63__parse_power: _1155___rgo_7374642f6d6174682f63616c63__parse_power(source_l, source_nth, invalid, __rgo_7374642f6d6174682f63616c63__parse_unary, args, ok, base)
+    __rgo_7374642f6d6174682f63616c63__skip_whitespace(source_l, source_nth, next_idx, _1176___rgo_7374642f6d6174682f63616c63__parse_power)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_power: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(uint, ((f64)))){
+    _1177___rgo_7374642f6d6174682f63616c63__parse_power: _1153___rgo_7374642f6d6174682f63616c63__parse_power(__rgo_7374642f6d6174682f63616c63__skip_whitespace, source_l, source_nth, invalid, __rgo_7374642f6d6174682f63616c63__parse_unary, args, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_primary(source_l, source_nth, idx, args, invalid, _1177___rgo_7374642f6d6174682f63616c63__parse_power)
+}
+_1191___rgo_7374642f6d6174682f63616c63__parse_group: (ok:(uint, ((f64))), value:((f64)), next_idx: uint){
+    ok(next_idx, value)
+}
+
+_1188___rgo_7374642f6d6174682f63616c63__parse_group: (following_idx: uint, ok:(uint, ((f64))), value:((f64))){
+    _1189: 1
+    _1192___rgo_7374642f6d6174682f63616c63__parse_group: _1191___rgo_7374642f6d6174682f63616c63__parse_group(ok, value)
+    @add_uint(following_idx, _1189, _1192___rgo_7374642f6d6174682f63616c63__parse_group)
+}
+
+_1185___rgo_7374642f6d6174682f63616c63__parse_group: (following_idx: uint, ok:(uint, ((f64))), value:((f64)), invalid:(), closing: u8){
+    _1186: 41
+    _1193___rgo_7374642f6d6174682f63616c63__parse_group: _1188___rgo_7374642f6d6174682f63616c63__parse_group(following_idx, ok, value)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(closing, _1186, _1193___rgo_7374642f6d6174682f63616c63__parse_group, invalid)
+}
+
+_1183___rgo_7374642f6d6174682f63616c63__parse_group: (source_nth:(uint, (), (u8)), following_idx: uint, invalid:(), ok:(uint, ((f64))), value:((f64))){
+    _1194___rgo_7374642f6d6174682f63616c63__parse_group: _1185___rgo_7374642f6d6174682f63616c63__parse_group(following_idx, ok, value, invalid)
+    source_nth(following_idx, invalid, _1194___rgo_7374642f6d6174682f63616c63__parse_group)
+}
+
+_1181___rgo_7374642f6d6174682f63616c63__parse_group: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(uint, ((f64))), following_idx: uint, value:((f64))){
+    _1195___rgo_7374642f6d6174682f63616c63__parse_group: _1183___rgo_7374642f6d6174682f63616c63__parse_group(source_nth, following_idx, invalid, ok, value)
+    @lt_uint(following_idx, source_l, _1195___rgo_7374642f6d6174682f63616c63__parse_group, invalid)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_group: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(uint, ((f64)))){
+    _1196___rgo_7374642f6d6174682f63616c63__parse_group: _1181___rgo_7374642f6d6174682f63616c63__parse_group(source_l, source_nth, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_expression(source_l, source_nth, idx, args, invalid, _1196___rgo_7374642f6d6174682f63616c63__parse_group)
+}
+_1212___rgo_7374642f6d6174682f63616c63__parse_function_tail: (ok:(uint, ((f64))), following_idx: uint, result:((f64))){
+    ok(following_idx, result)
+}
+
+_1210___rgo_7374642f6d6174682f63616c63__parse_function_tail: (source_nth:(uint, (), (u8)), start: uint, end: uint, a:((f64)), invalid:(), ok:(uint, ((f64))), following_idx: uint){
+    _1213___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1212___rgo_7374642f6d6174682f63616c63__parse_function_tail(ok, following_idx)
+    __rgo_7374642f6d6174682f63616c63__apply_unary_function(source_nth, start, end, a, invalid, _1213___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1207___rgo_7374642f6d6174682f63616c63__parse_function_tail: (next_idx: uint, source_nth:(uint, (), (u8)), start: uint, end: uint, a:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1208: 1
+    _1214___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1210___rgo_7374642f6d6174682f63616c63__parse_function_tail(source_nth, start, end, a, invalid, ok)
+    @add_uint(next_idx, _1208, _1214___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+_1239___rgo_7374642f6d6174682f63616c63__parse_function_tail: (ok:(uint, ((f64))), result_idx: uint, result:((f64))){
+    ok(result_idx, result)
+}
+
+_1237___rgo_7374642f6d6174682f63616c63__parse_function_tail: (source_nth:(uint, (), (u8)), start: uint, end: uint, a:((f64)), b:((f64)), invalid:(), ok:(uint, ((f64))), result_idx: uint){
+    _1240___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1239___rgo_7374642f6d6174682f63616c63__parse_function_tail(ok, result_idx)
+    __rgo_7374642f6d6174682f63616c63__apply_binary_function(source_nth, start, end, a, b, invalid, _1240___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1234___rgo_7374642f6d6174682f63616c63__parse_function_tail: (closing_idx: uint, source_nth:(uint, (), (u8)), start: uint, end: uint, a:((f64)), b:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1235: 1
+    _1241___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1237___rgo_7374642f6d6174682f63616c63__parse_function_tail(source_nth, start, end, a, b, invalid, ok)
+    @add_uint(closing_idx, _1235, _1241___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1231___rgo_7374642f6d6174682f63616c63__parse_function_tail: (closing_idx: uint, source_nth:(uint, (), (u8)), start: uint, end: uint, a:((f64)), b:((f64)), invalid:(), ok:(uint, ((f64))), closing: u8){
+    _1232: 41
+    _1242___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1234___rgo_7374642f6d6174682f63616c63__parse_function_tail(closing_idx, source_nth, start, end, a, b, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(closing, _1232, _1242___rgo_7374642f6d6174682f63616c63__parse_function_tail, invalid)
+}
+
+_1229___rgo_7374642f6d6174682f63616c63__parse_function_tail: (source_nth:(uint, (), (u8)), closing_idx: uint, invalid:(), start: uint, end: uint, a:((f64)), b:((f64)), ok:(uint, ((f64)))){
+    _1243___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1231___rgo_7374642f6d6174682f63616c63__parse_function_tail(closing_idx, source_nth, start, end, a, b, invalid, ok)
+    source_nth(closing_idx, invalid, _1243___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1227___rgo_7374642f6d6174682f63616c63__parse_function_tail: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), start: uint, end: uint, a:((f64)), b:((f64)), ok:(uint, ((f64))), closing_idx: uint){
+    _1244___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1229___rgo_7374642f6d6174682f63616c63__parse_function_tail(source_nth, closing_idx, invalid, start, end, a, b, ok)
+    @lt_uint(closing_idx, source_l, _1244___rgo_7374642f6d6174682f63616c63__parse_function_tail, invalid)
+}
+
+_1225___rgo_7374642f6d6174682f63616c63__parse_function_tail: (__rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint)), source_l: uint, source_nth:(uint, (), (u8)), invalid:(), start: uint, end: uint, a:((f64)), ok:(uint, ((f64))), following_idx: uint, b:((f64))){
+    _1245___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1227___rgo_7374642f6d6174682f63616c63__parse_function_tail(source_l, source_nth, invalid, start, end, a, b, ok)
+    __rgo_7374642f6d6174682f63616c63__skip_whitespace(source_l, source_nth, following_idx, _1245___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1223___rgo_7374642f6d6174682f63616c63__parse_function_tail: (source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint)), start: uint, end: uint, a:((f64)), ok:(uint, ((f64))), operand_idx: uint){
+    _1246___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1225___rgo_7374642f6d6174682f63616c63__parse_function_tail(__rgo_7374642f6d6174682f63616c63__skip_whitespace, source_l, source_nth, invalid, start, end, a, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_expression(source_l, source_nth, operand_idx, args, invalid, _1246___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1220___rgo_7374642f6d6174682f63616c63__parse_function_tail: (next_idx: uint, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint)), start: uint, end: uint, a:((f64)), ok:(uint, ((f64)))){
+    _1221: 1
+    _1247___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1223___rgo_7374642f6d6174682f63616c63__parse_function_tail(source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__skip_whitespace, start, end, a, ok)
+    @add_uint(next_idx, _1221, _1247___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1217___rgo_7374642f6d6174682f63616c63__parse_function_tail: (value: u8, next_idx: uint, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint)), start: uint, end: uint, a:((f64)), ok:(uint, ((f64)))){
+    _1218: 44
+    _1248___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1220___rgo_7374642f6d6174682f63616c63__parse_function_tail(next_idx, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__skip_whitespace, start, end, a, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1218, _1248___rgo_7374642f6d6174682f63616c63__parse_function_tail, invalid)
+}
+
+_1204___rgo_7374642f6d6174682f63616c63__parse_function_tail: (next_idx: uint, source_nth:(uint, (), (u8)), start: uint, end: uint, a:((f64)), invalid:(), ok:(uint, ((f64))), source_l: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint)), value: u8){
+    _1205: 41
+    _1215___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1207___rgo_7374642f6d6174682f63616c63__parse_function_tail(next_idx, source_nth, start, end, a, invalid, ok)
+    _1249___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1217___rgo_7374642f6d6174682f63616c63__parse_function_tail(value, next_idx, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__skip_whitespace, start, end, a, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1205, _1215___rgo_7374642f6d6174682f63616c63__parse_function_tail, _1249___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1202___rgo_7374642f6d6174682f63616c63__parse_function_tail: (source_nth:(uint, (), (u8)), next_idx: uint, invalid:(), start: uint, end: uint, a:((f64)), ok:(uint, ((f64))), source_l: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint))){
+    _1250___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1204___rgo_7374642f6d6174682f63616c63__parse_function_tail(next_idx, source_nth, start, end, a, invalid, ok, source_l, args, __rgo_7374642f6d6174682f63616c63__skip_whitespace)
+    source_nth(next_idx, invalid, _1250___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1200___rgo_7374642f6d6174682f63616c63__parse_function_tail: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), start: uint, end: uint, a:((f64)), ok:(uint, ((f64))), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint)), next_idx: uint){
+    _1251___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1202___rgo_7374642f6d6174682f63616c63__parse_function_tail(source_nth, next_idx, invalid, start, end, a, ok, source_l, args, __rgo_7374642f6d6174682f63616c63__skip_whitespace)
+    @lt_uint(next_idx, source_l, _1251___rgo_7374642f6d6174682f63616c63__parse_function_tail, invalid)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_function_tail: (source_l: uint, source_nth:(uint, (), (u8)), start: uint, end: uint, idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), a:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1252___rgo_7374642f6d6174682f63616c63__parse_function_tail: _1200___rgo_7374642f6d6174682f63616c63__parse_function_tail(source_l, source_nth, invalid, start, end, a, ok, args, __rgo_7374642f6d6174682f63616c63__skip_whitespace)
+    __rgo_7374642f6d6174682f63616c63__skip_whitespace(source_l, source_nth, idx, _1252___rgo_7374642f6d6174682f63616c63__parse_function_tail)
+}
+
+_1256___rgo_7374642f6d6174682f63616c63__parse_function: (source_l: uint, source_nth:(uint, (), (u8)), start: uint, end: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), next_idx: uint, value:((f64))){
+    __rgo_7374642f6d6174682f63616c63__parse_function_tail(source_l, source_nth, start, end, next_idx, args, value, invalid, ok)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_function: (source_l: uint, source_nth:(uint, (), (u8)), start: uint, end: uint, idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(uint, ((f64)))){
+    _1257___rgo_7374642f6d6174682f63616c63__parse_function: _1256___rgo_7374642f6d6174682f63616c63__parse_function(source_l, source_nth, start, end, args, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_expression(source_l, source_nth, idx, args, invalid, _1257___rgo_7374642f6d6174682f63616c63__parse_function)
+}
+
+_1281___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: (ok:(((f64))), value:((f64))){
+    ok(value)
+}
+
+_1279___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: (args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), source_nth:(uint, (), (u8)), start: uint, end: uint, invalid:(), ok:(((f64)))){
+    _1282___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: _1281___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder(ok)
+    __rgo_7374642f6d6174682f63616c63__lookup(args, source_nth, start, end, invalid, _1282___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder)
+}
+
+_1273___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:()){
+    _1274: "tau"
+    _1275: 6.283185307179586
+    _1276___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(_1275)
+    _1277_ok: ok(_1276___rgo_7374642f6d6174682f63616c63__constant)
+    _1283___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: _1279___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder(args, source_nth, start, end, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _1274, _1277_ok, _1283___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder)
+}
+
+_1267___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: (source_nth:(uint, (), (u8)), start: uint, end: uint, ok:(((f64))), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:()){
+    _1268: "pi"
+    _1269: 3.141592653589793
+    _1270___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(_1269)
+    _1271_ok: ok(_1270___rgo_7374642f6d6174682f63616c63__constant)
+    _1284___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: _1273___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder(source_nth, start, end, ok, args, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _1268, _1271_ok, _1284___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder)
+}
+
+_1264___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: (source_nth:(uint, (), (u8)), start: uint, end: uint, invalid:(), ok:(((f64))), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())){
+    _1265: "i"
+    _1285___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: _1267___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder(source_nth, start, end, ok, args, invalid)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _1265, invalid, _1285___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: (source_nth:(uint, (), (u8)), start: uint, end: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(((f64)))){
+    _1259: "e"
+    _1260: 2.718281828459045
+    _1261___rgo_7374642f6d6174682f63616c63__constant: __rgo_7374642f6d6174682f63616c63__constant(_1260)
+    _1262_ok: ok(_1261___rgo_7374642f6d6174682f63616c63__constant)
+    _1286___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: _1264___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder(source_nth, start, end, invalid, ok, args)
+    __rgo_7374642f6d6174682f63616c63__range_equals_name(source_nth, start, end, _1259, _1262_ok, _1286___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder)
+}
+_1302___rgo_7374642f6d6174682f63616c63__parse_identifier: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, end: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), argument_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_function(source_l, source_nth, idx, end, argument_idx, args, invalid, ok)
+}
+
+_1299___rgo_7374642f6d6174682f63616c63__parse_identifier: (next_idx: uint, source_l: uint, source_nth:(uint, (), (u8)), idx: uint, end: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64)))){
+    _1300: 1
+    _1303___rgo_7374642f6d6174682f63616c63__parse_identifier: _1302___rgo_7374642f6d6174682f63616c63__parse_identifier(source_l, source_nth, idx, end, args, invalid, ok)
+    @add_uint(next_idx, _1300, _1303___rgo_7374642f6d6174682f63616c63__parse_identifier)
+}
+
+_1296___rgo_7374642f6d6174682f63616c63__parse_identifier: (next_idx: uint, source_l: uint, source_nth:(uint, (), (u8)), idx: uint, end: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), following: u8){
+    _1297: 40
+    _1304___rgo_7374642f6d6174682f63616c63__parse_identifier: _1299___rgo_7374642f6d6174682f63616c63__parse_identifier(next_idx, source_l, source_nth, idx, end, args, invalid, ok)
+    _1305_ok: ok(end)
+    _1306___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: __rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder(source_nth, idx, end, args, invalid, _1305_ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(following, _1297, _1304___rgo_7374642f6d6174682f63616c63__parse_identifier, _1306___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder)
+}
+
+_1294___rgo_7374642f6d6174682f63616c63__parse_identifier: (source_nth:(uint, (), (u8)), next_idx: uint, invalid:(), source_l: uint, idx: uint, end: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64)))){
+    _1307___rgo_7374642f6d6174682f63616c63__parse_identifier: _1296___rgo_7374642f6d6174682f63616c63__parse_identifier(next_idx, source_l, source_nth, idx, end, args, invalid, ok)
+    source_nth(next_idx, invalid, _1307___rgo_7374642f6d6174682f63616c63__parse_identifier)
+}
+
+_1292___rgo_7374642f6d6174682f63616c63__parse_identifier: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), idx: uint, end: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64))), next_idx: uint){
+    _1308___rgo_7374642f6d6174682f63616c63__parse_identifier: _1294___rgo_7374642f6d6174682f63616c63__parse_identifier(source_nth, next_idx, invalid, source_l, idx, end, args, ok)
+    _1309_ok: ok(end)
+    _1310___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder: __rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder(source_nth, idx, end, args, invalid, _1309_ok)
+    @lt_uint(next_idx, source_l, _1308___rgo_7374642f6d6174682f63616c63__parse_identifier, _1310___rgo_7374642f6d6174682f63616c63__parse_constant_or_placeholder)
+}
+
+_1290___rgo_7374642f6d6174682f63616c63__parse_identifier: (__rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint)), source_l: uint, source_nth:(uint, (), (u8)), invalid:(), idx: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64))), end: uint){
+    _1311___rgo_7374642f6d6174682f63616c63__parse_identifier: _1292___rgo_7374642f6d6174682f63616c63__parse_identifier(source_l, source_nth, invalid, idx, end, args, ok)
+    __rgo_7374642f6d6174682f63616c63__skip_whitespace(source_l, source_nth, end, _1311___rgo_7374642f6d6174682f63616c63__parse_identifier)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_identifier: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(uint, ((f64)))){
+    _1312___rgo_7374642f6d6174682f63616c63__parse_identifier: _1290___rgo_7374642f6d6174682f63616c63__parse_identifier(__rgo_7374642f6d6174682f63616c63__skip_whitespace, source_l, source_nth, invalid, idx, args, ok)
+    __rgo_7374642f6d6174682f63616c63__identifier_end(source_l, source_nth, idx, _1312___rgo_7374642f6d6174682f63616c63__parse_identifier)
+}
+_1326___rgo_7374642f6d6174682f63616c63__parse_primary: (source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_group(source_l, source_nth, next_idx, args, invalid, ok)
+}
+
+_1323___rgo_7374642f6d6174682f63616c63__parse_primary: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64)))){
+    _1324: 1
+    _1327___rgo_7374642f6d6174682f63616c63__parse_primary: _1326___rgo_7374642f6d6174682f63616c63__parse_primary(source_l, source_nth, args, invalid, ok)
+    @add_uint(idx, _1324, _1327___rgo_7374642f6d6174682f63616c63__parse_primary)
+}
+
+_1320___rgo_7374642f6d6174682f63616c63__parse_primary: (value: u8, idx: uint, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64)))){
+    _1321: 40
+    _1328___rgo_7374642f6d6174682f63616c63__parse_primary: _1323___rgo_7374642f6d6174682f63616c63__parse_primary(idx, source_l, source_nth, args, invalid, ok)
+    _1329___rgo_7374642f6d6174682f63616c63__parse_identifier: __rgo_7374642f6d6174682f63616c63__parse_identifier(source_l, source_nth, idx, args, invalid, ok)
+    _1330___rgo_7374642f6d6174682f63616c63__is_identifier_byte: __rgo_7374642f6d6174682f63616c63__is_identifier_byte(value, _1329___rgo_7374642f6d6174682f63616c63__parse_identifier, invalid)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1321, _1328___rgo_7374642f6d6174682f63616c63__parse_primary, _1330___rgo_7374642f6d6174682f63616c63__is_identifier_byte)
+}
+_1336___rgo_7374642f6d6174682f63616c63__parse_primary: (source_l: uint, source_nth:(uint, (), (u8)), first_digit: f64, invalid:(), ok:(uint, ((f64))), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_number(source_l, source_nth, next_idx, first_digit, invalid, ok)
+}
+
+_1333___rgo_7374642f6d6174682f63616c63__parse_primary: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), ok:(uint, ((f64))), first_digit: f64){
+    _1334: 1
+    _1337___rgo_7374642f6d6174682f63616c63__parse_primary: _1336___rgo_7374642f6d6174682f63616c63__parse_primary(source_l, source_nth, first_digit, invalid, ok)
+    @add_uint(idx, _1334, _1337___rgo_7374642f6d6174682f63616c63__parse_primary)
+}
+
+_1318___rgo_7374642f6d6174682f63616c63__parse_primary: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), value: u8){
+    _1331___rgo_7374642f6d6174682f63616c63__parse_primary: _1320___rgo_7374642f6d6174682f63616c63__parse_primary(value, idx, source_l, source_nth, args, invalid, ok)
+    _1338___rgo_7374642f6d6174682f63616c63__parse_primary: _1333___rgo_7374642f6d6174682f63616c63__parse_primary(idx, source_l, source_nth, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__digit(value, _1331___rgo_7374642f6d6174682f63616c63__parse_primary, _1338___rgo_7374642f6d6174682f63616c63__parse_primary)
+}
+
+_1316___rgo_7374642f6d6174682f63616c63__parse_primary: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), source_l: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64)))){
+    _1339___rgo_7374642f6d6174682f63616c63__parse_primary: _1318___rgo_7374642f6d6174682f63616c63__parse_primary(idx, source_l, source_nth, args, invalid, ok)
+    source_nth(idx, invalid, _1339___rgo_7374642f6d6174682f63616c63__parse_primary)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_primary: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(uint, ((f64)))){
+    _1340___rgo_7374642f6d6174682f63616c63__parse_primary: _1316___rgo_7374642f6d6174682f63616c63__parse_primary(source_nth, idx, invalid, source_l, args, ok)
+    @lt_uint(idx, source_l, _1340___rgo_7374642f6d6174682f63616c63__parse_primary, invalid)
+}
+_1356___rgo_7374642f6d6174682f63616c63__parse_product_tail: (__rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), a:((f64)), invalid:(), ok:(uint, ((f64))), following_idx: uint, b:((f64))){
+    _1357___rgo_7374642f6d6174682f63616c63__multiply: __rgo_7374642f6d6174682f63616c63__multiply(a, b)
+    __rgo_7374642f6d6174682f63616c63__parse_product_tail(source_l, source_nth, following_idx, args, _1357___rgo_7374642f6d6174682f63616c63__multiply, invalid, ok)
+}
+
+_1354___rgo_7374642f6d6174682f63616c63__parse_product_tail: (__rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64))), operand_idx: uint){
+    _1358___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1356___rgo_7374642f6d6174682f63616c63__parse_product_tail(__rgo_7374642f6d6174682f63616c63__parse_product_tail, source_l, source_nth, args, a, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_unary(source_l, source_nth, operand_idx, args, invalid, _1358___rgo_7374642f6d6174682f63616c63__parse_product_tail)
+}
+
+_1351___rgo_7374642f6d6174682f63616c63__parse_product_tail: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64)))){
+    _1352: 1
+    _1359___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1354___rgo_7374642f6d6174682f63616c63__parse_product_tail(__rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_product_tail, a, ok)
+    @add_uint(next_idx, _1352, _1359___rgo_7374642f6d6174682f63616c63__parse_product_tail)
+}
+_1370___rgo_7374642f6d6174682f63616c63__parse_product_tail: (__rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ((f64)), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ())), ()), a:((f64)), invalid:(), ok:(uint, ((f64))), following_idx: uint, b:((f64))){
+    _1371___rgo_7374642f6d6174682f63616c63__divide: __rgo_7374642f6d6174682f63616c63__divide(a, b)
+    __rgo_7374642f6d6174682f63616c63__parse_product_tail(source_l, source_nth, following_idx, args, _1371___rgo_7374642f6d6174682f63616c63__divide, invalid, ok)
+}
+
+_1368___rgo_7374642f6d6174682f63616c63__parse_product_tail: (__rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64))), operand_idx: uint){
+    _1372___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1370___rgo_7374642f6d6174682f63616c63__parse_product_tail(__rgo_7374642f6d6174682f63616c63__parse_product_tail, source_l, source_nth, args, a, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_unary(source_l, source_nth, operand_idx, args, invalid, _1372___rgo_7374642f6d6174682f63616c63__parse_product_tail)
+}
+
+_1365___rgo_7374642f6d6174682f63616c63__parse_product_tail: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64)))){
+    _1366: 1
+    _1373___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1368___rgo_7374642f6d6174682f63616c63__parse_product_tail(__rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_product_tail, a, ok)
+    @add_uint(next_idx, _1366, _1373___rgo_7374642f6d6174682f63616c63__parse_product_tail)
+}
+
+_1362___rgo_7374642f6d6174682f63616c63__parse_product_tail: (operator: u8, next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64)))){
+    _1363: 47
+    _1374___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1365___rgo_7374642f6d6174682f63616c63__parse_product_tail(next_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_product_tail, a, ok)
+    _1375_ok: ok(next_idx, a)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(operator, _1363, _1374___rgo_7374642f6d6174682f63616c63__parse_product_tail, _1375_ok)
+}
+
+_1348___rgo_7374642f6d6174682f63616c63__parse_product_tail: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64))), operator: u8){
+    _1349: 42
+    _1360___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1351___rgo_7374642f6d6174682f63616c63__parse_product_tail(next_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_product_tail, a, ok)
+    _1376___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1362___rgo_7374642f6d6174682f63616c63__parse_product_tail(operator, next_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_product_tail, a, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(operator, _1349, _1360___rgo_7374642f6d6174682f63616c63__parse_product_tail, _1376___rgo_7374642f6d6174682f63616c63__parse_product_tail)
+}
+
+_1346___rgo_7374642f6d6174682f63616c63__parse_product_tail: (source_nth:(uint, (), (u8)), next_idx: uint, invalid:(), __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), source_l: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), __rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64)))){
+    _1377___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1348___rgo_7374642f6d6174682f63616c63__parse_product_tail(next_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, __rgo_7374642f6d6174682f63616c63__parse_product_tail, a, ok)
+    source_nth(next_idx, invalid, _1377___rgo_7374642f6d6174682f63616c63__parse_product_tail)
+}
+
+_1344___rgo_7374642f6d6174682f63616c63__parse_product_tail: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64)))), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), __rgo_7374642f6d6174682f63616c63__parse_product_tail:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ((f64)), (), (uint, ((f64))))!, a:((f64)), ok:(uint, ((f64))), next_idx: uint){
+    _1378___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1346___rgo_7374642f6d6174682f63616c63__parse_product_tail(source_nth, next_idx, invalid, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, args, __rgo_7374642f6d6174682f63616c63__parse_product_tail, a, ok)
+    _1379_ok: ok(next_idx, a)
+    @lt_uint(next_idx, source_l, _1378___rgo_7374642f6d6174682f63616c63__parse_product_tail, _1379_ok)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_product_tail: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), a:((f64)), invalid:(), ok:(uint, ((f64)))){
+    _1380___rgo_7374642f6d6174682f63616c63__parse_product_tail: _1344___rgo_7374642f6d6174682f63616c63__parse_product_tail(source_l, source_nth, invalid, __rgo_7374642f6d6174682f63616c63__parse_unary, args, __rgo_7374642f6d6174682f63616c63__parse_product_tail, a, ok)
+    __rgo_7374642f6d6174682f63616c63__skip_whitespace(source_l, source_nth, idx, _1380___rgo_7374642f6d6174682f63616c63__parse_product_tail)
+}
+
+_1384___rgo_7374642f6d6174682f63616c63__parse_product: (source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), next_idx: uint, value:((f64))){
+    __rgo_7374642f6d6174682f63616c63__parse_product_tail(source_l, source_nth, next_idx, args, value, invalid, ok)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_product: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(uint, ((f64)))){
+    _1385___rgo_7374642f6d6174682f63616c63__parse_product: _1384___rgo_7374642f6d6174682f63616c63__parse_product(source_l, source_nth, args, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__parse_unary(source_l, source_nth, idx, args, invalid, _1385___rgo_7374642f6d6174682f63616c63__parse_product)
+}
+_1401___rgo_7374642f6d6174682f63616c63__parse_unary: (ok:(uint, ((f64))), following_idx: uint, operand:((f64))){
+    _1402___rgo_7374642f6d6174682f63616c63__negate: __rgo_7374642f6d6174682f63616c63__negate(operand)
+    ok(following_idx, _1402___rgo_7374642f6d6174682f63616c63__negate)
+}
+
+_1399___rgo_7374642f6d6174682f63616c63__parse_unary: (__rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), operand_idx: uint){
+    _1403___rgo_7374642f6d6174682f63616c63__parse_unary: _1401___rgo_7374642f6d6174682f63616c63__parse_unary(ok)
+    __rgo_7374642f6d6174682f63616c63__parse_unary(source_l, source_nth, operand_idx, args, invalid, _1403___rgo_7374642f6d6174682f63616c63__parse_unary)
+}
+
+_1396___rgo_7374642f6d6174682f63616c63__parse_unary: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64)))){
+    _1397: 1
+    _1404___rgo_7374642f6d6174682f63616c63__parse_unary: _1399___rgo_7374642f6d6174682f63616c63__parse_unary(__rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok)
+    @add_uint(next_idx, _1397, _1404___rgo_7374642f6d6174682f63616c63__parse_unary)
+}
+_1413___rgo_7374642f6d6174682f63616c63__parse_unary: (__rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), ok:(uint, ((f64))), operand_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__parse_unary(source_l, source_nth, operand_idx, args, invalid, ok)
+}
+
+_1410___rgo_7374642f6d6174682f63616c63__parse_unary: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), ok:(uint, ((f64)))){
+    _1411: 1
+    _1414___rgo_7374642f6d6174682f63616c63__parse_unary: _1413___rgo_7374642f6d6174682f63616c63__parse_unary(__rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok)
+    @add_uint(next_idx, _1411, _1414___rgo_7374642f6d6174682f63616c63__parse_unary)
+}
+
+_1407___rgo_7374642f6d6174682f63616c63__parse_unary: (value: u8, next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())), ()), invalid:(), ok:(uint, ((f64)))){
+    _1408: 43
+    _1415___rgo_7374642f6d6174682f63616c63__parse_unary: _1410___rgo_7374642f6d6174682f63616c63__parse_unary(next_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok)
+    _1416___rgo_7374642f6d6174682f63616c63__parse_power: __rgo_7374642f6d6174682f63616c63__parse_power(source_l, source_nth, next_idx, args, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1408, _1415___rgo_7374642f6d6174682f63616c63__parse_unary, _1416___rgo_7374642f6d6174682f63616c63__parse_power)
+}
+
+_1393___rgo_7374642f6d6174682f63616c63__parse_unary: (next_idx: uint, __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), (), (uint, ((f64))))!, source_l: uint, source_nth:(uint, (), (u8)), args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), invalid:(), ok:(uint, ((f64))), value: u8){
+    _1394: 45
+    _1405___rgo_7374642f6d6174682f63616c63__parse_unary: _1396___rgo_7374642f6d6174682f63616c63__parse_unary(next_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok)
+    _1417___rgo_7374642f6d6174682f63616c63__parse_unary: _1407___rgo_7374642f6d6174682f63616c63__parse_unary(value, next_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1394, _1405___rgo_7374642f6d6174682f63616c63__parse_unary, _1417___rgo_7374642f6d6174682f63616c63__parse_unary)
+}
+
+_1391___rgo_7374642f6d6174682f63616c63__parse_unary: (source_nth:(uint, (), (u8)), next_idx: uint, invalid:(), __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), (), (uint, ((f64))))!, source_l: uint, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64)))){
+    _1418___rgo_7374642f6d6174682f63616c63__parse_unary: _1393___rgo_7374642f6d6174682f63616c63__parse_unary(next_idx, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, source_nth, args, invalid, ok)
+    source_nth(next_idx, invalid, _1418___rgo_7374642f6d6174682f63616c63__parse_unary)
+}
+
+_1389___rgo_7374642f6d6174682f63616c63__parse_unary: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), __rgo_7374642f6d6174682f63616c63__parse_unary:(uint, (uint, (), (u8)), uint, ((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), (), (uint, ((f64))))!, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ()), ok:(uint, ((f64))), next_idx: uint){
+    _1419___rgo_7374642f6d6174682f63616c63__parse_unary: _1391___rgo_7374642f6d6174682f63616c63__parse_unary(source_nth, next_idx, invalid, __rgo_7374642f6d6174682f63616c63__parse_unary, source_l, args, ok)
+    @lt_uint(next_idx, source_l, _1419___rgo_7374642f6d6174682f63616c63__parse_unary, invalid)
+}
+
+__rgo_7374642f6d6174682f63616c63__parse_unary: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()), invalid:(), ok:(uint, ((f64)))){
+    _1420___rgo_7374642f6d6174682f63616c63__parse_unary: _1389___rgo_7374642f6d6174682f63616c63__parse_unary(source_l, source_nth, invalid, __rgo_7374642f6d6174682f63616c63__parse_unary, args, ok)
+    __rgo_7374642f6d6174682f63616c63__skip_whitespace(source_l, source_nth, idx, _1420___rgo_7374642f6d6174682f63616c63__parse_unary)
+}
+
+_1429___rgo_7374642f6d6174682f63616c63__whitespace: (value: u8, yes:(), no:()){
+    _1430: 13
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1430, yes, no)
+}
+
+_1426___rgo_7374642f6d6174682f63616c63__whitespace: (value: u8, yes:(), no:()){
+    _1427: 10
+    _1431___rgo_7374642f6d6174682f63616c63__whitespace: _1429___rgo_7374642f6d6174682f63616c63__whitespace(value, yes, no)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1427, yes, _1431___rgo_7374642f6d6174682f63616c63__whitespace)
+}
+
+_1423___rgo_7374642f6d6174682f63616c63__whitespace: (value: u8, yes:(), no:()){
+    _1424: 9
+    _1432___rgo_7374642f6d6174682f63616c63__whitespace: _1426___rgo_7374642f6d6174682f63616c63__whitespace(value, yes, no)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1424, yes, _1432___rgo_7374642f6d6174682f63616c63__whitespace)
+}
+
+__rgo_7374642f6d6174682f63616c63__whitespace: (value: u8, yes:(), no:()){
+    _1421: 32
+    _1433___rgo_7374642f6d6174682f63616c63__whitespace: _1423___rgo_7374642f6d6174682f63616c63__whitespace(value, yes, no)
+    __rgo_7374642f6d6174682f63616c63__eq_byte(value, _1421, yes, _1433___rgo_7374642f6d6174682f63616c63__whitespace)
+}
+_1444___rgo_7374642f6d6174682f63616c63__skip_whitespace: (__rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint))!, source_l: uint, source_nth:(uint, (), (u8)), ok:(uint), next_idx: uint){
+    __rgo_7374642f6d6174682f63616c63__skip_whitespace(source_l, source_nth, next_idx, ok)
+}
+
+_1441___rgo_7374642f6d6174682f63616c63__skip_whitespace: (idx: uint, __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint))!, source_l: uint, source_nth:(uint, (), (u8)), ok:(uint)){
+    _1442: 1
+    _1445___rgo_7374642f6d6174682f63616c63__skip_whitespace: _1444___rgo_7374642f6d6174682f63616c63__skip_whitespace(__rgo_7374642f6d6174682f63616c63__skip_whitespace, source_l, source_nth, ok)
+    @add_uint(idx, _1442, _1445___rgo_7374642f6d6174682f63616c63__skip_whitespace)
+}
+
+_1439___rgo_7374642f6d6174682f63616c63__skip_whitespace: (idx: uint, __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint))!, source_l: uint, source_nth:(uint, (), (u8)), ok:(uint), value: u8){
+    _1446___rgo_7374642f6d6174682f63616c63__skip_whitespace: _1441___rgo_7374642f6d6174682f63616c63__skip_whitespace(idx, __rgo_7374642f6d6174682f63616c63__skip_whitespace, source_l, source_nth, ok)
+    _1447_ok: ok(idx)
+    __rgo_7374642f6d6174682f63616c63__whitespace(value, _1446___rgo_7374642f6d6174682f63616c63__skip_whitespace, _1447_ok)
+}
+
+_1436___rgo_7374642f6d6174682f63616c63__skip_whitespace: (source_nth:(uint, (), (u8)), idx: uint, ok:(uint), __rgo_7374642f6d6174682f63616c63__skip_whitespace:(uint, (uint, (), (u8)), uint, (uint))!, source_l: uint){
+    _1437_ok: ok(idx)
+    _1448___rgo_7374642f6d6174682f63616c63__skip_whitespace: _1439___rgo_7374642f6d6174682f63616c63__skip_whitespace(idx, __rgo_7374642f6d6174682f63616c63__skip_whitespace, source_l, source_nth, ok)
+    source_nth(idx, _1437_ok, _1448___rgo_7374642f6d6174682f63616c63__skip_whitespace)
+}
+
+__rgo_7374642f6d6174682f63616c63__skip_whitespace: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, ok:(uint)){
+    _1449___rgo_7374642f6d6174682f63616c63__skip_whitespace: _1436___rgo_7374642f6d6174682f63616c63__skip_whitespace(source_nth, idx, ok, __rgo_7374642f6d6174682f63616c63__skip_whitespace, source_l)
+    _1450_ok: ok(idx)
+    @lt_uint(idx, source_l, _1449___rgo_7374642f6d6174682f63616c63__skip_whitespace, _1450_ok)
+}
+
+__rgo_7374642f6d6174682f63616c63__var: (name: str!, value: f64, tail:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())!, next:(((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ()))!, _1453___rgo_7374642f6d6174682f63616c63__var:()!){
+    _1454___rgo_7374642f6d6174682f63616c63__as_var: __rgo_7374642f6d6174682f63616c63__as_var(name, value)
+    next(_1454___rgo_7374642f6d6174682f63616c63__as_var, tail)
+}
+
+__rgo_7374642f6d6174682f63616c63__end: (value:(((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), done_case:()){
+    __rgo_737464__end(value, done_case)
+}
+_1464___rgo_7374642f6d6174682f63616c63__new: (ok:(f64), value:((f64))){
+    value(ok)
+}
+
+_1461___rgo_7374642f6d6174682f63616c63__new: (source_bytes: bytes, args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())!, invalid:()!, ok:(f64), source_l: uint){
+    _1462___rgo_7374642f6d6174682f63616c63__raw_nth: __rgo_7374642f6d6174682f63616c63__raw_nth(source_bytes)
+    _1465___rgo_7374642f6d6174682f63616c63__new: _1464___rgo_7374642f6d6174682f63616c63__new(ok)
+    __rgo_7374642f6d6174682f63616c63__calculate(source_l, _1462___rgo_7374642f6d6174682f63616c63__raw_nth, args, invalid, _1465___rgo_7374642f6d6174682f63616c63__new)
+}
+
+_1459___rgo_7374642f6d6174682f63616c63__new: (args:((((str, f64)), ((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())), ())!, invalid:()!, ok:(f64), source_bytes: bytes){
+    _1466___rgo_7374642f6d6174682f63616c63__new: _1461___rgo_7374642f6d6174682f63616c63__new(source_bytes, args, invalid, ok)
+    @bytes_descriptor_len(source_bytes, _1466___rgo_7374642f6d6174682f63616c63__new)
+}
+
+__rgo_7374642f6d6174682f63616c63__new: (source: str!, invalid:()!, args:((((str, f64)), __rgo_7374642f6d6174682f63616c63__arg), ())!, ok:(f64)){
+    _1467___rgo_7374642f6d6174682f63616c63__new: _1459___rgo_7374642f6d6174682f63616c63__new(args, invalid, ok)
+    @bytes_from_str(source, _1467___rgo_7374642f6d6174682f63616c63__new)
+}
+calculated: (message: str, ok:(), _1468_calculated: f64){
+    @write(message, ok)
+}
+
+staged: (handle_error:()!, price: f64, tax: f64, ok:()){
+    _1469: "(price + 2.5) * -tax / 2"
+    _1470: "price"
+    _1471: "tax"
+    _1472___rgo_7374642f6d6174682f63616c63__var: __rgo_7374642f6d6174682f63616c63__var(_1471, tax, __rgo_7374642f6d6174682f63616c63__end)
+    _1473___rgo_7374642f6d6174682f63616c63__var: __rgo_7374642f6d6174682f63616c63__var(_1470, price, _1472___rgo_7374642f6d6174682f63616c63__var)
+    _1474: "staged calculation\n"
+    _1475_calculated: calculated(_1474, ok)
+    __rgo_7374642f6d6174682f63616c63__new(_1469, handle_error, _1473___rgo_7374642f6d6174682f63616c63__var, _1475_calculated)
+}
+
+constant: (handle_error:()!, ok:()){
+    _1476: "1 + 2"
+    _1477: "constant calculation\n"
+    _1478_calculated: calculated(_1477, ok)
+    __rgo_7374642f6d6174682f63616c63__new(_1476, handle_error, __rgo_7374642f6d6174682f63616c63__end, _1478_calculated)
+}
+
+_1482_main: (){
+    _1483: 0
+    @exit(_1483)
+}
+
+main: (handle_error:()!){
+    _1479: 10
+    _1480: 3
+    _1485_constant: constant(handle_error, _1482_main)
+    staged(handle_error, _1479, _1480, _1485_constant)
+}
+handle_error: @compile_error(_158, _160_lambda)
+main(handle_error)

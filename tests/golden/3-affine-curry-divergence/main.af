@@ -1,0 +1,15 @@
+int: @int
+
+run: (add: (int, int, (int))) {
+    add_two: add(2)
+    add_three: add(3)
+    add_two(4, (a: int) {
+        add_three(5, (b: int) {
+            @add(a, b, @exit)
+        })
+    })
+}
+
+main: () {
+    run(@add)
+}

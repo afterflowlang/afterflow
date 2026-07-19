@@ -1,4 +1,0 @@
-[hir] `!` is only valid for int, uint, and str parameters
-tests/failing/1-compile_time_continuation/main.rgo:1
-main: (ok: ()!) {
-^^^^

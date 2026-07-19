@@ -1,0 +1,20 @@
+str: @str
+_1_puts: (ok:()){
+    _2: "\n"
+    @write(_2, ok)
+}
+
+puts: (s: str, ok:()){
+    _3_puts: _1_puts(ok)
+    @write(s, _3_puts)
+}
+_6_hello: (){
+    _7: 0
+    @exit(_7)
+}
+
+hello: (){
+    _4: "hello"
+    puts(_4, _6_hello)
+}
+hello()

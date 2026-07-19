@@ -1,6 +1,6 @@
 use crate::compiler::ast;
 use crate::compiler::builtins;
-use crate::compiler::error::{Code, Error};
+use crate::compiler::error::Error;
 use crate::compiler::hir;
 use crate::compiler::hir_context as ctx;
 use crate::compiler::span::Span;
@@ -44,13 +44,6 @@ pub fn resolve_signature(
                     item.name.clone()
                 };
                 let kind = lower_sig_kind(&item.kind, ctx)?;
-                if item.is_comptime && !normalize_sig_kind(&kind, ctx).supports_comptime() {
-                    return Err(Error::new(
-                        Code::HIR,
-                        "`!` is only valid for int, uint, and str parameters",
-                        Span::unknown(),
-                    ));
-                }
                 Ok(hir::SigItem {
                     name,
                     kind,
@@ -154,43 +147,7 @@ pub fn expected_params_for_args(
     params: &[hir::SigItem],
     args_len: usize,
 ) -> Vec<Option<&hir::SigItem>> {
-    let mut expected = Vec::with_capacity(args_len);
-    if args_len == 0 {
-        return expected;
-    }
-
-    let mut prefix_assigned = 0;
-    let mut suffix_start = args_len;
-    let variadic_index = params
-        .iter()
-        .position(|item| matches!(item.kind, hir::SigKind::Variadic));
-
-    if let Some(var_idx) = variadic_index {
-        let prefix_count = var_idx;
-        prefix_assigned = prefix_count.min(args_len);
-        let remaining_after_prefix = args_len.saturating_sub(prefix_assigned);
-        let suffix_params = params.len().saturating_sub(var_idx + 1);
-        let suffix_assigned = remaining_after_prefix.min(suffix_params);
-        suffix_start = args_len.saturating_sub(suffix_assigned);
-    }
-
-    for idx in 0..args_len {
-        let expected_param = if let Some(var_idx) = variadic_index {
-            if idx < prefix_assigned {
-                params.get(idx)
-            } else if idx >= suffix_start {
-                let suffix_param_idx = var_idx + 1 + (idx - suffix_start);
-                params.get(suffix_param_idx)
-            } else {
-                params.get(var_idx)
-            }
-        } else {
-            params.get(idx)
-        };
-        expected.push(expected_param);
-    }
-
-    expected
+    (0..args_len).map(|idx| params.get(idx)).collect()
 }
 
 fn resolve_ident(ident: &hir::SigIdent, ctx: &ctx::Context) -> hir::SigKind {
@@ -221,7 +178,6 @@ fn ast_sig_kind_to_hir(kind: ast::SigKind) -> hir::SigKind {
         ast::SigKind::Int => hir::SigKind::Int,
         ast::SigKind::Str => hir::SigKind::Str,
         ast::SigKind::F64 => hir::SigKind::F64,
-        ast::SigKind::Variadic => hir::SigKind::Variadic,
         ast::SigKind::Ident(ident) => hir::SigKind::Ident(hir::SigIdent { name: ident.name }),
         ast::SigKind::Sig(signature) => hir::SigKind::Sig(ast_signature_to_hir(signature)),
         ast::SigKind::GenericInst { name, args } => hir::SigKind::GenericInst {
@@ -249,13 +205,20 @@ fn hir_sig_kind_to_ast(kind: hir::SigKind) -> ast::SigKind {
             name: "uint".to_string(),
             span: Span::unknown(),
         }),
+        hir::SigKind::Rune => ast::SigKind::Ident(ast::SigIdent {
+            name: "rune".to_string(),
+            span: Span::unknown(),
+        }),
         hir::SigKind::FixedInt(kind) => ast::SigKind::Ident(ast::SigIdent {
             name: kind.name(),
             span: Span::unknown(),
         }),
+        hir::SigKind::Bytes => ast::SigKind::Ident(ast::SigIdent {
+            name: "bytes".to_string(),
+            span: Span::unknown(),
+        }),
         hir::SigKind::Str => ast::SigKind::Str,
         hir::SigKind::F64 => ast::SigKind::F64,
-        hir::SigKind::Variadic => ast::SigKind::Variadic,
         hir::SigKind::Ident(ident) => ast::SigKind::Ident(ast::SigIdent {
             name: ident.name,
             span: Span::unknown(),
@@ -286,10 +249,11 @@ fn lower_sig_kind(kind: &hir::SigKind, ctx: &mut ctx::Context) -> Result<hir::Si
         hir::SigKind::Byte
         | hir::SigKind::Int
         | hir::SigKind::UInt
+        | hir::SigKind::Rune
         | hir::SigKind::FixedInt(_)
+        | hir::SigKind::Bytes
         | hir::SigKind::Str
         | hir::SigKind::F64 => kind.clone(),
-        hir::SigKind::Variadic => hir::SigKind::Variadic,
     })
 }
 
@@ -319,7 +283,7 @@ fn instantiate_generic_inst(
     Some(hir::SigKind::Sig(substitute_signature(signature, &mapping)))
 }
 
-fn substitute_signature(
+pub(crate) fn substitute_signature(
     signature: &hir::Signature,
     mapping: &HashMap<String, hir::SigKind>,
 ) -> hir::Signature {
@@ -357,6 +321,13 @@ fn substitute_kind(kind: &hir::SigKind, mapping: &HashMap<String, hir::SigKind>)
                 hir::SigKind::Generic(name.clone())
             }
         }
+        hir::SigKind::GenericInst { name, args } => hir::SigKind::GenericInst {
+            name: name.clone(),
+            args: args
+                .iter()
+                .map(|arg| substitute_kind(arg, mapping))
+                .collect(),
+        },
         _ => kind.clone(),
     }
 }

@@ -1,0 +1,499 @@
+__rgo_7374642f666d74__nth: (uint, (), (u8))
+__rgo_7374642f666d74__inspect: (uint, (uint, (), (u8)))
+__rgo_7374642f666d74__source: ((uint, (uint, (), (u8))))
+__rgo_7374642f666d74__format_value: ((str), (int), (f64))
+__rgo_7374642f666d74__arg: ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())
+str: @str
+bytes: @bytes
+__rgo_737464__end: (_80___rgo_737464__end: T, ok:()){
+    ok()
+}
+
+__rgo_737464__pipe: (value: T, ok:(T)){
+    ok(value)
+}
+__rgo_737464__print: (value: str, ok:()){
+    @write(value, ok)
+}
+_83___rgo_737464__println: (ok:()){
+    _84: "\n"
+    @write(_84, ok)
+}
+
+__rgo_737464__println: (value: str, ok:()){
+    _85___rgo_737464__println: _83___rgo_737464__println(ok)
+    @write(value, _85___rgo_737464__println)
+}
+
+__rgo_7374642f666d74__as_str: (value: str, str_case:(str), _87___rgo_7374642f666d74__as_str:(int), _89___rgo_7374642f666d74__as_str:(f64)){
+    str_case(value)
+}
+
+__rgo_7374642f666d74__as_int: (value: int, _91___rgo_7374642f666d74__as_int:(str), int_case:(int), _94___rgo_7374642f666d74__as_int:(f64)){
+    int_case(value)
+}
+
+__rgo_7374642f666d74__as_f64: (value: f64, _96___rgo_7374642f666d74__as_f64:(str), _98___rgo_7374642f666d74__as_f64:(int), f64_case:(f64)){
+    f64_case(value)
+}
+
+__rgo_7374642f666d74__empty_nth: (_101___rgo_7374642f666d74__empty_nth: uint, empty:(), _102___rgo_7374642f666d74__empty_nth:(u8)){
+    empty()
+}
+
+__rgo_7374642f666d74__empty: (inspect_value:(uint, (uint, (), (u8)))){
+    _104: 0
+    inspect_value(_104, __rgo_7374642f666d74__empty_nth)
+}
+__rgo_7374642f666d74__single_nth: (value: u8, idx: uint, empty_case:(), one:(u8)){
+    _106: 0
+    _107_one: one(value)
+    @eq_uint(idx, _106, _107_one, empty_case)
+}
+
+__rgo_7374642f666d74__single: (value: u8, inspect_value:(uint, (uint, (), (u8)))){
+    _108: 1
+    _109___rgo_7374642f666d74__single_nth: __rgo_7374642f666d74__single_nth(value)
+    inspect_value(_108, _109___rgo_7374642f666d74__single_nth)
+}
+__rgo_7374642f666d74__raw_nth: (value: bytes, idx: uint, empty_case:(), one:(u8)){
+    @bytes_nth(value, idx, empty_case, one)
+}
+_112___rgo_7374642f666d74__from_raw: (inspect_value:(uint, (uint, (), (u8))), value: bytes, l: uint){
+    _113___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(value)
+    inspect_value(l, _113___rgo_7374642f666d74__raw_nth)
+}
+
+__rgo_7374642f666d74__from_raw: (value: bytes, inspect_value:(uint, (uint, (), (u8)))){
+    _114___rgo_7374642f666d74__from_raw: _112___rgo_7374642f666d74__from_raw(inspect_value, value)
+    @bytes_descriptor_len(value, _114___rgo_7374642f666d74__from_raw)
+}
+_120___rgo_7374642f666d74__concat_nth: (b:(uint, (), (u8)), empty_case:(), one:(u8), b_idx: uint){
+    b(b_idx, empty_case, one)
+}
+
+_118___rgo_7374642f666d74__concat_nth: (idx: uint, l: uint, b:(uint, (), (u8)), empty_case:(), one:(u8)){
+    _121___rgo_7374642f666d74__concat_nth: _120___rgo_7374642f666d74__concat_nth(b, empty_case, one)
+    @sub_uint(idx, l, _121___rgo_7374642f666d74__concat_nth)
+}
+
+__rgo_7374642f666d74__concat_nth: (l: uint, a:(uint, (), (u8)), b:(uint, (), (u8)), idx: uint, empty_case:(), one:(u8)){
+    _116_a: a(idx, empty_case, one)
+    _122___rgo_7374642f666d74__concat_nth: _118___rgo_7374642f666d74__concat_nth(idx, l, b, empty_case, one)
+    @lt_uint(idx, l, _116_a, _122___rgo_7374642f666d74__concat_nth)
+}
+_128___rgo_7374642f666d74__concat: (inspect_value:(uint, (uint, (), (u8))), a_l: uint, a_nth:(uint, (), (u8)), b_nth:(uint, (), (u8)), l: uint){
+    _129___rgo_7374642f666d74__concat_nth: __rgo_7374642f666d74__concat_nth(a_l, a_nth, b_nth)
+    inspect_value(l, _129___rgo_7374642f666d74__concat_nth)
+}
+
+_126___rgo_7374642f666d74__concat: (a_l: uint, inspect_value:(uint, (uint, (), (u8))), a_nth:(uint, (), (u8)), b_l: uint, b_nth:(uint, (), (u8))){
+    _130___rgo_7374642f666d74__concat: _128___rgo_7374642f666d74__concat(inspect_value, a_l, a_nth, b_nth)
+    @add_uint(a_l, b_l, _130___rgo_7374642f666d74__concat)
+}
+
+_124___rgo_7374642f666d74__concat: (b:((uint, (uint, (), (u8)))), inspect_value:(uint, (uint, (), (u8))), a_l: uint, a_nth:(uint, (), (u8))){
+    _131___rgo_7374642f666d74__concat: _126___rgo_7374642f666d74__concat(a_l, inspect_value, a_nth)
+    b(_131___rgo_7374642f666d74__concat)
+}
+
+__rgo_7374642f666d74__concat: (a:((uint, (uint, (), (u8)))), b:((uint, (uint, (), (u8)))), inspect_value:(uint, (uint, (), (u8)))){
+    _132___rgo_7374642f666d74__concat: _124___rgo_7374642f666d74__concat(b, inspect_value)
+    a(_132___rgo_7374642f666d74__concat)
+}
+_134___rgo_7374642f666d74__str_source: (inspect_value:(uint, (uint, (), (u8))), value_bytes: bytes){
+    __rgo_7374642f666d74__from_raw(value_bytes, inspect_value)
+}
+
+__rgo_7374642f666d74__str_source: (value: str, inspect_value:(uint, (uint, (), (u8)))){
+    _135___rgo_7374642f666d74__str_source: _134___rgo_7374642f666d74__str_source(inspect_value)
+    @bytes_from_str(value, _135___rgo_7374642f666d74__str_source)
+}
+
+_137___rgo_7374642f666d74__int_source: (inspect_value:(uint, (uint, (), (u8))), rendered:((uint, (uint, (), (u8))))){
+    rendered(inspect_value)
+}
+
+__rgo_7374642f666d74__int_source: (value: int, invalid:(), inspect_value:(uint, (uint, (), (u8)))){
+    _138___rgo_7374642f666d74__int_source: _137___rgo_7374642f666d74__int_source(inspect_value)
+    __rgo_7374642f666d74__from_int(value, invalid, _138___rgo_7374642f666d74__int_source)
+}
+_143___rgo_7374642f666d74__f64_nth: (one:(u8), byte: u8){
+    one(byte)
+}
+
+_141___rgo_7374642f666d74__f64_nth: (value: f64, idx: uint, one:(u8)){
+    _144___rgo_7374642f666d74__f64_nth: _143___rgo_7374642f666d74__f64_nth(one)
+    @format_f64_nth(value, idx, _144___rgo_7374642f666d74__f64_nth)
+}
+
+__rgo_7374642f666d74__f64_nth: (value: f64, l: uint, idx: uint, empty_case:(), one:(u8)){
+    _145___rgo_7374642f666d74__f64_nth: _141___rgo_7374642f666d74__f64_nth(value, idx, one)
+    @lt_uint(idx, l, _145___rgo_7374642f666d74__f64_nth, empty_case)
+}
+_147___rgo_7374642f666d74__f64_source: (inspect_value:(uint, (uint, (), (u8))), value: f64, l: uint){
+    _148___rgo_7374642f666d74__f64_nth: __rgo_7374642f666d74__f64_nth(value, l)
+    inspect_value(l, _148___rgo_7374642f666d74__f64_nth)
+}
+
+__rgo_7374642f666d74__f64_source: (value: f64, inspect_value:(uint, (uint, (), (u8)))){
+    _149___rgo_7374642f666d74__f64_source: _147___rgo_7374642f666d74__f64_source(inspect_value, value)
+    @format_f64_len(value, _149___rgo_7374642f666d74__f64_source)
+}
+
+_152___rgo_7374642f666d74__consume: (output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), (((uint, (uint, (), (u8)))))), source_l: uint, source_nth:(uint, (), (u8)), idx: uint, invalid:(), tail:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), str_value: str){
+    _153___rgo_7374642f666d74__str_source: __rgo_7374642f666d74__str_source(str_value)
+    next_output: __rgo_7374642f666d74__concat(output, _153___rgo_7374642f666d74__str_source)
+    __rgo_7374642f666d74__parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
+}
+
+_156___rgo_7374642f666d74__consume: (output:((uint, (uint, (), (u8)))), invalid:(), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), (((uint, (uint, (), (u8)))))), source_l: uint, source_nth:(uint, (), (u8)), idx: uint, tail:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), int_value: int){
+    _157___rgo_7374642f666d74__int_source: __rgo_7374642f666d74__int_source(int_value, invalid)
+    next_output: __rgo_7374642f666d74__concat(output, _157___rgo_7374642f666d74__int_source)
+    __rgo_7374642f666d74__parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
+}
+
+_160___rgo_7374642f666d74__consume: (output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), (((uint, (uint, (), (u8)))))), source_l: uint, source_nth:(uint, (), (u8)), idx: uint, invalid:(), tail:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), f64_value: f64){
+    _161___rgo_7374642f666d74__f64_source: __rgo_7374642f666d74__f64_source(f64_value)
+    next_output: __rgo_7374642f666d74__concat(output, _161___rgo_7374642f666d74__f64_source)
+    __rgo_7374642f666d74__parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
+}
+
+__rgo_7374642f666d74__consume: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, output:((uint, (uint, (), (u8)))), invalid:(), ready:(((uint, (uint, (), (u8))))), item:((str), (int), (f64)), tail:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())){
+    _154___rgo_7374642f666d74__consume: _152___rgo_7374642f666d74__consume(output, __rgo_7374642f666d74__parse, source_l, source_nth, idx, invalid, tail, ready)
+    _158___rgo_7374642f666d74__consume: _156___rgo_7374642f666d74__consume(output, invalid, __rgo_7374642f666d74__parse, source_l, source_nth, idx, tail, ready)
+    _162___rgo_7374642f666d74__consume: _160___rgo_7374642f666d74__consume(output, __rgo_7374642f666d74__parse, source_l, source_nth, idx, invalid, tail, ready)
+    item(_154___rgo_7374642f666d74__consume, _158___rgo_7374642f666d74__consume, _162___rgo_7374642f666d74__consume)
+}
+
+__rgo_7374642f666d74__missing: (invalid:()){
+    invalid()
+}
+
+__rgo_7374642f666d74__extra: (invalid:(), _163___rgo_7374642f666d74__extra:((str), (int), (f64)), _164___rgo_7374642f666d74__extra:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())){
+    invalid()
+}
+_167___rgo_7374642f666d74__finish: (invalid:(), ok:(str), value: bytes){
+    @str_from_utf8(value, invalid, ok)
+}
+
+__rgo_7374642f666d74__finish: (output:((uint, (uint, (), (u8)))), invalid:(), ok:(str)){
+    _168___rgo_7374642f666d74__finish: _167___rgo_7374642f666d74__finish(invalid, ok)
+    @bytes_build(output, invalid, _168___rgo_7374642f666d74__finish)
+}
+_180___rgo_7374642f666d74__digit: (ok:(((uint, (uint, (), (u8))))), ascii: u8){
+    _181___rgo_7374642f666d74__single: __rgo_7374642f666d74__single(ascii)
+    ok(_181___rgo_7374642f666d74__single)
+}
+
+_178___rgo_7374642f666d74__digit: (ok:(((uint, (uint, (), (u8))))), ascii_bits: b8){
+    _182___rgo_7374642f666d74__digit: _180___rgo_7374642f666d74__digit(ok)
+    @u8_from_b8(ascii_bits, _182___rgo_7374642f666d74__digit)
+}
+
+_176___rgo_7374642f666d74__digit: (value_bits: b8, ok:(((uint, (uint, (), (u8))))), zero_bits: b8){
+    _183___rgo_7374642f666d74__digit: _178___rgo_7374642f666d74__digit(ok)
+    @add_b8(value_bits, zero_bits, _183___rgo_7374642f666d74__digit)
+}
+
+_173___rgo_7374642f666d74__digit: (ok:(((uint, (uint, (), (u8))))), value_bits: b8){
+    _174: 48
+    _184___rgo_7374642f666d74__digit: _176___rgo_7374642f666d74__digit(value_bits, ok)
+    @b8_from_u8(_174, _184___rgo_7374642f666d74__digit)
+}
+
+_171___rgo_7374642f666d74__digit: (ok:(((uint, (uint, (), (u8))))), value_u8: u8){
+    _185___rgo_7374642f666d74__digit: _173___rgo_7374642f666d74__digit(ok)
+    @b8_from_u8(value_u8, _185___rgo_7374642f666d74__digit)
+}
+
+__rgo_7374642f666d74__digit: (value: int, invalid:(), ok:(((uint, (uint, (), (u8)))))){
+    _186___rgo_7374642f666d74__digit: _171___rgo_7374642f666d74__digit(ok)
+    @u8_from_int(value, invalid, _186___rgo_7374642f666d74__digit)
+}
+_203___rgo_7374642f666d74__positive_digits: (ok:(((uint, (uint, (), (u8))))), suffix:((uint, (uint, (), (u8)))), prefix:((uint, (uint, (), (u8))))){
+    _204___rgo_7374642f666d74__concat: __rgo_7374642f666d74__concat(prefix, suffix)
+    ok(_204___rgo_7374642f666d74__concat)
+}
+
+_201___rgo_7374642f666d74__positive_digits: (__rgo_7374642f666d74__positive_digits:(int, (), (((uint, (uint, (), (u8))))))!, quotient: int, invalid:(), ok:(((uint, (uint, (), (u8))))), suffix:((uint, (uint, (), (u8))))){
+    _205___rgo_7374642f666d74__positive_digits: _203___rgo_7374642f666d74__positive_digits(ok, suffix)
+    __rgo_7374642f666d74__positive_digits(quotient, invalid, _205___rgo_7374642f666d74__positive_digits)
+}
+
+_197___rgo_7374642f666d74__positive_digits: (quotient: int, ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__positive_digits:(int, (), (((uint, (uint, (), (u8))))))!, invalid:(), suffix:((uint, (uint, (), (u8))))){
+    _198: 0
+    _199_ok: ok(suffix)
+    _206___rgo_7374642f666d74__positive_digits: _201___rgo_7374642f666d74__positive_digits(__rgo_7374642f666d74__positive_digits, quotient, invalid, ok, suffix)
+    @eq_int(quotient, _198, _199_ok, _206___rgo_7374642f666d74__positive_digits)
+}
+
+_195___rgo_7374642f666d74__positive_digits: (invalid:(), quotient: int, ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__positive_digits:(int, (), (((uint, (uint, (), (u8))))))!, remainder: int){
+    _207___rgo_7374642f666d74__positive_digits: _197___rgo_7374642f666d74__positive_digits(quotient, ok, __rgo_7374642f666d74__positive_digits, invalid)
+    __rgo_7374642f666d74__digit(remainder, invalid, _207___rgo_7374642f666d74__positive_digits)
+}
+
+_193___rgo_7374642f666d74__positive_digits: (value: int, invalid:(), quotient: int, ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__positive_digits:(int, (), (((uint, (uint, (), (u8))))))!, magnitude: int){
+    _208___rgo_7374642f666d74__positive_digits: _195___rgo_7374642f666d74__positive_digits(invalid, quotient, ok, __rgo_7374642f666d74__positive_digits)
+    @sub(value, magnitude, _208___rgo_7374642f666d74__positive_digits)
+}
+
+_190___rgo_7374642f666d74__positive_digits: (value: int, invalid:(), ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__positive_digits:(int, (), (((uint, (uint, (), (u8))))))!, quotient: int){
+    _191: 10
+    _209___rgo_7374642f666d74__positive_digits: _193___rgo_7374642f666d74__positive_digits(value, invalid, quotient, ok, __rgo_7374642f666d74__positive_digits)
+    @mul(quotient, _191, _209___rgo_7374642f666d74__positive_digits)
+}
+
+__rgo_7374642f666d74__positive_digits: (value: int, invalid:(), ok:(((uint, (uint, (), (u8)))))){
+    _188: 10
+    _210___rgo_7374642f666d74__positive_digits: _190___rgo_7374642f666d74__positive_digits(value, invalid, ok, __rgo_7374642f666d74__positive_digits)
+    @div(value, _188, invalid, _210___rgo_7374642f666d74__positive_digits)
+}
+_230___rgo_7374642f666d74__negative_digits: (ok:(((uint, (uint, (), (u8))))), suffix:((uint, (uint, (), (u8)))), prefix:((uint, (uint, (), (u8))))){
+    _231___rgo_7374642f666d74__concat: __rgo_7374642f666d74__concat(prefix, suffix)
+    ok(_231___rgo_7374642f666d74__concat)
+}
+
+_228___rgo_7374642f666d74__negative_digits: (__rgo_7374642f666d74__negative_digits:(int, (), (((uint, (uint, (), (u8))))))!, quotient: int, invalid:(), ok:(((uint, (uint, (), (u8))))), suffix:((uint, (uint, (), (u8))))){
+    _232___rgo_7374642f666d74__negative_digits: _230___rgo_7374642f666d74__negative_digits(ok, suffix)
+    __rgo_7374642f666d74__negative_digits(quotient, invalid, _232___rgo_7374642f666d74__negative_digits)
+}
+
+_224___rgo_7374642f666d74__negative_digits: (quotient: int, ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__negative_digits:(int, (), (((uint, (uint, (), (u8))))))!, invalid:(), suffix:((uint, (uint, (), (u8))))){
+    _225: 0
+    _226_ok: ok(suffix)
+    _233___rgo_7374642f666d74__negative_digits: _228___rgo_7374642f666d74__negative_digits(__rgo_7374642f666d74__negative_digits, quotient, invalid, ok, suffix)
+    @eq_int(quotient, _225, _226_ok, _233___rgo_7374642f666d74__negative_digits)
+}
+
+_222___rgo_7374642f666d74__negative_digits: (invalid:(), quotient: int, ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__negative_digits:(int, (), (((uint, (uint, (), (u8))))))!, remainder: int){
+    _234___rgo_7374642f666d74__negative_digits: _224___rgo_7374642f666d74__negative_digits(quotient, ok, __rgo_7374642f666d74__negative_digits, invalid)
+    __rgo_7374642f666d74__digit(remainder, invalid, _234___rgo_7374642f666d74__negative_digits)
+}
+
+_219___rgo_7374642f666d74__negative_digits: (invalid:(), quotient: int, ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__negative_digits:(int, (), (((uint, (uint, (), (u8))))))!, negative_remainder: int){
+    _220: 0
+    _235___rgo_7374642f666d74__negative_digits: _222___rgo_7374642f666d74__negative_digits(invalid, quotient, ok, __rgo_7374642f666d74__negative_digits)
+    @sub(_220, negative_remainder, _235___rgo_7374642f666d74__negative_digits)
+}
+
+_217___rgo_7374642f666d74__negative_digits: (value: int, invalid:(), quotient: int, ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__negative_digits:(int, (), (((uint, (uint, (), (u8))))))!, magnitude: int){
+    _236___rgo_7374642f666d74__negative_digits: _219___rgo_7374642f666d74__negative_digits(invalid, quotient, ok, __rgo_7374642f666d74__negative_digits)
+    @sub(value, magnitude, _236___rgo_7374642f666d74__negative_digits)
+}
+
+_214___rgo_7374642f666d74__negative_digits: (value: int, invalid:(), ok:(((uint, (uint, (), (u8))))), __rgo_7374642f666d74__negative_digits:(int, (), (((uint, (uint, (), (u8))))))!, quotient: int){
+    _215: 10
+    _237___rgo_7374642f666d74__negative_digits: _217___rgo_7374642f666d74__negative_digits(value, invalid, quotient, ok, __rgo_7374642f666d74__negative_digits)
+    @mul(quotient, _215, _237___rgo_7374642f666d74__negative_digits)
+}
+
+__rgo_7374642f666d74__negative_digits: (value: int, invalid:(), ok:(((uint, (uint, (), (u8)))))){
+    _212: 10
+    _238___rgo_7374642f666d74__negative_digits: _214___rgo_7374642f666d74__negative_digits(value, invalid, ok, __rgo_7374642f666d74__negative_digits)
+    @div(value, _212, invalid, _238___rgo_7374642f666d74__negative_digits)
+}
+_244___rgo_7374642f666d74__from_int: (ok:(((uint, (uint, (), (u8))))), magnitude:((uint, (uint, (), (u8))))){
+    _245: 45
+    _246___rgo_7374642f666d74__single: __rgo_7374642f666d74__single(_245)
+    _247___rgo_7374642f666d74__concat: __rgo_7374642f666d74__concat(_246___rgo_7374642f666d74__single, magnitude)
+    ok(_247___rgo_7374642f666d74__concat)
+}
+
+_242___rgo_7374642f666d74__from_int: (value: int, invalid:(), ok:(((uint, (uint, (), (u8)))))){
+    _248___rgo_7374642f666d74__from_int: _244___rgo_7374642f666d74__from_int(ok)
+    __rgo_7374642f666d74__negative_digits(value, invalid, _248___rgo_7374642f666d74__from_int)
+}
+
+_251___rgo_7374642f666d74__from_int: (value: int, invalid:(), ok:(((uint, (uint, (), (u8)))))){
+    __rgo_7374642f666d74__positive_digits(value, invalid, ok)
+}
+
+__rgo_7374642f666d74__from_int: (value: int, invalid:(), ok:(((uint, (uint, (), (u8)))))){
+    _240: 0
+    _249___rgo_7374642f666d74__from_int: _242___rgo_7374642f666d74__from_int(value, invalid, ok)
+    _252___rgo_7374642f666d74__from_int: _251___rgo_7374642f666d74__from_int(value, invalid, ok)
+    @lt(value, _240, _249___rgo_7374642f666d74__from_int, _252___rgo_7374642f666d74__from_int)
+}
+_278___rgo_7374642f666d74__parse: (output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), following_idx: uint){
+    _279: 37
+    _280___rgo_7374642f666d74__single: __rgo_7374642f666d74__single(_279)
+    next_output: __rgo_7374642f666d74__concat(output, _280___rgo_7374642f666d74__single)
+    __rgo_7374642f666d74__parse(source_l, source_nth, following_idx, next_output, invalid, args, ready)
+}
+
+_275___rgo_7374642f666d74__parse: (next_idx: uint, output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8)))))){
+    _276: 1
+    _281___rgo_7374642f666d74__parse: _278___rgo_7374642f666d74__parse(output, __rgo_7374642f666d74__parse, source_l, source_nth, invalid, args, ready)
+    @add_uint(next_idx, _276, _281___rgo_7374642f666d74__parse)
+}
+
+_284___rgo_7374642f666d74__parse: (args:((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), source_l: uint, source_nth:(uint, (), (u8)), next_idx: uint, output:((uint, (uint, (), (u8)))), invalid:(), ready:(((uint, (uint, (), (u8)))))){
+    _285___rgo_7374642f666d74__consume: __rgo_7374642f666d74__consume(source_l, source_nth, next_idx, output, invalid, ready)
+    _286___rgo_7374642f666d74__missing: __rgo_7374642f666d74__missing(invalid)
+    args(_285___rgo_7374642f666d74__consume, _286___rgo_7374642f666d74__missing)
+}
+
+_273___rgo_7374642f666d74__parse: (percent_bits: b8, next_idx: uint, output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), next_bits: b8){
+    _282___rgo_7374642f666d74__parse: _275___rgo_7374642f666d74__parse(next_idx, output, __rgo_7374642f666d74__parse, source_l, source_nth, invalid, args, ready)
+    _287___rgo_7374642f666d74__parse: _284___rgo_7374642f666d74__parse(args, source_l, source_nth, next_idx, output, invalid, ready)
+    @eq_b8(next_bits, percent_bits, _282___rgo_7374642f666d74__parse, _287___rgo_7374642f666d74__parse)
+}
+
+_271___rgo_7374642f666d74__parse: (percent_bits: b8, next_idx: uint, output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), next_value: u8){
+    _288___rgo_7374642f666d74__parse: _273___rgo_7374642f666d74__parse(percent_bits, next_idx, output, __rgo_7374642f666d74__parse, source_l, source_nth, invalid, args, ready)
+    @b8_from_u8(next_value, _288___rgo_7374642f666d74__parse)
+}
+
+_269___rgo_7374642f666d74__parse: (source_nth:(uint, (), (u8)), next_idx: uint, invalid:(), percent_bits: b8, output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, source_l: uint, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8)))))){
+    _289___rgo_7374642f666d74__parse: _271___rgo_7374642f666d74__parse(percent_bits, next_idx, output, __rgo_7374642f666d74__parse, source_l, source_nth, invalid, args, ready)
+    source_nth(next_idx, invalid, _289___rgo_7374642f666d74__parse)
+}
+
+_292___rgo_7374642f666d74__parse: (args:((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), source_l: uint, source_nth:(uint, (), (u8)), next_idx: uint, output:((uint, (uint, (), (u8)))), invalid:(), ready:(((uint, (uint, (), (u8)))))){
+    _293___rgo_7374642f666d74__consume: __rgo_7374642f666d74__consume(source_l, source_nth, next_idx, output, invalid, ready)
+    _294___rgo_7374642f666d74__missing: __rgo_7374642f666d74__missing(invalid)
+    args(_293___rgo_7374642f666d74__consume, _294___rgo_7374642f666d74__missing)
+}
+
+_267___rgo_7374642f666d74__parse: (source_l: uint, source_nth:(uint, (), (u8)), invalid:(), percent_bits: b8, output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), next_idx: uint){
+    _290___rgo_7374642f666d74__parse: _269___rgo_7374642f666d74__parse(source_nth, next_idx, invalid, percent_bits, output, __rgo_7374642f666d74__parse, source_l, args, ready)
+    _295___rgo_7374642f666d74__parse: _292___rgo_7374642f666d74__parse(args, source_l, source_nth, next_idx, output, invalid, ready)
+    @lt_uint(next_idx, source_l, _290___rgo_7374642f666d74__parse, _295___rgo_7374642f666d74__parse)
+}
+
+_264___rgo_7374642f666d74__parse: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), percent_bits: b8, output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8)))))){
+    _265: 1
+    _296___rgo_7374642f666d74__parse: _267___rgo_7374642f666d74__parse(source_l, source_nth, invalid, percent_bits, output, __rgo_7374642f666d74__parse, args, ready)
+    @add_uint(idx, _265, _296___rgo_7374642f666d74__parse)
+}
+_302___rgo_7374642f666d74__parse: (output:((uint, (uint, (), (u8)))), value: u8, __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), (((uint, (uint, (), (u8))))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), args:((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), ready:(((uint, (uint, (), (u8))))), next_idx: uint){
+    _303___rgo_7374642f666d74__single: __rgo_7374642f666d74__single(value)
+    next_output: __rgo_7374642f666d74__concat(output, _303___rgo_7374642f666d74__single)
+    __rgo_7374642f666d74__parse(source_l, source_nth, next_idx, next_output, invalid, args, ready)
+}
+
+_299___rgo_7374642f666d74__parse: (idx: uint, output:((uint, (uint, (), (u8)))), value: u8, __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), (((uint, (uint, (), (u8))))))!, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), args:((((str), (int), (f64)), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())), ()), ready:(((uint, (uint, (), (u8)))))){
+    _300: 1
+    _304___rgo_7374642f666d74__parse: _302___rgo_7374642f666d74__parse(output, value, __rgo_7374642f666d74__parse, source_l, source_nth, invalid, args, ready)
+    @add_uint(idx, _300, _304___rgo_7374642f666d74__parse)
+}
+
+_262___rgo_7374642f666d74__parse: (value_bits: b8, idx: uint, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), value: u8, percent_bits: b8){
+    _297___rgo_7374642f666d74__parse: _264___rgo_7374642f666d74__parse(idx, source_l, source_nth, invalid, percent_bits, output, __rgo_7374642f666d74__parse, args, ready)
+    _305___rgo_7374642f666d74__parse: _299___rgo_7374642f666d74__parse(idx, output, value, __rgo_7374642f666d74__parse, source_l, source_nth, invalid, args, ready)
+    @eq_b8(value_bits, percent_bits, _297___rgo_7374642f666d74__parse, _305___rgo_7374642f666d74__parse)
+}
+
+_259___rgo_7374642f666d74__parse: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), value: u8, value_bits: b8){
+    _260: 37
+    _306___rgo_7374642f666d74__parse: _262___rgo_7374642f666d74__parse(value_bits, idx, source_l, source_nth, invalid, output, __rgo_7374642f666d74__parse, args, ready, value)
+    @b8_from_u8(_260, _306___rgo_7374642f666d74__parse)
+}
+
+_257___rgo_7374642f666d74__parse: (idx: uint, source_l: uint, source_nth:(uint, (), (u8)), invalid:(), output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8))))), value: u8){
+    _307___rgo_7374642f666d74__parse: _259___rgo_7374642f666d74__parse(idx, source_l, source_nth, invalid, output, __rgo_7374642f666d74__parse, args, ready, value)
+    @b8_from_u8(value, _307___rgo_7374642f666d74__parse)
+}
+
+_255___rgo_7374642f666d74__parse: (source_nth:(uint, (), (u8)), idx: uint, invalid:(), source_l: uint, output:((uint, (uint, (), (u8)))), __rgo_7374642f666d74__parse:(uint, (uint, (), (u8)), uint, ((uint, (uint, (), (u8)))), (), ((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), (((uint, (uint, (), (u8))))))!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), ready:(((uint, (uint, (), (u8)))))){
+    _308___rgo_7374642f666d74__parse: _257___rgo_7374642f666d74__parse(idx, source_l, source_nth, invalid, output, __rgo_7374642f666d74__parse, args, ready)
+    source_nth(idx, invalid, _308___rgo_7374642f666d74__parse)
+}
+
+_311___rgo_7374642f666d74__parse: (args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ()), invalid:(), ready:(((uint, (uint, (), (u8))))), output:((uint, (uint, (), (u8))))){
+    _312___rgo_7374642f666d74__extra: __rgo_7374642f666d74__extra(invalid)
+    _313_ready: ready(output)
+    args(_312___rgo_7374642f666d74__extra, _313_ready)
+}
+
+__rgo_7374642f666d74__parse: (source_l: uint, source_nth:(uint, (), (u8)), idx: uint, output:((uint, (uint, (), (u8)))), invalid:(), args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ()), ready:(((uint, (uint, (), (u8)))))){
+    _309___rgo_7374642f666d74__parse: _255___rgo_7374642f666d74__parse(source_nth, idx, invalid, source_l, output, __rgo_7374642f666d74__parse, args, ready)
+    _314___rgo_7374642f666d74__parse: _311___rgo_7374642f666d74__parse(args, invalid, ready, output)
+    @lt_uint(idx, source_l, _309___rgo_7374642f666d74__parse, _314___rgo_7374642f666d74__parse)
+}
+
+__rgo_7374642f666d74__str: (value: str, tail:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ()), next:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), _317___rgo_7374642f666d74__str:()){
+    _318___rgo_7374642f666d74__as_str: __rgo_7374642f666d74__as_str(value)
+    next(_318___rgo_7374642f666d74__as_str, tail)
+}
+
+__rgo_7374642f666d74__int: (value: int, tail:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ()), next:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), _321___rgo_7374642f666d74__int:()){
+    _322___rgo_7374642f666d74__as_int: __rgo_7374642f666d74__as_int(value)
+    next(_322___rgo_7374642f666d74__as_int, tail)
+}
+
+__rgo_7374642f666d74__f64: (value: f64, tail:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ()), next:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), _325___rgo_7374642f666d74__f64:()){
+    _326___rgo_7374642f666d74__as_f64: __rgo_7374642f666d74__as_f64(value)
+    next(_326___rgo_7374642f666d74__as_f64, tail)
+}
+
+__rgo_7374642f666d74__end: (value:(((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), done_case:()){
+    __rgo_737464__end(value, done_case)
+}
+_337___rgo_7374642f666d74__new: (invalid:()!, ok:(str), output:((uint, (uint, (), (u8))))){
+    __rgo_7374642f666d74__finish(output, invalid, ok)
+}
+
+_333___rgo_7374642f666d74__new: (source_bytes: bytes, invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), l: uint){
+    _334___rgo_7374642f666d74__raw_nth: __rgo_7374642f666d74__raw_nth(source_bytes)
+    _335: 0
+    _338___rgo_7374642f666d74__new: _337___rgo_7374642f666d74__new(invalid, ok)
+    __rgo_7374642f666d74__parse(l, _334___rgo_7374642f666d74__raw_nth, _335, __rgo_7374642f666d74__empty, invalid, args, _338___rgo_7374642f666d74__new)
+}
+
+_331___rgo_7374642f666d74__new: (invalid:()!, args:((((str), (int), (f64)), ((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())), ())!, ok:(str), source_bytes: bytes){
+    _339___rgo_7374642f666d74__new: _333___rgo_7374642f666d74__new(source_bytes, invalid, args, ok)
+    @bytes_descriptor_len(source_bytes, _339___rgo_7374642f666d74__new)
+}
+
+__rgo_7374642f666d74__new: (template: str!, invalid:()!, args:((((str), (int), (f64)), __rgo_7374642f666d74__arg), ())!, ok:(str)){
+    _340___rgo_7374642f666d74__new: _331___rgo_7374642f666d74__new(invalid, args, ok)
+    @bytes_from_str(template, _340___rgo_7374642f666d74__new)
+}
+_343_file_read_str: (err:(), ok:(str), contents: bytes){
+    @str_from_utf8(contents, err, ok)
+}
+
+file_read_str: (path: str, err:(), ok:(str)){
+    _344_file_read_str: _343_file_read_str(err, ok)
+    @file_read(path, err, _344_file_read_str)
+}
+_347_error: (){
+    _348: 1
+    @exit(_348)
+}
+_353_error: (ok:(), value: str){
+    @write(value, ok)
+}
+
+_355_error: (){
+    _356: 1
+    @exit(_356)
+}
+
+_352_error: (_329___rgo_7374642f666d74__new: str){
+    _353_error(_355_error, _329___rgo_7374642f666d74__new)
+}
+
+error: (msg: str){
+    _345: "Error: %\n"
+    _350___rgo_7374642f666d74__str: __rgo_7374642f666d74__str(msg, __rgo_7374642f666d74__end)
+    __rgo_7374642f666d74__new(_345, _347_error, _350___rgo_7374642f666d74__str, _352_error)
+}
+_365_main: (){
+    _366: 0
+    @exit(_366)
+}
+
+_363_main: (contents: str){
+    @write(contents, _365_main)
+}
+
+main: (){
+    _359: "tests/golden/2-readfile/data.txt"
+    _360: "cannot read file"
+    _361_error: error(_360)
+    file_read_str(_359, _361_error, _363_main)
+}
+main()

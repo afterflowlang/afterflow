@@ -1,0 +1,537 @@
+[
+    Import {
+        label: "calc",
+        path: "/std/math/calc",
+        span: ,
+    },
+    IdentDef {
+        name: "handle_error",
+        ident: Ident {
+            name: "@compile_error",
+            args: [
+                Arg {
+                    name: None,
+                    term: Lit(
+                        Literal {
+                            value: Str(
+                                "invalid calculation",
+                            ),
+                            span: ,
+                        },
+                    ),
+                    span: ,
+                },
+                Arg {
+                    name: None,
+                    term: Ident(
+                        Ident {
+                            name: "@exit",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: Int(
+                                                1,
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                    span: ,
+                },
+            ],
+            span: ,
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "calculated",
+        lambda: Lambda {
+            params: Signature {
+                items: [
+                    SigItem {
+                        name: "message",
+                        kind: Ident(
+                            SigIdent {
+                                name: "@str",
+                                span: ,
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                    SigItem {
+                        name: "ok",
+                        kind: Sig(
+                            Signature {
+                                items: [],
+                                span: ,
+                                generics: {},
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                    SigItem {
+                        name: "",
+                        kind: Ident(
+                            SigIdent {
+                                name: "@f64",
+                                span: ,
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                ],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "@write",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "message",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "ok",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "staged",
+        lambda: Lambda {
+            params: Signature {
+                items: [
+                    SigItem {
+                        name: "price",
+                        kind: Ident(
+                            SigIdent {
+                                name: "@f64",
+                                span: ,
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                    SigItem {
+                        name: "tax",
+                        kind: Ident(
+                            SigIdent {
+                                name: "@f64",
+                                span: ,
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                    SigItem {
+                        name: "ok",
+                        kind: Sig(
+                            Signature {
+                                items: [],
+                                span: ,
+                                generics: {},
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                ],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "calc.new",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: Str(
+                                                "(price + 2.5) * -tax / 2",
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "handle_error",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "calc.var",
+                                            args: [
+                                                Arg {
+                                                    name: None,
+                                                    term: Lit(
+                                                        Literal {
+                                                            value: Str(
+                                                                "price",
+                                                            ),
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "price",
+                                                            args: [],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "calc.var",
+                                                            args: [
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Lit(
+                                                                        Literal {
+                                                                            value: Str(
+                                                                                "tax",
+                                                                            ),
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Ident(
+                                                                        Ident {
+                                                                            name: "tax",
+                                                                            args: [],
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Ident(
+                                                                        Ident {
+                                                                            name: "calc.end",
+                                                                            args: [],
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                            ],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "calculated",
+                                            args: [
+                                                Arg {
+                                                    name: None,
+                                                    term: Lit(
+                                                        Literal {
+                                                            value: Str(
+                                                                "staged calculation\n",
+                                                            ),
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "ok",
+                                                            args: [],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "constant",
+        lambda: Lambda {
+            params: Signature {
+                items: [
+                    SigItem {
+                        name: "ok",
+                        kind: Sig(
+                            Signature {
+                                items: [],
+                                span: ,
+                                generics: {},
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                ],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "calc.new",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: Str(
+                                                "1 + 2",
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "handle_error",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "calc.end",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "calculated",
+                                            args: [
+                                                Arg {
+                                                    name: None,
+                                                    term: Lit(
+                                                        Literal {
+                                                            value: Str(
+                                                                "constant calculation\n",
+                                                            ),
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "ok",
+                                                            args: [],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "main",
+        lambda: Lambda {
+            params: Signature {
+                items: [],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "staged",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: F64(
+                                                10.0,
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: F64(
+                                                3.0,
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "constant",
+                                            args: [
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "@exit",
+                                                            args: [
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Lit(
+                                                                        Literal {
+                                                                            value: Int(
+                                                                                0,
+                                                                            ),
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                            ],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    Ident(
+        Ident {
+            name: "main",
+            args: [],
+            span: ,
+        },
+    ),
+]

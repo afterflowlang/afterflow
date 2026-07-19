@@ -1,0 +1,7 @@
+std: /std
+
+main: () {
+    std.print("before")
+    std.println(" end")
+    std.end("unused", @exit(0))
+}

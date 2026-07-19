@@ -1,0 +1,21 @@
+int: @int
+
+bar: (ok: ()) {
+    @write("bar,", ok)
+}
+
+baz: (ok: ()) {
+    @write("baz,", ok)
+}
+
+foo: (remaining: int, done: ()) {
+    @eq_int(remaining, 0, done, () {
+        @sub(remaining, 1, (next: int) {
+            @write("foo,", bar(baz(foo(next, done))))
+        })
+    })
+}
+
+main: () {
+    foo(3, @exit(0))
+}

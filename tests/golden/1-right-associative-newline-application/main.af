@@ -1,0 +1,21 @@
+fmt: /std/fmt
+str: @str
+
+produce: (value: @int, ok: (@int)){
+    ok(value)
+}
+
+finish: (prefix: str, value: @int){
+    fmt.new("% %\n", @exit(1),
+        fmt.str(prefix)
+        fmt.int(value)
+        fmt.end, @write(ok: @exit(0))
+    )
+}
+
+main: (){
+    @write("start ")
+    prefix: "value"
+    produce(42)
+    finish(prefix)
+}

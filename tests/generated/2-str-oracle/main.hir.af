@@ -1,0 +1,56 @@
+str: @str
+uint: @uint
+rune: @rune
+u32: @u32
+value: "Aé😀"
+_6_run: (value: str!, idx: uint, empty:(), one:(rune)){
+    @str_rune_nth(value, idx, empty, one)
+}
+
+_4_run: (inspect:(uint, (uint, (), (rune))), value: str!, _2_str_rune_len: uint){
+    _7_run: _6_run(value)
+    inspect(_2_str_rune_len, _7_run)
+}
+
+run: (value: str!, inspect:(uint, (uint, (), (rune)))){
+    _8_run: _4_run(inspect, value)
+    @str_rune_len(value, _8_run)
+}
+unexpected: (_9_unexpected: rune){
+    _10: 1
+    @exit(_10)
+}
+_14_inspect: (){
+    _15: 1
+    @exit(_15)
+}
+_26_inspect: (){
+    _27: 0
+    @exit(_27)
+}
+
+_23_inspect: (){
+    _24: "3 128512\n"
+    @write(_24, _26_inspect)
+}
+
+_20_inspect: (nth:(uint, (), (rune)), scalar: u32){
+    _21: 3
+    nth(_21, _23_inspect, unexpected)
+}
+
+_18_inspect: (nth:(uint, (), (rune)), value: rune){
+    _30_inspect: _20_inspect(nth)
+    @u32_from_rune(value, _30_inspect)
+}
+
+inspect: (l: uint, nth:(uint, (), (rune))){
+    _12: 2
+    _31_inspect: _18_inspect(nth)
+    nth(_12, _14_inspect, _31_inspect)
+}
+
+main: (value: str!){
+    run(value, inspect)
+}
+main(value)

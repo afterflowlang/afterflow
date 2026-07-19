@@ -1,0 +1,78 @@
+_10_main():
+    @exit($_11: int = 0)
+
+
+_10_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_10_main)
+
+
+_10_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_10_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+__rgo_737464__end__generic_0($_2___rgo_737464__end: int, $ok: ()):
+    @jumpclosure($ok)
+
+
+__rgo_737464__end__generic_0_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $_2___rgo_737464__end = @field($__env_end, -2)
+    $ok = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_737464__end__generic_0, $_2___rgo_737464__end: int, $ok: ())
+
+
+__rgo_737464__end__generic_0_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_737464__end__generic_0_release_skip_1, $__num_remaining, 0)
+    $__rgo_737464__end__generic_0_release_field_1 = @field($__env_end, -1)
+    @dropclosure($__rgo_737464__end__generic_0_release_field_1)
+__rgo_737464__end__generic_0_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+__rgo_737464__end__generic_0_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_737464__end__generic_0_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($__rgo_737464__end__generic_0_deepcopy_field_1, $__env_end, -1)
+__rgo_737464__end__generic_0_deepcopy_skip_1:
+    @return()
+
+
+main():
+    $_10_main = @newclosure<>(_10_main)
+    @jumpargs(__rgo_737464__end__generic_0, $_8: int = 42, $_10_main: ())
+
+
+main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(main)
+
+
+main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_start():
+    @jumpargs(main)
+

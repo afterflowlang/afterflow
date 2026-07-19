@@ -1,0 +1,30 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+tail: (x: int, rest: tail)
+chain: (next: (chain), done_case: ())
+
+done: ((chain), done_case: ()) {
+    done_case
+}
+
+unexpected: (chain) {
+    @exit(1)
+}
+
+accept: (value: chain, ok: ()) {
+    value(unexpected, ok)
+}
+
+identity: (node: tail) {
+    fmt.new("unused\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+}
+
+hello: () {
+    fmt.new("hi\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+}
+
+main: () {
+    accept(done, hello)
+}

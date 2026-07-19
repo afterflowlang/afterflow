@@ -1,4 +1,5 @@
 pub use crate::compiler::hir_context::{Context, ContextEntry};
+use crate::compiler::span::Span;
 use std::collections::BTreeSet;
 use std::hash::{Hash, Hasher};
 
@@ -7,10 +8,11 @@ pub enum SigKind {
     Byte,
     Int,
     UInt,
+    Rune,
     FixedInt(FixedIntKind),
+    Bytes,
     Str,
     F64,
-    Variadic,
     Ident(SigIdent),
     Sig(Signature),
     GenericInst { name: String, args: Vec<SigKind> },
@@ -69,10 +71,6 @@ impl SigKind {
     {
         SigKind::Sig(Signature::from_tuple(items))
     }
-
-    pub fn supports_comptime(&self) -> bool {
-        matches!(self, SigKind::Int | SigKind::UInt | SigKind::Str)
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -120,12 +118,6 @@ impl Signature {
             items: sig_items,
             generics: BTreeSet::new(),
         }
-    }
-
-    pub fn is_variadic(&self) -> bool {
-        self.items
-            .iter()
-            .any(|item| matches!(item.kind, SigKind::Variadic))
     }
 
     pub fn names(&self) -> Vec<String> {
@@ -204,6 +196,7 @@ pub struct Function {
     pub name: String,
     pub sig: Signature,
     pub body: Block,
+    pub has_comptime_params: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -225,6 +218,8 @@ pub enum BlockItem {
 pub struct Exec {
     pub of: String,
     pub args: Vec<String>,
+    pub is_comptime: bool,
+    pub span: Span,
 }
 
 #[derive(Debug, Clone)]

@@ -1,0 +1,9 @@
+fmt: /std/fmt
+
+main: () {
+    fmt.new(
+        "trailing %",
+        @compile_error("trailing format placeholder", @exit(1)),
+        fmt.end, @write(ok: @exit(0))
+    )
+}

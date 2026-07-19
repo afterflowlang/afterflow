@@ -1,0 +1,135 @@
+math: /math
+
+str: @str
+
+expect_zero_i128: (value: @i128, ok: ()) {
+    math.div_i128(1, value, ok, (unexpected: @i128) {
+        @exit(1)
+    })
+}
+
+expect_zero_u128: (value: @u128, ok: ()) {
+    math.div_u128(1, value, ok, (unexpected: @u128) {
+        @exit(1)
+    })
+}
+
+expect_zero_128: (signed_value: @i128, unsigned_value: @u128, ok: ()) {
+    expect_zero_i128(signed_value, () {
+        expect_zero_u128(unsigned_value, ok)
+    })
+}
+
+test_add: (ok: ()) {
+    (i8_result: @i8) = math.add_i8(120, 20)
+    (u8_result: @u8) = math.add_u8(250, 10)
+    (i32_result: @i32) = math.add_i32(2147483640, 10)
+    (u32_result: @u32) = math.add_u32(4294967290, 10)
+    (i64_result: @i64) = math.add_i64(10, 11)
+    (u64_result: @u64) = math.add_u64(11, 12)
+    (i128_result: @i128) = math.add_i128(5000000000, 5000000000)
+    (u128_result: @u128) = math.add_u128(6000000000, 6000000000)
+    (i128_difference: @i128) = math.sub_i128(i128_result, 10000000000)
+    (u128_difference: @u128) = math.sub_u128(u128_result, 12000000000)
+    add_first: "add: fixed-width operations ok "
+    add_second: "128 ok\n"
+    expect_zero_128(i128_difference, u128_difference, () {
+        @write(add_first, () {
+            @write(add_second, ok)
+        })
+    })
+}
+
+test_sub: (ok: ()) {
+    (i8_result: @i8) = math.sub_i8(10, 20)
+    (u8_result: @u8) = math.sub_u8(10, 20)
+    (i32_result: @i32) = math.sub_i32(10, 20)
+    (u32_result: @u32) = math.sub_u32(10, 20)
+    (i64_result: @i64) = math.sub_i64(20, 10)
+    (u64_result: @u64) = math.sub_u64(20, 10)
+    (i128_result: @i128) = math.sub_i128(5000000000, 6000000000)
+    (u128_result: @u128) = math.sub_u128(6000000000, 5000000000)
+    (i128_expected: @i128) = math.sub_i128(0, 1000000000)
+    (i128_difference: @i128) = math.sub_i128(i128_result, i128_expected)
+    (u128_difference: @u128) = math.sub_u128(u128_result, 1000000000)
+    sub_first: "sub: fixed-width operations ok "
+    sub_second: "128 ok\n"
+    expect_zero_128(i128_difference, u128_difference, () {
+        @write(sub_first, () {
+            @write(sub_second, ok)
+        })
+    })
+}
+
+test_mul: (ok: ()) {
+    (i8_result: @i8) = math.mul_i8(20, 10)
+    (u8_result: @u8) = math.mul_u8(20, 20)
+    (i32_result: @i32) = math.mul_i32(50000, 50000)
+    (u32_result: @u32) = math.mul_u32(100000, 100000)
+    (i64_result: @i64) = math.mul_i64(10, 11)
+    (u64_result: @u64) = math.mul_u64(11, 12)
+    (i128_result: @i128) = math.mul_i128(5000000000, 5000000000)
+    (u128_result: @u128) = math.mul_u128(6000000000, 6000000000)
+    (i128_factor: @i128) = math.div_i128(i128_result, 5000000000, () {
+        @exit(1)
+    })
+    (u128_factor: @u128) = math.div_u128(u128_result, 6000000000, () {
+        @exit(1)
+    })
+    (i128_difference: @i128) = math.sub_i128(i128_factor, 5000000000)
+    (u128_difference: @u128) = math.sub_u128(u128_factor, 6000000000)
+    mul_first: "mul: fixed-width operations ok "
+    mul_second: "128 ok\n"
+    expect_zero_128(i128_difference, u128_difference, () {
+        @write(mul_first, () {
+            @write(mul_second, ok)
+        })
+    })
+}
+
+division_error: () {
+    @write("unexpected division error\n", @exit(1))
+}
+
+test_div: (ok: ()) {
+    (i8_dividend: @i8) = math.sub_i8(0, 100)
+    (i8_result: @i8) = math.div_i8(i8_dividend, 3, division_error)
+    (u8_result: @u8) = math.div_u8(200, 3, division_error)
+    (i32_dividend: @i32) = math.sub_i32(0, 100000)
+    (i32_result: @i32) = math.div_i32(i32_dividend, 10, division_error)
+    (u32_result: @u32) = math.div_u32(4000000000, 10, division_error)
+    (i64_dividend: @i64) = math.sub_i64(0, 10000000000)
+    (i64_result: @i64) = math.div_i64(i64_dividend, 10, division_error)
+    (u64_result: @u64) = math.div_u64(6000000000, 3, division_error)
+    (i128_dividend: @i128) = math.sub_i128(0, 25000000000)
+    (i128_result: @i128) = math.div_i128(i128_dividend, 5000000000, division_error)
+    (u128_result: @u128) = math.div_u128(36000000000, 6000000000, division_error)
+    (i128_expected: @i128) = math.sub_i128(0, 5)
+    (i128_difference: @i128) = math.sub_i128(i128_result, i128_expected)
+    (u128_difference: @u128) = math.sub_u128(u128_result, 6)
+    div_first: "div: fixed-width operations ok "
+    div_second: "128 ok\n"
+    expect_zero_128(i128_difference, u128_difference, () {
+        @write(div_first, () {
+            @write(div_second, ok)
+        })
+    })
+}
+
+test_div_zero: (ok: ()) {
+    math.div_u8(1, 0, ok, (unexpected: @u8) {
+        @exit(1)
+    })
+}
+
+main: () {
+    test_add(() {
+        test_sub(() {
+            test_mul(() {
+                test_div(() {
+                    test_div_zero(@exit(0))
+                })
+            })
+        })
+    })
+}

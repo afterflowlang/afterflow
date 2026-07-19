@@ -1,0 +1,38 @@
+format_value: (str_case: (@str), int_case: (@int), f64_case: (@f64))
+arg: (next: (format_value, arg), done_case: ())
+nth: (idx: @uint, empty_case: (), one: (@u8))
+inspect: (l: @uint, byte_at: nth)
+source: (inspect)
+
+empty: (inspect_value: inspect) {
+    @exit(0)
+}
+
+raw_nth: (value: @bytes, idx: @uint, empty_case: (), one: (@u8)) {
+    @exit(0)
+}
+
+parse: (source_l: @uint, source_nth: nth, idx: @uint, output: source, invalid: (), args: arg, ready: (source)) {
+    @exit(0)
+}
+
+finish: (output: source, invalid: (), ok: (@str)) {
+    @exit(0)
+}
+
+end: (next: (format_value, arg), done_case: ()) {
+    done_case
+}
+
+new: (template: @str, invalid: ()!, args: arg!, ok: (@str)) {
+    (source_bytes: @bytes) = @bytes_from_str(template)
+    (l: @uint) = @bytes_descriptor_len(source_bytes)
+    (output: source) = parse(l, raw_nth(source_bytes), 0, empty, invalid, args)
+    finish(output, invalid, ok)
+}
+
+main: () {
+    new("value", @exit(1), end, (@str) {
+        @exit(0)
+    })
+}

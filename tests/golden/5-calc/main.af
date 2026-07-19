@@ -1,0 +1,32 @@
+calc: /std/math/calc
+
+handle_error: @compile_error("invalid calculation", @exit(1))
+
+calculated: (message: @str, ok: (), @f64) {
+    @write(message, ok)
+}
+
+staged: (price: @f64, tax: @f64, ok: ()) {
+    calc.new(
+        "(price + 2.5) * -tax / 2",
+        handle_error,
+        calc.var("price", price)
+        calc.var("tax", tax)
+        calc.end, calculated("staged calculation\n", ok)
+    )
+}
+
+constant: (ok: ()) {
+    calc.new(
+        "1 + 2",
+        handle_error,
+        calc.end,
+        calculated("constant calculation\n", ok)
+    )
+}
+
+main: () {
+    staged(10.0, 3.0)
+    constant
+    @exit(0)
+}

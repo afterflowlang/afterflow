@@ -3,6 +3,7 @@ use std::error::Error as StdError;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Write};
 
+use compiler::compiler::span::Span;
 use compiler::compiler::{ast, hir};
 use compiler::compiler::{format_hir::render_normalized_rgo, lexer::Lexer, parser::Parser};
 
@@ -48,11 +49,20 @@ fn render_normalized_hir<R: std::io::BufRead>(
         }
     }
 
-    if ctx.get(target).is_none() {
-        return Err(format!("could not resolve target '{target}'").into());
+    lowerer.consume(&mut ctx, target_exec(target))?;
+    while let Some(lowered) = lowerer.produce() {
+        hir_block_items.push(lowered);
     }
 
     Ok(render_normalized_rgo(&hir_block_items))
+}
+
+fn target_exec(target: &str) -> ast::BlockItem {
+    ast::BlockItem::Ident(ast::Ident {
+        name: target.to_string(),
+        args: Vec::new(),
+        span: Span::unknown(),
+    })
 }
 
 fn reject_root_execution(item: &ast::BlockItem) -> Result<(), Box<dyn StdError>> {

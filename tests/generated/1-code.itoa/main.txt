@@ -1,4 +1,9 @@
 [
+    Import {
+        label: "fmt",
+        path: "/std/fmt",
+        span: ,
+    },
     IdentDef {
         name: "str",
         ident: Ident {
@@ -65,14 +70,14 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "@sprintf",
+                            name: "fmt.new",
                             args: [
                                 Arg {
                                     name: None,
                                     term: Lit(
                                         Literal {
                                             value: Str(
-                                                "%d",
+                                                "%",
                                             ),
                                             span: ,
                                         },
@@ -83,8 +88,55 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "n",
-                                            args: [],
+                                            name: "@exit",
+                                            args: [
+                                                Arg {
+                                                    name: None,
+                                                    term: Lit(
+                                                        Literal {
+                                                            value: Int(
+                                                                1,
+                                                            ),
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "fmt.int",
+                                            args: [
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "n",
+                                                            args: [],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "fmt.end",
+                                                            args: [],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
                                             span: ,
                                         },
                                     ),

@@ -1,38 +1,935 @@
-_7_print1($ok: (), $s: str):
-    @write($s: str, $ok)
+__rgo_7374642f666d74__single_nth($value: u8, $idx: uint, $empty_case: (), $one: ()):
+    $_107_one = @moveclosure($one)
+    $___107_one_env_end = @pin($_107_one)
+    @setfield($___107_one_env_end, -1, $value: u8)
+    @setfield($___107_one_env_end, 5, $___107_one_num_remaining_value: int = 0)
+    @eq_uint(eq_uint__107_one_true_0_0, $idx: uint, $_106: uint = 0)
+eq_uint_empty_case_false_0_0:
+    @dropclosure($_107_one)
+    @jumpclosure($empty_case)
+eq_uint__107_one_true_0_0:
+    @dropclosure($empty_case)
+    @jumpclosure($_107_one)
 
 
-_7_print1_unwrapper($env_end: int):
+__rgo_7374642f666d74__single_nth_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
-    $ok = @field($__env_end, -2)
-    $s = @field($__env_end, -1)
+    $value = @field($__env_end, -4)
+    $idx = @field($__env_end, -3)
+    $empty_case = @field($__env_end, -2)
+    $one = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_7_print1, $ok: (), $s: str)
+    @jumpargs(__rgo_7374642f666d74__single_nth, $value: u8, $idx: uint, $empty_case: (), $one: ())
 
 
-_7_print1_deep_release($env_end: int):
+__rgo_7374642f666d74__single_nth_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_7_print1_release_skip_0, $__num_remaining, 1)
-    $_7_print1_release_field_0 = @field($__env_end, -2)
-    @callptr($_7_print1_release_field_0)
-_7_print1_release_skip_0:
+    @gt(__rgo_7374642f666d74__single_nth_release_skip_2, $__num_remaining, 1)
+    $__rgo_7374642f666d74__single_nth_release_field_2 = @field($__env_end, -2)
+    @dropclosure($__rgo_7374642f666d74__single_nth_release_field_2)
+__rgo_7374642f666d74__single_nth_release_skip_2:
+    @gt(__rgo_7374642f666d74__single_nth_release_skip_3, $__num_remaining, 0)
+    $__rgo_7374642f666d74__single_nth_release_field_3 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__single_nth_release_field_3)
+__rgo_7374642f666d74__single_nth_release_skip_3:
     @release($__env_end)
     @return()
 
 
-_7_print1_deepcopy($env_end: int):
+__rgo_7374642f666d74__single_nth_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_7_print1_deepcopy_skip_0, $num_remaining, 1)
-    @deepcopy($_7_print1_deepcopy_field_0, $__env_end, -2)
-_7_print1_deepcopy_skip_0:
+    @gt(__rgo_7374642f666d74__single_nth_deepcopy_skip_2, $num_remaining, 1)
+    @deepcopy($__rgo_7374642f666d74__single_nth_deepcopy_field_2, $__env_end, -2)
+__rgo_7374642f666d74__single_nth_deepcopy_skip_2:
+    @gt(__rgo_7374642f666d74__single_nth_deepcopy_skip_3, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__single_nth_deepcopy_field_3, $__env_end, -1)
+__rgo_7374642f666d74__single_nth_deepcopy_skip_3:
+    @return()
+
+
+__rgo_7374642f666d74__single($value: u8, $inspect_value: ()):
+    $_109___rgo_7374642f666d74__single_nth = @newclosure<u8, uint, (), ($_105___rgo_7374642f666d74__single_nth: u8)>(__rgo_7374642f666d74__single_nth, $value: u8)
+    @jumpclosure($inspect_value, $_108: uint = 1, $_109___rgo_7374642f666d74__single_nth: ())
+
+
+__rgo_7374642f666d74__single_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $value = @field($__env_end, -2)
+    $inspect_value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f666d74__single, $value: u8, $inspect_value: ())
+
+
+__rgo_7374642f666d74__single_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__single_release_skip_1, $__num_remaining, 0)
+    $__rgo_7374642f666d74__single_release_field_1 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__single_release_field_1)
+__rgo_7374642f666d74__single_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f666d74__single_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__single_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__single_deepcopy_field_1, $__env_end, -1)
+__rgo_7374642f666d74__single_deepcopy_skip_1:
+    @return()
+
+
+__rgo_7374642f666d74__empty_nth($_101___rgo_7374642f666d74__empty_nth: uint, $empty: (), $_102___rgo_7374642f666d74__empty_nth: ()):
+    @dropclosure($_102___rgo_7374642f666d74__empty_nth)
+    @jumpclosure($empty)
+
+
+__rgo_7374642f666d74__empty_nth_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $_101___rgo_7374642f666d74__empty_nth = @field($__env_end, -3)
+    $empty = @field($__env_end, -2)
+    $_102___rgo_7374642f666d74__empty_nth = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f666d74__empty_nth, $_101___rgo_7374642f666d74__empty_nth: uint, $empty: (), $_102___rgo_7374642f666d74__empty_nth: ())
+
+
+__rgo_7374642f666d74__empty_nth_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__empty_nth_release_skip_1, $__num_remaining, 1)
+    $__rgo_7374642f666d74__empty_nth_release_field_1 = @field($__env_end, -2)
+    @dropclosure($__rgo_7374642f666d74__empty_nth_release_field_1)
+__rgo_7374642f666d74__empty_nth_release_skip_1:
+    @gt(__rgo_7374642f666d74__empty_nth_release_skip_2, $__num_remaining, 0)
+    $__rgo_7374642f666d74__empty_nth_release_field_2 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__empty_nth_release_field_2)
+__rgo_7374642f666d74__empty_nth_release_skip_2:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f666d74__empty_nth_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__empty_nth_deepcopy_skip_1, $num_remaining, 1)
+    @deepcopy($__rgo_7374642f666d74__empty_nth_deepcopy_field_1, $__env_end, -2)
+__rgo_7374642f666d74__empty_nth_deepcopy_skip_1:
+    @gt(__rgo_7374642f666d74__empty_nth_deepcopy_skip_2, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__empty_nth_deepcopy_field_2, $__env_end, -1)
+__rgo_7374642f666d74__empty_nth_deepcopy_skip_2:
+    @return()
+
+
+__rgo_7374642f666d74__empty($inspect_value: ()):
+    $__rgo_7374642f666d74__empty_nth = @newclosure<uint, (), ($_103___rgo_7374642f666d74__empty_nth: u8)>(__rgo_7374642f666d74__empty_nth)
+    @jumpclosure($inspect_value, $_104: uint = 0, $__rgo_7374642f666d74__empty_nth: ())
+
+
+__rgo_7374642f666d74__empty_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $inspect_value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f666d74__empty, $inspect_value: ())
+
+
+__rgo_7374642f666d74__empty_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__empty_release_skip_0, $__num_remaining, 0)
+    $__rgo_7374642f666d74__empty_release_field_0 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__empty_release_field_0)
+__rgo_7374642f666d74__empty_release_skip_0:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f666d74__empty_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__empty_deepcopy_skip_0, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__empty_deepcopy_field_0, $__env_end, -1)
+__rgo_7374642f666d74__empty_deepcopy_skip_0:
+    @return()
+
+
+_120___rgo_7374642f666d74__concat_nth($b: (), $empty_case: (), $one: (), $b_idx: uint):
+    @jumpclosure($b, $b_idx: uint, $empty_case: (), $one: ())
+
+
+_120___rgo_7374642f666d74__concat_nth_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $b = @field($__env_end, -4)
+    $empty_case = @field($__env_end, -3)
+    $one = @field($__env_end, -2)
+    $b_idx = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_120___rgo_7374642f666d74__concat_nth, $b: (), $empty_case: (), $one: (), $b_idx: uint)
+
+
+_120___rgo_7374642f666d74__concat_nth_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_120___rgo_7374642f666d74__concat_nth_release_skip_0, $__num_remaining, 3)
+    $_120___rgo_7374642f666d74__concat_nth_release_field_0 = @field($__env_end, -4)
+    @dropclosure($_120___rgo_7374642f666d74__concat_nth_release_field_0)
+_120___rgo_7374642f666d74__concat_nth_release_skip_0:
+    @gt(_120___rgo_7374642f666d74__concat_nth_release_skip_1, $__num_remaining, 2)
+    $_120___rgo_7374642f666d74__concat_nth_release_field_1 = @field($__env_end, -3)
+    @dropclosure($_120___rgo_7374642f666d74__concat_nth_release_field_1)
+_120___rgo_7374642f666d74__concat_nth_release_skip_1:
+    @gt(_120___rgo_7374642f666d74__concat_nth_release_skip_2, $__num_remaining, 1)
+    $_120___rgo_7374642f666d74__concat_nth_release_field_2 = @field($__env_end, -2)
+    @dropclosure($_120___rgo_7374642f666d74__concat_nth_release_field_2)
+_120___rgo_7374642f666d74__concat_nth_release_skip_2:
+    @release($__env_end)
+    @return()
+
+
+_120___rgo_7374642f666d74__concat_nth_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_120___rgo_7374642f666d74__concat_nth_deepcopy_skip_0, $num_remaining, 3)
+    @deepcopy($_120___rgo_7374642f666d74__concat_nth_deepcopy_field_0, $__env_end, -4)
+_120___rgo_7374642f666d74__concat_nth_deepcopy_skip_0:
+    @gt(_120___rgo_7374642f666d74__concat_nth_deepcopy_skip_1, $num_remaining, 2)
+    @deepcopy($_120___rgo_7374642f666d74__concat_nth_deepcopy_field_1, $__env_end, -3)
+_120___rgo_7374642f666d74__concat_nth_deepcopy_skip_1:
+    @gt(_120___rgo_7374642f666d74__concat_nth_deepcopy_skip_2, $num_remaining, 1)
+    @deepcopy($_120___rgo_7374642f666d74__concat_nth_deepcopy_field_2, $__env_end, -2)
+_120___rgo_7374642f666d74__concat_nth_deepcopy_skip_2:
+    @return()
+
+
+_118___rgo_7374642f666d74__concat_nth($idx: uint, $l: uint, $b: (), $empty_case: (), $one: ()):
+    $_121___rgo_7374642f666d74__concat_nth = @newclosure<($_63_: uint, $_64_: (), $_65_: ()), (), ($_115___rgo_7374642f666d74__concat_nth: u8), uint>(_120___rgo_7374642f666d74__concat_nth, $b: (), $empty_case: (), $one: ())
+    @sub_uint($idx: uint, $l: uint, $_121___rgo_7374642f666d74__concat_nth)
+
+
+_118___rgo_7374642f666d74__concat_nth_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $idx = @field($__env_end, -5)
+    $l = @field($__env_end, -4)
+    $b = @field($__env_end, -3)
+    $empty_case = @field($__env_end, -2)
+    $one = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_118___rgo_7374642f666d74__concat_nth, $idx: uint, $l: uint, $b: (), $empty_case: (), $one: ())
+
+
+_118___rgo_7374642f666d74__concat_nth_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_118___rgo_7374642f666d74__concat_nth_release_skip_2, $__num_remaining, 2)
+    $_118___rgo_7374642f666d74__concat_nth_release_field_2 = @field($__env_end, -3)
+    @dropclosure($_118___rgo_7374642f666d74__concat_nth_release_field_2)
+_118___rgo_7374642f666d74__concat_nth_release_skip_2:
+    @gt(_118___rgo_7374642f666d74__concat_nth_release_skip_3, $__num_remaining, 1)
+    $_118___rgo_7374642f666d74__concat_nth_release_field_3 = @field($__env_end, -2)
+    @dropclosure($_118___rgo_7374642f666d74__concat_nth_release_field_3)
+_118___rgo_7374642f666d74__concat_nth_release_skip_3:
+    @gt(_118___rgo_7374642f666d74__concat_nth_release_skip_4, $__num_remaining, 0)
+    $_118___rgo_7374642f666d74__concat_nth_release_field_4 = @field($__env_end, -1)
+    @dropclosure($_118___rgo_7374642f666d74__concat_nth_release_field_4)
+_118___rgo_7374642f666d74__concat_nth_release_skip_4:
+    @release($__env_end)
+    @return()
+
+
+_118___rgo_7374642f666d74__concat_nth_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_118___rgo_7374642f666d74__concat_nth_deepcopy_skip_2, $num_remaining, 2)
+    @deepcopy($_118___rgo_7374642f666d74__concat_nth_deepcopy_field_2, $__env_end, -3)
+_118___rgo_7374642f666d74__concat_nth_deepcopy_skip_2:
+    @gt(_118___rgo_7374642f666d74__concat_nth_deepcopy_skip_3, $num_remaining, 1)
+    @deepcopy($_118___rgo_7374642f666d74__concat_nth_deepcopy_field_3, $__env_end, -2)
+_118___rgo_7374642f666d74__concat_nth_deepcopy_skip_3:
+    @gt(_118___rgo_7374642f666d74__concat_nth_deepcopy_skip_4, $num_remaining, 0)
+    @deepcopy($_118___rgo_7374642f666d74__concat_nth_deepcopy_field_4, $__env_end, -1)
+_118___rgo_7374642f666d74__concat_nth_deepcopy_skip_4:
+    @return()
+
+
+__rgo_7374642f666d74__concat_nth($l: uint, $a: (), $b: (), $idx: uint, $empty_case: (), $one: ()):
+    $_116_a = @moveclosure($a)
+    $___116_a_arg_clone_1 = @cloneclosure($empty_case, )
+    $___116_a_arg_clone_2 = @cloneclosure($one, u8)
+    $___116_a_env_end = @pin($_116_a)
+    @setfield($___116_a_env_end, -3, $idx: uint)
+    @setfield($___116_a_env_end, -2, $___116_a_arg_clone_1: ())
+    @setfield($___116_a_env_end, -1, $___116_a_arg_clone_2: ())
+    @setfield($___116_a_env_end, 5, $___116_a_num_remaining_value: int = 0)
+    $_122___rgo_7374642f666d74__concat_nth = @newclosure<uint, uint, ($_63_: uint, $_64_: (), $_65_: ()), (), ($_115___rgo_7374642f666d74__concat_nth: u8)>(_118___rgo_7374642f666d74__concat_nth, $idx: uint, $l: uint, $b: (), $empty_case: (), $one: ())
+    @lt_uint(lt_uint__116_a_true_0_0, $idx, $l)
+lt_uint__122___rgo_7374642f666d74__concat_nth_false_0_0:
+    @dropclosure($_116_a)
+    @jumpclosure($_122___rgo_7374642f666d74__concat_nth)
+lt_uint__116_a_true_0_0:
+    @dropclosure($_122___rgo_7374642f666d74__concat_nth)
+    @jumpclosure($_116_a)
+
+
+__rgo_7374642f666d74__concat_nth_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $l = @field($__env_end, -6)
+    $a = @field($__env_end, -5)
+    $b = @field($__env_end, -4)
+    $idx = @field($__env_end, -3)
+    $empty_case = @field($__env_end, -2)
+    $one = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f666d74__concat_nth, $l: uint, $a: (), $b: (), $idx: uint, $empty_case: (), $one: ())
+
+
+__rgo_7374642f666d74__concat_nth_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__concat_nth_release_skip_1, $__num_remaining, 4)
+    $__rgo_7374642f666d74__concat_nth_release_field_1 = @field($__env_end, -5)
+    @dropclosure($__rgo_7374642f666d74__concat_nth_release_field_1)
+__rgo_7374642f666d74__concat_nth_release_skip_1:
+    @gt(__rgo_7374642f666d74__concat_nth_release_skip_2, $__num_remaining, 3)
+    $__rgo_7374642f666d74__concat_nth_release_field_2 = @field($__env_end, -4)
+    @dropclosure($__rgo_7374642f666d74__concat_nth_release_field_2)
+__rgo_7374642f666d74__concat_nth_release_skip_2:
+    @gt(__rgo_7374642f666d74__concat_nth_release_skip_4, $__num_remaining, 1)
+    $__rgo_7374642f666d74__concat_nth_release_field_4 = @field($__env_end, -2)
+    @dropclosure($__rgo_7374642f666d74__concat_nth_release_field_4)
+__rgo_7374642f666d74__concat_nth_release_skip_4:
+    @gt(__rgo_7374642f666d74__concat_nth_release_skip_5, $__num_remaining, 0)
+    $__rgo_7374642f666d74__concat_nth_release_field_5 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__concat_nth_release_field_5)
+__rgo_7374642f666d74__concat_nth_release_skip_5:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f666d74__concat_nth_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__concat_nth_deepcopy_skip_1, $num_remaining, 4)
+    @deepcopy($__rgo_7374642f666d74__concat_nth_deepcopy_field_1, $__env_end, -5)
+__rgo_7374642f666d74__concat_nth_deepcopy_skip_1:
+    @gt(__rgo_7374642f666d74__concat_nth_deepcopy_skip_2, $num_remaining, 3)
+    @deepcopy($__rgo_7374642f666d74__concat_nth_deepcopy_field_2, $__env_end, -4)
+__rgo_7374642f666d74__concat_nth_deepcopy_skip_2:
+    @gt(__rgo_7374642f666d74__concat_nth_deepcopy_skip_4, $num_remaining, 1)
+    @deepcopy($__rgo_7374642f666d74__concat_nth_deepcopy_field_4, $__env_end, -2)
+__rgo_7374642f666d74__concat_nth_deepcopy_skip_4:
+    @gt(__rgo_7374642f666d74__concat_nth_deepcopy_skip_5, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__concat_nth_deepcopy_field_5, $__env_end, -1)
+__rgo_7374642f666d74__concat_nth_deepcopy_skip_5:
+    @return()
+
+
+_128___rgo_7374642f666d74__concat($inspect_value: (), $a_l: uint, $a_nth: (), $b_nth: (), $l: uint):
+    $_129___rgo_7374642f666d74__concat_nth = @newclosure<uint, ($_63_: uint, $_64_: (), $_65_: ()), ($_63_: uint, $_64_: (), $_65_: ()), uint, (), ($_115___rgo_7374642f666d74__concat_nth: u8)>(__rgo_7374642f666d74__concat_nth, $a_l: uint, $a_nth: (), $b_nth: ())
+    @jumpclosure($inspect_value, $l: uint, $_129___rgo_7374642f666d74__concat_nth: ())
+
+
+_128___rgo_7374642f666d74__concat_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $inspect_value = @field($__env_end, -5)
+    $a_l = @field($__env_end, -4)
+    $a_nth = @field($__env_end, -3)
+    $b_nth = @field($__env_end, -2)
+    $l = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_128___rgo_7374642f666d74__concat, $inspect_value: (), $a_l: uint, $a_nth: (), $b_nth: (), $l: uint)
+
+
+_128___rgo_7374642f666d74__concat_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_128___rgo_7374642f666d74__concat_release_skip_0, $__num_remaining, 4)
+    $_128___rgo_7374642f666d74__concat_release_field_0 = @field($__env_end, -5)
+    @dropclosure($_128___rgo_7374642f666d74__concat_release_field_0)
+_128___rgo_7374642f666d74__concat_release_skip_0:
+    @gt(_128___rgo_7374642f666d74__concat_release_skip_2, $__num_remaining, 2)
+    $_128___rgo_7374642f666d74__concat_release_field_2 = @field($__env_end, -3)
+    @dropclosure($_128___rgo_7374642f666d74__concat_release_field_2)
+_128___rgo_7374642f666d74__concat_release_skip_2:
+    @gt(_128___rgo_7374642f666d74__concat_release_skip_3, $__num_remaining, 1)
+    $_128___rgo_7374642f666d74__concat_release_field_3 = @field($__env_end, -2)
+    @dropclosure($_128___rgo_7374642f666d74__concat_release_field_3)
+_128___rgo_7374642f666d74__concat_release_skip_3:
+    @release($__env_end)
+    @return()
+
+
+_128___rgo_7374642f666d74__concat_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_128___rgo_7374642f666d74__concat_deepcopy_skip_0, $num_remaining, 4)
+    @deepcopy($_128___rgo_7374642f666d74__concat_deepcopy_field_0, $__env_end, -5)
+_128___rgo_7374642f666d74__concat_deepcopy_skip_0:
+    @gt(_128___rgo_7374642f666d74__concat_deepcopy_skip_2, $num_remaining, 2)
+    @deepcopy($_128___rgo_7374642f666d74__concat_deepcopy_field_2, $__env_end, -3)
+_128___rgo_7374642f666d74__concat_deepcopy_skip_2:
+    @gt(_128___rgo_7374642f666d74__concat_deepcopy_skip_3, $num_remaining, 1)
+    @deepcopy($_128___rgo_7374642f666d74__concat_deepcopy_field_3, $__env_end, -2)
+_128___rgo_7374642f666d74__concat_deepcopy_skip_3:
+    @return()
+
+
+_126___rgo_7374642f666d74__concat($a_l: uint, $inspect_value: (), $a_nth: (), $b_l: uint, $b_nth: ()):
+    $_130___rgo_7374642f666d74__concat = @newclosure<($_67_: uint, $_68_: ()), uint, ($_63_: uint, $_64_: (), $_65_: ()), ($_63_: uint, $_64_: (), $_65_: ()), uint>(_128___rgo_7374642f666d74__concat, $inspect_value: (), $a_l: uint, $a_nth: (), $b_nth: ())
+    @add_uint($a_l: uint, $b_l: uint, $_130___rgo_7374642f666d74__concat)
+
+
+_126___rgo_7374642f666d74__concat_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $a_l = @field($__env_end, -5)
+    $inspect_value = @field($__env_end, -4)
+    $a_nth = @field($__env_end, -3)
+    $b_l = @field($__env_end, -2)
+    $b_nth = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_126___rgo_7374642f666d74__concat, $a_l: uint, $inspect_value: (), $a_nth: (), $b_l: uint, $b_nth: ())
+
+
+_126___rgo_7374642f666d74__concat_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_126___rgo_7374642f666d74__concat_release_skip_1, $__num_remaining, 3)
+    $_126___rgo_7374642f666d74__concat_release_field_1 = @field($__env_end, -4)
+    @dropclosure($_126___rgo_7374642f666d74__concat_release_field_1)
+_126___rgo_7374642f666d74__concat_release_skip_1:
+    @gt(_126___rgo_7374642f666d74__concat_release_skip_2, $__num_remaining, 2)
+    $_126___rgo_7374642f666d74__concat_release_field_2 = @field($__env_end, -3)
+    @dropclosure($_126___rgo_7374642f666d74__concat_release_field_2)
+_126___rgo_7374642f666d74__concat_release_skip_2:
+    @gt(_126___rgo_7374642f666d74__concat_release_skip_4, $__num_remaining, 0)
+    $_126___rgo_7374642f666d74__concat_release_field_4 = @field($__env_end, -1)
+    @dropclosure($_126___rgo_7374642f666d74__concat_release_field_4)
+_126___rgo_7374642f666d74__concat_release_skip_4:
+    @release($__env_end)
+    @return()
+
+
+_126___rgo_7374642f666d74__concat_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_126___rgo_7374642f666d74__concat_deepcopy_skip_1, $num_remaining, 3)
+    @deepcopy($_126___rgo_7374642f666d74__concat_deepcopy_field_1, $__env_end, -4)
+_126___rgo_7374642f666d74__concat_deepcopy_skip_1:
+    @gt(_126___rgo_7374642f666d74__concat_deepcopy_skip_2, $num_remaining, 2)
+    @deepcopy($_126___rgo_7374642f666d74__concat_deepcopy_field_2, $__env_end, -3)
+_126___rgo_7374642f666d74__concat_deepcopy_skip_2:
+    @gt(_126___rgo_7374642f666d74__concat_deepcopy_skip_4, $num_remaining, 0)
+    @deepcopy($_126___rgo_7374642f666d74__concat_deepcopy_field_4, $__env_end, -1)
+_126___rgo_7374642f666d74__concat_deepcopy_skip_4:
+    @return()
+
+
+_124___rgo_7374642f666d74__concat($b: (), $inspect_value: (), $a_l: uint, $a_nth: ()):
+    $_131___rgo_7374642f666d74__concat = @newclosure<uint, ($_67_: uint, $_68_: ()), ($_63_: uint, $_64_: (), $_65_: ()), uint, ($_63_: uint, $_64_: (), $_65_: ())>(_126___rgo_7374642f666d74__concat, $a_l: uint, $inspect_value: (), $a_nth: ())
+    @jumpclosure($b, $_131___rgo_7374642f666d74__concat: ())
+
+
+_124___rgo_7374642f666d74__concat_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $b = @field($__env_end, -4)
+    $inspect_value = @field($__env_end, -3)
+    $a_l = @field($__env_end, -2)
+    $a_nth = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_124___rgo_7374642f666d74__concat, $b: (), $inspect_value: (), $a_l: uint, $a_nth: ())
+
+
+_124___rgo_7374642f666d74__concat_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_124___rgo_7374642f666d74__concat_release_skip_0, $__num_remaining, 3)
+    $_124___rgo_7374642f666d74__concat_release_field_0 = @field($__env_end, -4)
+    @dropclosure($_124___rgo_7374642f666d74__concat_release_field_0)
+_124___rgo_7374642f666d74__concat_release_skip_0:
+    @gt(_124___rgo_7374642f666d74__concat_release_skip_1, $__num_remaining, 2)
+    $_124___rgo_7374642f666d74__concat_release_field_1 = @field($__env_end, -3)
+    @dropclosure($_124___rgo_7374642f666d74__concat_release_field_1)
+_124___rgo_7374642f666d74__concat_release_skip_1:
+    @gt(_124___rgo_7374642f666d74__concat_release_skip_3, $__num_remaining, 0)
+    $_124___rgo_7374642f666d74__concat_release_field_3 = @field($__env_end, -1)
+    @dropclosure($_124___rgo_7374642f666d74__concat_release_field_3)
+_124___rgo_7374642f666d74__concat_release_skip_3:
+    @release($__env_end)
+    @return()
+
+
+_124___rgo_7374642f666d74__concat_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_124___rgo_7374642f666d74__concat_deepcopy_skip_0, $num_remaining, 3)
+    @deepcopy($_124___rgo_7374642f666d74__concat_deepcopy_field_0, $__env_end, -4)
+_124___rgo_7374642f666d74__concat_deepcopy_skip_0:
+    @gt(_124___rgo_7374642f666d74__concat_deepcopy_skip_1, $num_remaining, 2)
+    @deepcopy($_124___rgo_7374642f666d74__concat_deepcopy_field_1, $__env_end, -3)
+_124___rgo_7374642f666d74__concat_deepcopy_skip_1:
+    @gt(_124___rgo_7374642f666d74__concat_deepcopy_skip_3, $num_remaining, 0)
+    @deepcopy($_124___rgo_7374642f666d74__concat_deepcopy_field_3, $__env_end, -1)
+_124___rgo_7374642f666d74__concat_deepcopy_skip_3:
+    @return()
+
+
+__rgo_7374642f666d74__concat($a: (), $b: (), $inspect_value: ()):
+    $_132___rgo_7374642f666d74__concat = @newclosure<($_69_: ()), ($_67_: uint, $_68_: ()), uint, ($_63_: uint, $_64_: (), $_65_: ())>(_124___rgo_7374642f666d74__concat, $b: (), $inspect_value: ())
+    @jumpclosure($a, $_132___rgo_7374642f666d74__concat: ())
+
+
+__rgo_7374642f666d74__concat_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $a = @field($__env_end, -3)
+    $b = @field($__env_end, -2)
+    $inspect_value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f666d74__concat, $a: (), $b: (), $inspect_value: ())
+
+
+__rgo_7374642f666d74__concat_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__concat_release_skip_0, $__num_remaining, 2)
+    $__rgo_7374642f666d74__concat_release_field_0 = @field($__env_end, -3)
+    @dropclosure($__rgo_7374642f666d74__concat_release_field_0)
+__rgo_7374642f666d74__concat_release_skip_0:
+    @gt(__rgo_7374642f666d74__concat_release_skip_1, $__num_remaining, 1)
+    $__rgo_7374642f666d74__concat_release_field_1 = @field($__env_end, -2)
+    @dropclosure($__rgo_7374642f666d74__concat_release_field_1)
+__rgo_7374642f666d74__concat_release_skip_1:
+    @gt(__rgo_7374642f666d74__concat_release_skip_2, $__num_remaining, 0)
+    $__rgo_7374642f666d74__concat_release_field_2 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__concat_release_field_2)
+__rgo_7374642f666d74__concat_release_skip_2:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f666d74__concat_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__concat_deepcopy_skip_0, $num_remaining, 2)
+    @deepcopy($__rgo_7374642f666d74__concat_deepcopy_field_0, $__env_end, -3)
+__rgo_7374642f666d74__concat_deepcopy_skip_0:
+    @gt(__rgo_7374642f666d74__concat_deepcopy_skip_1, $num_remaining, 1)
+    @deepcopy($__rgo_7374642f666d74__concat_deepcopy_field_1, $__env_end, -2)
+__rgo_7374642f666d74__concat_deepcopy_skip_1:
+    @gt(__rgo_7374642f666d74__concat_deepcopy_skip_2, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__concat_deepcopy_field_2, $__env_end, -1)
+__rgo_7374642f666d74__concat_deepcopy_skip_2:
+    @return()
+
+
+__rgo_7374642f666d74__raw_nth($value: bytes, $idx: uint, $empty_case: (), $one: ()):
+    @bytes_nth(one, empty_case, $value: bytes, $idx: uint)
+
+
+__rgo_7374642f666d74__raw_nth_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $value = @field($__env_end, -4)
+    $idx = @field($__env_end, -3)
+    $empty_case = @field($__env_end, -2)
+    $one = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f666d74__raw_nth, $value: bytes, $idx: uint, $empty_case: (), $one: ())
+
+
+__rgo_7374642f666d74__raw_nth_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__raw_nth_release_skip_0, $__num_remaining, 3)
+    $__rgo_7374642f666d74__raw_nth_release_field_0 = @field($__env_end, -4)
+    @dropdescriptor($__rgo_7374642f666d74__raw_nth_release_field_0)
+__rgo_7374642f666d74__raw_nth_release_skip_0:
+    @gt(__rgo_7374642f666d74__raw_nth_release_skip_2, $__num_remaining, 1)
+    $__rgo_7374642f666d74__raw_nth_release_field_2 = @field($__env_end, -2)
+    @dropclosure($__rgo_7374642f666d74__raw_nth_release_field_2)
+__rgo_7374642f666d74__raw_nth_release_skip_2:
+    @gt(__rgo_7374642f666d74__raw_nth_release_skip_3, $__num_remaining, 0)
+    $__rgo_7374642f666d74__raw_nth_release_field_3 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__raw_nth_release_field_3)
+__rgo_7374642f666d74__raw_nth_release_skip_3:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f666d74__raw_nth_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__raw_nth_deepcopy_skip_0, $num_remaining, 3)
+    @deepcopy($__rgo_7374642f666d74__raw_nth_deepcopy_field_0, $__env_end, -4)
+__rgo_7374642f666d74__raw_nth_deepcopy_skip_0:
+    @gt(__rgo_7374642f666d74__raw_nth_deepcopy_skip_2, $num_remaining, 1)
+    @deepcopy($__rgo_7374642f666d74__raw_nth_deepcopy_field_2, $__env_end, -2)
+__rgo_7374642f666d74__raw_nth_deepcopy_skip_2:
+    @gt(__rgo_7374642f666d74__raw_nth_deepcopy_skip_3, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__raw_nth_deepcopy_field_3, $__env_end, -1)
+__rgo_7374642f666d74__raw_nth_deepcopy_skip_3:
+    @return()
+
+
+_112___rgo_7374642f666d74__from_raw($inspect_value: (), $value: bytes, $l: uint):
+    $_113___rgo_7374642f666d74__raw_nth = @newclosure<bytes, uint, (), ($_110___rgo_7374642f666d74__raw_nth: u8)>(__rgo_7374642f666d74__raw_nth, $value: bytes)
+    @jumpclosure($inspect_value, $l: uint, $_113___rgo_7374642f666d74__raw_nth: ())
+
+
+_112___rgo_7374642f666d74__from_raw_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $inspect_value = @field($__env_end, -3)
+    $value = @field($__env_end, -2)
+    $l = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_112___rgo_7374642f666d74__from_raw, $inspect_value: (), $value: bytes, $l: uint)
+
+
+_112___rgo_7374642f666d74__from_raw_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_112___rgo_7374642f666d74__from_raw_release_skip_0, $__num_remaining, 2)
+    $_112___rgo_7374642f666d74__from_raw_release_field_0 = @field($__env_end, -3)
+    @dropclosure($_112___rgo_7374642f666d74__from_raw_release_field_0)
+_112___rgo_7374642f666d74__from_raw_release_skip_0:
+    @gt(_112___rgo_7374642f666d74__from_raw_release_skip_1, $__num_remaining, 1)
+    $_112___rgo_7374642f666d74__from_raw_release_field_1 = @field($__env_end, -2)
+    @dropdescriptor($_112___rgo_7374642f666d74__from_raw_release_field_1)
+_112___rgo_7374642f666d74__from_raw_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+_112___rgo_7374642f666d74__from_raw_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_112___rgo_7374642f666d74__from_raw_deepcopy_skip_0, $num_remaining, 2)
+    @deepcopy($_112___rgo_7374642f666d74__from_raw_deepcopy_field_0, $__env_end, -3)
+_112___rgo_7374642f666d74__from_raw_deepcopy_skip_0:
+    @gt(_112___rgo_7374642f666d74__from_raw_deepcopy_skip_1, $num_remaining, 1)
+    @deepcopy($_112___rgo_7374642f666d74__from_raw_deepcopy_field_1, $__env_end, -2)
+_112___rgo_7374642f666d74__from_raw_deepcopy_skip_1:
+    @return()
+
+
+__rgo_7374642f666d74__from_raw($value: bytes, $inspect_value: ()):
+    $___114___rgo_7374642f666d74__from_raw_arg_clone_1 = @clonedescriptor($value)
+    $_114___rgo_7374642f666d74__from_raw = @newclosure<($_67_: uint, $_68_: ()), bytes, uint>(_112___rgo_7374642f666d74__from_raw, $inspect_value: (), $___114___rgo_7374642f666d74__from_raw_arg_clone_1: bytes)
+    bytes_descriptor_len(_114___rgo_7374642f666d74__from_raw, $value: bytes)
+
+
+__rgo_7374642f666d74__from_raw_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $value = @field($__env_end, -2)
+    $inspect_value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f666d74__from_raw, $value: bytes, $inspect_value: ())
+
+
+__rgo_7374642f666d74__from_raw_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__from_raw_release_skip_0, $__num_remaining, 1)
+    $__rgo_7374642f666d74__from_raw_release_field_0 = @field($__env_end, -2)
+    @dropdescriptor($__rgo_7374642f666d74__from_raw_release_field_0)
+__rgo_7374642f666d74__from_raw_release_skip_0:
+    @gt(__rgo_7374642f666d74__from_raw_release_skip_1, $__num_remaining, 0)
+    $__rgo_7374642f666d74__from_raw_release_field_1 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__from_raw_release_field_1)
+__rgo_7374642f666d74__from_raw_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f666d74__from_raw_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__from_raw_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($__rgo_7374642f666d74__from_raw_deepcopy_field_0, $__env_end, -2)
+__rgo_7374642f666d74__from_raw_deepcopy_skip_0:
+    @gt(__rgo_7374642f666d74__from_raw_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__from_raw_deepcopy_field_1, $__env_end, -1)
+__rgo_7374642f666d74__from_raw_deepcopy_skip_1:
+    @return()
+
+
+_134___rgo_7374642f666d74__str_source($inspect_value: (), $value_bytes: bytes):
+    @jumpargs(__rgo_7374642f666d74__from_raw, $value_bytes: bytes, $inspect_value: ())
+
+
+_134___rgo_7374642f666d74__str_source_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $inspect_value = @field($__env_end, -2)
+    $value_bytes = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_134___rgo_7374642f666d74__str_source, $inspect_value: (), $value_bytes: bytes)
+
+
+_134___rgo_7374642f666d74__str_source_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_134___rgo_7374642f666d74__str_source_release_skip_0, $__num_remaining, 1)
+    $_134___rgo_7374642f666d74__str_source_release_field_0 = @field($__env_end, -2)
+    @dropclosure($_134___rgo_7374642f666d74__str_source_release_field_0)
+_134___rgo_7374642f666d74__str_source_release_skip_0:
+    @gt(_134___rgo_7374642f666d74__str_source_release_skip_1, $__num_remaining, 0)
+    $_134___rgo_7374642f666d74__str_source_release_field_1 = @field($__env_end, -1)
+    @dropdescriptor($_134___rgo_7374642f666d74__str_source_release_field_1)
+_134___rgo_7374642f666d74__str_source_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+_134___rgo_7374642f666d74__str_source_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_134___rgo_7374642f666d74__str_source_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($_134___rgo_7374642f666d74__str_source_deepcopy_field_0, $__env_end, -2)
+_134___rgo_7374642f666d74__str_source_deepcopy_skip_0:
+    @gt(_134___rgo_7374642f666d74__str_source_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($_134___rgo_7374642f666d74__str_source_deepcopy_field_1, $__env_end, -1)
+_134___rgo_7374642f666d74__str_source_deepcopy_skip_1:
+    @return()
+
+
+__rgo_7374642f666d74__str_source($value: str, $inspect_value: ()):
+    $_135___rgo_7374642f666d74__str_source = @newclosure<($_67_: uint, $_68_: ()), bytes>(_134___rgo_7374642f666d74__str_source, $inspect_value: ())
+    @bytes_from_str($value: str, _135___rgo_7374642f666d74__str_source)
+
+
+__rgo_7374642f666d74__str_source_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $value = @field($__env_end, -2)
+    $inspect_value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f666d74__str_source, $value: str, $inspect_value: ())
+
+
+__rgo_7374642f666d74__str_source_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__str_source_release_skip_0, $__num_remaining, 1)
+    $__rgo_7374642f666d74__str_source_release_field_0 = @field($__env_end, -2)
+    @dropdescriptor($__rgo_7374642f666d74__str_source_release_field_0)
+__rgo_7374642f666d74__str_source_release_skip_0:
+    @gt(__rgo_7374642f666d74__str_source_release_skip_1, $__num_remaining, 0)
+    $__rgo_7374642f666d74__str_source_release_field_1 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f666d74__str_source_release_field_1)
+__rgo_7374642f666d74__str_source_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f666d74__str_source_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f666d74__str_source_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($__rgo_7374642f666d74__str_source_deepcopy_field_0, $__env_end, -2)
+__rgo_7374642f666d74__str_source_deepcopy_skip_0:
+    @gt(__rgo_7374642f666d74__str_source_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f666d74__str_source_deepcopy_field_1, $__env_end, -1)
+__rgo_7374642f666d74__str_source_deepcopy_skip_1:
+    @return()
+
+
+_350_print1($ok: (), $value: str):
+    @write($value: str, $ok)
+
+
+_350_print1_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $ok = @field($__env_end, -2)
+    $value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_350_print1, $ok: (), $value: str)
+
+
+_350_print1_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_350_print1_release_skip_0, $__num_remaining, 1)
+    $_350_print1_release_field_0 = @field($__env_end, -2)
+    @dropclosure($_350_print1_release_field_0)
+_350_print1_release_skip_0:
+    @gt(_350_print1_release_skip_1, $__num_remaining, 0)
+    $_350_print1_release_field_1 = @field($__env_end, -1)
+    @dropdescriptor($_350_print1_release_field_1)
+_350_print1_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+_350_print1_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_350_print1_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($_350_print1_deepcopy_field_0, $__env_end, -2)
+_350_print1_deepcopy_skip_0:
+    @gt(_350_print1_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($_350_print1_deepcopy_field_1, $__env_end, -1)
+_350_print1_deepcopy_skip_1:
+    @return()
+
+
+_349_print1($ok: (), $_329___rgo_7374642f666d74__new: str):
+    @jumpargs(_350_print1, $ok: (), $_329___rgo_7374642f666d74__new: str)
+
+
+_349_print1_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $ok = @field($__env_end, -2)
+    $_329___rgo_7374642f666d74__new = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_349_print1, $ok: (), $_329___rgo_7374642f666d74__new: str)
+
+
+_349_print1_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_349_print1_release_skip_0, $__num_remaining, 1)
+    $_349_print1_release_field_0 = @field($__env_end, -2)
+    @dropclosure($_349_print1_release_field_0)
+_349_print1_release_skip_0:
+    @gt(_349_print1_release_skip_1, $__num_remaining, 0)
+    $_349_print1_release_field_1 = @field($__env_end, -1)
+    @dropdescriptor($_349_print1_release_field_1)
+_349_print1_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+_349_print1_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_349_print1_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($_349_print1_deepcopy_field_0, $__env_end, -2)
+_349_print1_deepcopy_skip_0:
+    @gt(_349_print1_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($_349_print1_deepcopy_field_1, $__env_end, -1)
+_349_print1_deepcopy_skip_1:
+    @return()
+
+
+_344_print1():
+    @exit($_345: int = 1)
+
+
+_344_print1_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_344_print1)
+
+
+_344_print1_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_344_print1_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_167___rgo_7374642f666d74__finish($invalid: (), $ok: (), $value: bytes):
+    @str_from_utf8(ok, invalid, $value: bytes)
+
+
+_167___rgo_7374642f666d74__finish_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $invalid = @field($__env_end, -3)
+    $ok = @field($__env_end, -2)
+    $value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_167___rgo_7374642f666d74__finish, $invalid: (), $ok: (), $value: bytes)
+
+
+_167___rgo_7374642f666d74__finish_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_167___rgo_7374642f666d74__finish_release_skip_0, $__num_remaining, 2)
+    $_167___rgo_7374642f666d74__finish_release_field_0 = @field($__env_end, -3)
+    @dropclosure($_167___rgo_7374642f666d74__finish_release_field_0)
+_167___rgo_7374642f666d74__finish_release_skip_0:
+    @gt(_167___rgo_7374642f666d74__finish_release_skip_1, $__num_remaining, 1)
+    $_167___rgo_7374642f666d74__finish_release_field_1 = @field($__env_end, -2)
+    @dropclosure($_167___rgo_7374642f666d74__finish_release_field_1)
+_167___rgo_7374642f666d74__finish_release_skip_1:
+    @gt(_167___rgo_7374642f666d74__finish_release_skip_2, $__num_remaining, 0)
+    $_167___rgo_7374642f666d74__finish_release_field_2 = @field($__env_end, -1)
+    @dropdescriptor($_167___rgo_7374642f666d74__finish_release_field_2)
+_167___rgo_7374642f666d74__finish_release_skip_2:
+    @release($__env_end)
+    @return()
+
+
+_167___rgo_7374642f666d74__finish_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_167___rgo_7374642f666d74__finish_deepcopy_skip_0, $num_remaining, 2)
+    @deepcopy($_167___rgo_7374642f666d74__finish_deepcopy_field_0, $__env_end, -3)
+_167___rgo_7374642f666d74__finish_deepcopy_skip_0:
+    @gt(_167___rgo_7374642f666d74__finish_deepcopy_skip_1, $num_remaining, 1)
+    @deepcopy($_167___rgo_7374642f666d74__finish_deepcopy_field_1, $__env_end, -2)
+_167___rgo_7374642f666d74__finish_deepcopy_skip_1:
+    @gt(_167___rgo_7374642f666d74__finish_deepcopy_skip_2, $num_remaining, 0)
+    @deepcopy($_167___rgo_7374642f666d74__finish_deepcopy_field_2, $__env_end, -1)
+_167___rgo_7374642f666d74__finish_deepcopy_skip_2:
     @return()
 
 
 print1($n: str, $ok: ()):
-    $_8_print1 = @newclosure<(), str>(_7_print1, $ok: ())
-    @sprintf($_5: str = "The losing number is %s\n", $n: str, $_8_print1)
+    $__comptime_1 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_0: u8 = 84)
+    $__rgo_7374642f666d74__empty = @newclosure<($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__empty)
+    $__comptime_2 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__rgo_7374642f666d74__empty: (), $__comptime_1: ())
+    $__comptime_4 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_3: u8 = 104)
+    $__comptime_5 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_2: (), $__comptime_4: ())
+    $__comptime_7 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_6: u8 = 101)
+    $__comptime_8 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_5: (), $__comptime_7: ())
+    $__comptime_10 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_9: u8 = 32)
+    $__comptime_11 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_8: (), $__comptime_10: ())
+    $__comptime_13 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_12: u8 = 108)
+    $__comptime_14 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_11: (), $__comptime_13: ())
+    $__comptime_16 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_15: u8 = 111)
+    $__comptime_17 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_14: (), $__comptime_16: ())
+    $__comptime_19 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_18: u8 = 115)
+    $__comptime_20 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_17: (), $__comptime_19: ())
+    $__comptime_22 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_21: u8 = 105)
+    $__comptime_23 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_20: (), $__comptime_22: ())
+    $__comptime_25 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_24: u8 = 110)
+    $__comptime_26 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_23: (), $__comptime_25: ())
+    $__comptime_28 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_27: u8 = 103)
+    $__comptime_29 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_26: (), $__comptime_28: ())
+    $__comptime_31 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_30: u8 = 32)
+    $__comptime_32 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_29: (), $__comptime_31: ())
+    $__comptime_34 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_33: u8 = 110)
+    $__comptime_35 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_32: (), $__comptime_34: ())
+    $__comptime_37 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_36: u8 = 117)
+    $__comptime_38 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_35: (), $__comptime_37: ())
+    $__comptime_40 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_39: u8 = 109)
+    $__comptime_41 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_38: (), $__comptime_40: ())
+    $__comptime_43 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_42: u8 = 98)
+    $__comptime_44 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_41: (), $__comptime_43: ())
+    $__comptime_46 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_45: u8 = 101)
+    $__comptime_47 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_44: (), $__comptime_46: ())
+    $__comptime_49 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_48: u8 = 114)
+    $__comptime_50 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_47: (), $__comptime_49: ())
+    $__comptime_52 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_51: u8 = 32)
+    $__comptime_53 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_50: (), $__comptime_52: ())
+    $__comptime_55 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_54: u8 = 105)
+    $__comptime_56 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_53: (), $__comptime_55: ())
+    $__comptime_58 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_57: u8 = 115)
+    $__comptime_59 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_56: (), $__comptime_58: ())
+    $__comptime_61 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_60: u8 = 32)
+    $__comptime_62 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_59: (), $__comptime_61: ())
+    $__comptime_63 = @newclosure<str, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__str_source, $n: str)
+    $__comptime_64 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_62: (), $__comptime_63: ())
+    $__comptime_66 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_65: u8 = 10)
+    $__comptime_67 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_64: (), $__comptime_66: ())
+    $__comptime_68 = @newclosure<(), str>(_349_print1, $ok: ())
+    $_344_print1 = @newclosure<>(_344_print1)
+    $____comptime_69_arg_clone_0 = @cloneclosure($_344_print1, )
+    $__comptime_69 = @newclosure<(), ($_165___rgo_7374642f666d74__finish: str), bytes>(_167___rgo_7374642f666d74__finish, $____comptime_69_arg_clone_0: (), $__comptime_68: ())
+    @bytes_build(__comptime_69, _344_print1, $__comptime_67: ())
 
 
 print1_unwrapper($env_end: int):
@@ -46,9 +943,13 @@ print1_unwrapper($env_end: int):
 print1_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
+    @gt(print1_release_skip_0, $__num_remaining, 1)
+    $print1_release_field_0 = @field($__env_end, -2)
+    @dropdescriptor($print1_release_field_0)
+print1_release_skip_0:
     @gt(print1_release_skip_1, $__num_remaining, 0)
     $print1_release_field_1 = @field($__env_end, -1)
-    @callptr($print1_release_field_1)
+    @dropclosure($print1_release_field_1)
 print1_release_skip_1:
     @release($__env_end)
     @return()
@@ -57,6 +958,9 @@ print1_release_skip_1:
 print1_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
+    @gt(print1_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($print1_deepcopy_field_0, $__env_end, -2)
+print1_deepcopy_skip_0:
     @gt(print1_deepcopy_skip_1, $num_remaining, 0)
     @deepcopy($print1_deepcopy_field_1, $__env_end, -1)
 print1_deepcopy_skip_1:
@@ -64,7 +968,7 @@ print1_deepcopy_skip_1:
 
 
 p1($ok: ()):
-    @jumpargs(print1, $_13: str = "41", $ok: ())
+    @jumpargs(print1, $_362: str = "41", $ok: ())
 
 
 p1_unwrapper($env_end: int):
@@ -79,7 +983,7 @@ p1_deep_release($env_end: int):
     $__num_remaining = @field($__env_end, 5)
     @gt(p1_release_skip_0, $__num_remaining, 0)
     $p1_release_field_0 = @field($__env_end, -1)
-    @callptr($p1_release_field_0)
+    @dropclosure($p1_release_field_0)
 p1_release_skip_0:
     @release($__env_end)
     @return()
@@ -94,41 +998,160 @@ p1_deepcopy_skip_0:
     @return()
 
 
-_11_print2($ok: (), $s: str):
-    @write($s: str, $ok)
+_360_print2($ok: (), $value: str):
+    @write($value: str, $ok)
 
 
-_11_print2_unwrapper($env_end: int):
+_360_print2_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     $ok = @field($__env_end, -2)
-    $s = @field($__env_end, -1)
+    $value = @field($__env_end, -1)
     @release($__env_end)
-    @jumpargs(_11_print2, $ok: (), $s: str)
+    @jumpargs(_360_print2, $ok: (), $value: str)
 
 
-_11_print2_deep_release($env_end: int):
+_360_print2_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
-    @gt(_11_print2_release_skip_0, $__num_remaining, 1)
-    $_11_print2_release_field_0 = @field($__env_end, -2)
-    @callptr($_11_print2_release_field_0)
-_11_print2_release_skip_0:
+    @gt(_360_print2_release_skip_0, $__num_remaining, 1)
+    $_360_print2_release_field_0 = @field($__env_end, -2)
+    @dropclosure($_360_print2_release_field_0)
+_360_print2_release_skip_0:
+    @gt(_360_print2_release_skip_1, $__num_remaining, 0)
+    $_360_print2_release_field_1 = @field($__env_end, -1)
+    @dropdescriptor($_360_print2_release_field_1)
+_360_print2_release_skip_1:
     @release($__env_end)
     @return()
 
 
-_11_print2_deepcopy($env_end: int):
+_360_print2_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
-    @gt(_11_print2_deepcopy_skip_0, $num_remaining, 1)
-    @deepcopy($_11_print2_deepcopy_field_0, $__env_end, -2)
-_11_print2_deepcopy_skip_0:
+    @gt(_360_print2_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($_360_print2_deepcopy_field_0, $__env_end, -2)
+_360_print2_deepcopy_skip_0:
+    @gt(_360_print2_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($_360_print2_deepcopy_field_1, $__env_end, -1)
+_360_print2_deepcopy_skip_1:
+    @return()
+
+
+_359_print2($ok: (), $_329___rgo_7374642f666d74__new: str):
+    @jumpargs(_360_print2, $ok: (), $_329___rgo_7374642f666d74__new: str)
+
+
+_359_print2_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $ok = @field($__env_end, -2)
+    $_329___rgo_7374642f666d74__new = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_359_print2, $ok: (), $_329___rgo_7374642f666d74__new: str)
+
+
+_359_print2_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_359_print2_release_skip_0, $__num_remaining, 1)
+    $_359_print2_release_field_0 = @field($__env_end, -2)
+    @dropclosure($_359_print2_release_field_0)
+_359_print2_release_skip_0:
+    @gt(_359_print2_release_skip_1, $__num_remaining, 0)
+    $_359_print2_release_field_1 = @field($__env_end, -1)
+    @dropdescriptor($_359_print2_release_field_1)
+_359_print2_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+_359_print2_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_359_print2_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($_359_print2_deepcopy_field_0, $__env_end, -2)
+_359_print2_deepcopy_skip_0:
+    @gt(_359_print2_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($_359_print2_deepcopy_field_1, $__env_end, -1)
+_359_print2_deepcopy_skip_1:
+    @return()
+
+
+_354_print2():
+    @exit($_355: int = 1)
+
+
+_354_print2_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_354_print2)
+
+
+_354_print2_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_354_print2_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
     @return()
 
 
 print2($n: str, $ok: ()):
-    $_12_print2 = @newclosure<(), str>(_11_print2, $ok: ())
-    @sprintf($_9: str = "The winning number is %s\n", $n: str, $_12_print2)
+    $__comptime_71 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_70: u8 = 84)
+    $__rgo_7374642f666d74__empty = @newclosure<($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__empty)
+    $__comptime_72 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__rgo_7374642f666d74__empty: (), $__comptime_71: ())
+    $__comptime_74 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_73: u8 = 104)
+    $__comptime_75 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_72: (), $__comptime_74: ())
+    $__comptime_77 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_76: u8 = 101)
+    $__comptime_78 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_75: (), $__comptime_77: ())
+    $__comptime_80 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_79: u8 = 32)
+    $__comptime_81 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_78: (), $__comptime_80: ())
+    $__comptime_83 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_82: u8 = 119)
+    $__comptime_84 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_81: (), $__comptime_83: ())
+    $__comptime_86 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_85: u8 = 105)
+    $__comptime_87 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_84: (), $__comptime_86: ())
+    $__comptime_89 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_88: u8 = 110)
+    $__comptime_90 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_87: (), $__comptime_89: ())
+    $__comptime_92 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_91: u8 = 110)
+    $__comptime_93 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_90: (), $__comptime_92: ())
+    $__comptime_95 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_94: u8 = 105)
+    $__comptime_96 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_93: (), $__comptime_95: ())
+    $__comptime_98 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_97: u8 = 110)
+    $__comptime_99 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_96: (), $__comptime_98: ())
+    $__comptime_101 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_100: u8 = 103)
+    $__comptime_102 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_99: (), $__comptime_101: ())
+    $__comptime_104 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_103: u8 = 32)
+    $__comptime_105 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_102: (), $__comptime_104: ())
+    $__comptime_107 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_106: u8 = 110)
+    $__comptime_108 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_105: (), $__comptime_107: ())
+    $__comptime_110 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_109: u8 = 117)
+    $__comptime_111 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_108: (), $__comptime_110: ())
+    $__comptime_113 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_112: u8 = 109)
+    $__comptime_114 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_111: (), $__comptime_113: ())
+    $__comptime_116 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_115: u8 = 98)
+    $__comptime_117 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_114: (), $__comptime_116: ())
+    $__comptime_119 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_118: u8 = 101)
+    $__comptime_120 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_117: (), $__comptime_119: ())
+    $__comptime_122 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_121: u8 = 114)
+    $__comptime_123 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_120: (), $__comptime_122: ())
+    $__comptime_125 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_124: u8 = 32)
+    $__comptime_126 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_123: (), $__comptime_125: ())
+    $__comptime_128 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_127: u8 = 105)
+    $__comptime_129 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_126: (), $__comptime_128: ())
+    $__comptime_131 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_130: u8 = 115)
+    $__comptime_132 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_129: (), $__comptime_131: ())
+    $__comptime_134 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_133: u8 = 32)
+    $__comptime_135 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_132: (), $__comptime_134: ())
+    $__comptime_136 = @newclosure<str, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__str_source, $n: str)
+    $__comptime_137 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_135: (), $__comptime_136: ())
+    $__comptime_139 = @newclosure<u8, ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__single, $__comptime_138: u8 = 10)
+    $__comptime_140 = @newclosure<($_69_: ()), ($_69_: ()), ($_67_: uint, $_68_: ())>(__rgo_7374642f666d74__concat, $__comptime_137: (), $__comptime_139: ())
+    $__comptime_141 = @newclosure<(), str>(_359_print2, $ok: ())
+    $_354_print2 = @newclosure<>(_354_print2)
+    $____comptime_142_arg_clone_0 = @cloneclosure($_354_print2, )
+    $__comptime_142 = @newclosure<(), ($_165___rgo_7374642f666d74__finish: str), bytes>(_167___rgo_7374642f666d74__finish, $____comptime_142_arg_clone_0: (), $__comptime_141: ())
+    @bytes_build(__comptime_142, _354_print2, $__comptime_140: ())
 
 
 print2_unwrapper($env_end: int):
@@ -142,9 +1165,13 @@ print2_unwrapper($env_end: int):
 print2_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     $__num_remaining = @field($__env_end, 5)
+    @gt(print2_release_skip_0, $__num_remaining, 1)
+    $print2_release_field_0 = @field($__env_end, -2)
+    @dropdescriptor($print2_release_field_0)
+print2_release_skip_0:
     @gt(print2_release_skip_1, $__num_remaining, 0)
     $print2_release_field_1 = @field($__env_end, -1)
-    @callptr($print2_release_field_1)
+    @dropclosure($print2_release_field_1)
 print2_release_skip_1:
     @release($__env_end)
     @return()
@@ -153,6 +1180,9 @@ print2_release_skip_1:
 print2_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     $num_remaining = @field($__env_end, 5)
+    @gt(print2_deepcopy_skip_0, $num_remaining, 1)
+    @deepcopy($print2_deepcopy_field_0, $__env_end, -2)
+print2_deepcopy_skip_0:
     @gt(print2_deepcopy_skip_1, $num_remaining, 0)
     @deepcopy($print2_deepcopy_field_1, $__env_end, -1)
 print2_deepcopy_skip_1:
@@ -160,7 +1190,7 @@ print2_deepcopy_skip_1:
 
 
 p2($ok: ()):
-    @jumpargs(print2, $_14: str = "42", $ok: ())
+    @jumpargs(print2, $_363: str = "42", $ok: ())
 
 
 p2_unwrapper($env_end: int):
@@ -175,7 +1205,7 @@ p2_deep_release($env_end: int):
     $__num_remaining = @field($__env_end, 5)
     @gt(p2_release_skip_0, $__num_remaining, 0)
     $p2_release_field_0 = @field($__env_end, -1)
-    @callptr($p2_release_field_0)
+    @dropclosure($p2_release_field_0)
 p2_release_skip_0:
     @release($__env_end)
     @return()
@@ -190,29 +1220,29 @@ p2_deepcopy_skip_0:
     @return()
 
 
-_18_main():
-    @exit($_19: int = 0)
+_367_main():
+    @exit($_368: int = 0)
 
 
-_18_main_unwrapper($env_end: int):
+_367_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_18_main)
+    @jumpargs(_367_main)
 
 
-_18_main_deep_release($env_end: int):
+_367_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_18_main_deepcopy($env_end: int):
+_367_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
 foo($p: (), $ok: ()):
-    @jumpclosure($p, $ok: int)
+    @jumpclosure($p, $ok: ())
 
 
 foo_unwrapper($env_end: int):
@@ -228,11 +1258,11 @@ foo_deep_release($env_end: int):
     $__num_remaining = @field($__env_end, 5)
     @gt(foo_release_skip_0, $__num_remaining, 1)
     $foo_release_field_0 = @field($__env_end, -2)
-    @callptr($foo_release_field_0)
+    @dropclosure($foo_release_field_0)
 foo_release_skip_0:
     @gt(foo_release_skip_1, $__num_remaining, 0)
     $foo_release_field_1 = @field($__env_end, -1)
-    @callptr($foo_release_field_1)
+    @dropclosure($foo_release_field_1)
 foo_release_skip_1:
     @release($__env_end)
     @return()
@@ -250,33 +1280,33 @@ foo_deepcopy_skip_1:
     @return()
 
 
-_16_main():
+_365_main():
     $p2 = @newclosure<()>(p2)
-    $_18_main = @newclosure<>(_18_main)
-    @jumpargs(foo, $p2: (), $_18_main: ())
+    $_367_main = @newclosure<>(_367_main)
+    @jumpargs(foo, $p2: (), $_367_main: ())
 
 
-_16_main_unwrapper($env_end: int):
+_365_main_unwrapper($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
-    @jumpargs(_16_main)
+    @jumpargs(_365_main)
 
 
-_16_main_deep_release($env_end: int):
+_365_main_deep_release($env_end: int):
     $__env_end = @pin($env_end)
     @release($__env_end)
     @return()
 
 
-_16_main_deepcopy($env_end: int):
+_365_main_deepcopy($env_end: int):
     $__env_end = @pin($env_end)
     @return()
 
 
 main():
     $p1 = @newclosure<()>(p1)
-    $_16_main = @newclosure<>(_16_main)
-    @jumpargs(foo, $p1: (), $_16_main: ())
+    $_365_main = @newclosure<>(_365_main)
+    @jumpargs(foo, $p1: (), $_365_main: ())
 
 
 main_unwrapper($env_end: int):

@@ -59,8 +59,11 @@ foo_deep_release:
     jg foo_release_skip_0
     mov rax, [r12-8] ; load foo_release_field_0 env field
     mov [rbp-24], rax ; store value
+    push r12 ; preserve current environment
     mov rdi, [rbp-24] ; load operand
-    call release_heap_ptr ; release heap pointer
+    mov rax, [rdi+8] ; load closure release helper
+    call rax ; recursively release closure
+    pop r12 ; restore current environment
 foo_release_skip_0:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
@@ -138,7 +141,7 @@ foo_deepcopy:
     jg foo_deepcopy_skip_0
     mov rcx, [r12-8] ; load field pointer
     mov rdi, rcx ; copy pointer argument for deepcopy
-    call deepcopy_heap_ptr ; duplicate heap pointer
+    call deepcopy_heap_ptr ; duplicate owned pointer
     mov [r12-8], rax ; store duplicated pointer
     mov [rbp-24], rax ; store value
 foo_deepcopy_skip_0:

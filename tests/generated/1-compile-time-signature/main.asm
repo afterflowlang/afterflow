@@ -7,7 +7,8 @@ main:
     mov rbp, rsp ; establish new frame base
     ; load exit code
     mov rdi, 0 ; operand literal
-    call exit ; call libc exit to flush buffers
+    mov rax, 60 ; exit syscall
+    syscall
 global release_heap_ptr
 release_heap_ptr:
     push rbp ; save caller frame
@@ -63,4 +64,3 @@ _start:
     mov rbp, rsp ; establish new frame base
     leave ; unwind before named jump
     jmp main
-extern exit

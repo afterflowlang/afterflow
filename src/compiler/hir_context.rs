@@ -127,7 +127,7 @@ impl Context {
     pub fn new_name_for_fn(&mut self, display_name: Option<&str>) -> String {
         if self.scope_stack.is_empty() {
             if let Some(name) = display_name {
-                if !name.is_empty() && !is_reserved_external_symbol(name) {
+                if !name.is_empty() {
                     return name.into();
                 }
             }
@@ -189,7 +189,6 @@ impl Context {
                 span,
             ));
         }
-        let is_comptime = matches!(kind, SigKind::Sig(_)) || is_comptime;
         self.params.push(name.to_string());
         self.inner.insert(
             name.to_string(),
@@ -218,7 +217,7 @@ impl Context {
                 let item = SigItem {
                     name: name.clone(),
                     kind: entry.kind.clone(),
-                    is_comptime: entry.is_comptime && entry.kind.supports_comptime(),
+                    is_comptime: entry.is_comptime,
                 };
                 if entry.is_capture {
                     capture_params.push(item);
@@ -238,7 +237,7 @@ impl Context {
                 let item = SigItem {
                     name: name.clone(),
                     kind: entry.kind.clone(),
-                    is_comptime: entry.is_comptime && entry.kind.supports_comptime(),
+                    is_comptime: entry.is_comptime,
                 };
                 if entry.is_capture {
                     capture_params.push(item);
@@ -249,7 +248,6 @@ impl Context {
     }
 
     pub fn add_literal(&mut self, name: &str, kind: SigKind) -> Result<(), Error> {
-        let is_comptime = kind.supports_comptime() || matches!(kind, SigKind::Sig(_));
         self.add(
             name,
             ContextEntry {
@@ -259,7 +257,7 @@ impl Context {
                 is_root: false,
                 is_param: false,
                 is_capture: false,
-                is_comptime,
+                is_comptime: true,
                 is_predeclared: false,
                 scope: self.scope_stack.clone(),
                 captures: Vec::new(),
@@ -397,10 +395,6 @@ impl Context {
     }
 }
 
-fn is_reserved_external_symbol(name: &str) -> bool {
-    matches!(name, "exit" | "sprintf" | "write")
-}
-
 pub fn register_import(
     ctx: &mut Context,
     alias: &str,
@@ -425,4 +419,18 @@ pub fn register_import(
     }
 
     Ok(())
+}
+
+pub fn register_internal_builtin(
+    ctx: &mut Context,
+    alias: &str,
+    builtin: builtins::Builtin,
+    comptime_param_index: Option<usize>,
+    span: Span,
+) -> Result<(), Error> {
+    let mut signature = builtin.signature();
+    if let Some(index) = comptime_param_index {
+        signature.items[index].is_comptime = true;
+    }
+    ctx.add_sig(alias, alias, signature, span, false)
 }

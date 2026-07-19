@@ -1,9 +1,4 @@
 [
-    Import {
-        label: "stdout",
-        path: "/stdout",
-        span: ,
-    },
     IdentDef {
         name: "str",
         ident: Ident {
@@ -94,26 +89,15 @@
                                                 items: [
                                                     Ident(
                                                         Ident {
-                                                            name: "stdout.printf",
+                                                            name: "@write",
                                                             args: [
                                                                 Arg {
                                                                     name: None,
                                                                     term: Lit(
                                                                         Literal {
                                                                             value: Str(
-                                                                                "result: %f",
+                                                                                "result: 1.500000",
                                                                             ),
-                                                                            span: ,
-                                                                        },
-                                                                    ),
-                                                                    span: ,
-                                                                },
-                                                                Arg {
-                                                                    name: None,
-                                                                    term: Ident(
-                                                                        Ident {
-                                                                            name: "x",
-                                                                            args: [],
                                                                             span: ,
                                                                         },
                                                                     ),

@@ -89,10 +89,10 @@ main():
     $_11_main = @newclosure<>(_11_main)
     @eq_str(eq_str__3_main_true_0_0, $_0: str = "aaa", $_1: str = "aaa")
 eq_str__11_main_false_0_0:
-    @release($_3_main)
+    @dropclosure($_3_main)
     @jumpclosure($_11_main)
 eq_str__3_main_true_0_0:
-    @release($_11_main)
+    @dropclosure($_11_main)
     @jumpclosure($_3_main)
 
 

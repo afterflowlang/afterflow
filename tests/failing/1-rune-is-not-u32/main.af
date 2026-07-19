@@ -1,0 +1,14 @@
+rune: @rune
+u32: @u32
+
+accept: (value: u32) {
+    @exit(0)
+}
+
+forward: (value: rune) {
+    accept(value)
+}
+
+main: () {
+    forward(65)
+}

@@ -61,9 +61,8 @@ pub enum SigKind {
     Int,
     Str,
     F64,
-    Variadic,        // TODO: This is before we have staged DSL
-    Ident(SigIdent), // `foo`, `str`, `list`
-    Sig(Signature),  // Nested tuple signature: `(int, b:int, tail:list)`
+    Ident(SigIdent),                                  // `foo`, `str`, `list`
+    Sig(Signature), // Nested tuple signature: `(int, b:int, tail:list)`
     GenericInst { name: String, args: Vec<SigKind> }, // Generic instantiation: `arr<int, list>`
     Generic(String), // Unbound generic type parameter: `T`
 }
@@ -79,9 +78,9 @@ impl SigKind {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Signature {
-    /// The items between the parentheses: (a: int, ...items: arr<int>, ok: (str))
+    /// The items between the parentheses: (a: int, ok: (str))
     pub items: Vec<SigItem>,
-    /// Span of the entire `( ... )` tuple, including parens.
+    /// Span of the entire `(items)` tuple, including parens.
     pub span: Span,
     /// Generic parameters declared just before the signature (e.g. `<T>`).
     pub generics: BTreeSet<String>,
@@ -129,11 +128,6 @@ impl Signature {
             span,
             generics: BTreeSet::new(),
         }
-    }
-    pub fn is_variadic(&self) -> bool {
-        self.items
-            .iter()
-            .any(|item| matches!(item.kind, SigKind::Variadic))
     }
     pub fn names(&self) -> Vec<String> {
         self.items.iter().map(|item| item.name.clone()).collect()

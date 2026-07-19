@@ -1,0 +1,119 @@
+str: @str
+bytes: @bytes
+uint: @uint
+u8: @u8
+_37_nth: (idx: uint, one:(u8), empty:()){
+    _38: 2
+    _39: 67
+    _40_one: one(_39)
+    @eq_uint(idx, _38, _40_one, empty)
+}
+
+_32_nth: (idx: uint, one:(u8), empty:()){
+    _33: 1
+    _34: 66
+    _35_one: one(_34)
+    _41_nth: _37_nth(idx, one, empty)
+    @eq_uint(idx, _33, _35_one, _41_nth)
+}
+
+nth: (base: u8, idx: uint, empty:(), one:(u8)){
+    _29: 0
+    _30_one: one(base)
+    _42_nth: _32_nth(idx, one, empty)
+    @eq_uint(idx, _29, _30_one, _42_nth)
+}
+
+source: (base: u8, inspect:(uint, (uint, (), (u8)))){
+    _49: 3
+    _50_nth: nth(base)
+    inspect(_49, _50_nth)
+}
+
+empty_nth: (_51_empty_nth: uint, empty:(), _52_empty_nth:(u8)){
+    empty()
+}
+
+empty_source: (inspect:(uint, (uint, (), (u8)))){
+    _60: 0
+    inspect(_60, empty_nth)
+}
+
+invalid_source: (inspect:(uint, (uint, (), (u8)))){
+    _67: 1
+    inspect(_67, empty_nth)
+}
+unexpected_bytes: (_68_unexpected_bytes: bytes){
+    _69: 1
+    @exit(_69)
+}
+_77_empty_inspect: (){
+    _78: 1
+    @exit(_78)
+}
+
+empty_inspect: (ok:(), l: uint, _70_empty_inspect:(uint, (), (u8))){
+    _75: 0
+    @eq_uint(l, _75, ok, _77_empty_inspect)
+}
+_81_test_empty: (){
+    _82: 1
+    @exit(_82)
+}
+_86_bytes_len: @__bytes_len
+_91_test_empty: (value: bytes, _71_empty_inspect: uint, _72_empty_inspect:(), _73_empty_inspect:(u8)){
+    @bytes_nth(value, _71_empty_inspect, _72_empty_inspect, _73_empty_inspect)
+}
+
+_89_test_empty: (ok:(), value: bytes, _87_bytes_len: uint){
+    _92_test_empty: _91_test_empty(value)
+    empty_inspect(ok, _87_bytes_len, _92_test_empty)
+}
+
+_85_test_empty: (ok:(), value: bytes){
+    _93_test_empty: _89_test_empty(ok, value)
+    _86_bytes_len(value, _93_test_empty)
+}
+
+test_empty: (ok:()){
+    _94_test_empty: _85_test_empty(ok)
+    @bytes_build(empty_source, _81_test_empty, _94_test_empty)
+}
+test_invalid: (ok:()){
+    @bytes_build(invalid_source, ok, unexpected_bytes)
+}
+_101_main: (){
+    _102: 1
+    @exit(_102)
+}
+_107_main: (){
+    _108: 1
+    @exit(_108)
+}
+_113_main: (){
+    _114: 0
+    @exit(_114)
+}
+
+_111_main: (text: str){
+    @write(text, _113_main)
+}
+
+_105_main: (value: bytes){
+    @str_from_utf8(value, _107_main, _111_main)
+}
+
+_98_main: (){
+    _99: 65
+    labelled: source(_99)
+    @bytes_build(labelled, _101_main, _105_main)
+}
+
+_96_main: (){
+    test_invalid(_98_main)
+}
+
+main: (){
+    test_empty(_96_main)
+}
+main()

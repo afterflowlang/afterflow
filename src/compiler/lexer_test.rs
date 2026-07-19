@@ -6,7 +6,7 @@ use super::token::TokenKind;
 
 #[test]
 fn lexer_test() {
-    let source = include_bytes!("lexer_test.rgo");
+    let source = include_bytes!("lexer_test.af");
     let cursor = Cursor::new(&source[..]);
     let mut lexer = Lexer::new(cursor);
     let ident = |name: &str| TokenKind::Ident(name.to_string());
@@ -24,11 +24,6 @@ fn lexer_test() {
         ident("fmt"),
         TokenKind::Colon,
         ident("str"),
-        TokenKind::Bang,
-        TokenKind::Comma,
-        ident("args"),
-        TokenKind::Colon,
-        TokenKind::Ellipsis,
         TokenKind::Comma,
         ident("ok"),
         TokenKind::Colon,
@@ -37,22 +32,9 @@ fn lexer_test() {
         TokenKind::RParen,
         TokenKind::LBrace,
         TokenKind::Newline,
-        TokenKind::LParen,
-        ident("s"),
-        TokenKind::Colon,
-        ident("str"),
-        TokenKind::RParen,
-        TokenKind::Equals,
-        builtin("sprintf"),
-        TokenKind::LParen,
-        ident("fmt"),
-        TokenKind::Comma,
-        ident("args"),
-        TokenKind::RParen,
-        TokenKind::Newline,
         builtin("write"),
         TokenKind::LParen,
-        ident("s"),
+        ident("fmt"),
         TokenKind::Comma,
         ident("ok"),
         TokenKind::RParen,
@@ -154,7 +136,7 @@ fn lexer_test() {
 
     assert_eq!(
         actual_tokens, expected_tokens,
-        "lexer should produce the exact token stream for lexer_test.rgo"
+        "lexer should produce the exact token stream for lexer_test.af"
     );
 }
 
@@ -176,8 +158,8 @@ fn single_quote_strings_preserve_backslashes() {
 
 #[test]
 fn double_quote_strings_support_unicode_and_escapes() {
-    let literal = lex_single_string(b"\"\\u{1F600}\\n\"");
-    assert_eq!(literal, "\u{1F600}\n");
+    let literal = lex_single_string("\"é😀\\u{1F600}\\n\"".as_bytes());
+    assert_eq!(literal, "é😀\u{1F600}\n");
 }
 
 #[test]
@@ -188,22 +170,10 @@ fn invalid_double_quote_escape_is_rejected() {
 }
 
 #[test]
-fn ellipsis_is_single_token() {
-    let cursor = Cursor::new(b"... foo");
+fn repeated_dots_are_rejected() {
+    let cursor = Cursor::new(b"...");
     let mut lexer = Lexer::new(cursor);
-
-    let ellipsis = lexer
-        .next_token()
-        .expect("lexer should produce ellipsis token");
-    assert_eq!(ellipsis.kind, TokenKind::Ellipsis);
-
-    let ident = lexer
-        .next_token()
-        .expect("lexer should produce identifier token");
-    assert_eq!(ident.kind, TokenKind::Ident("foo".to_string()));
-
-    let eof = lexer.next_token().expect("should reach EOF");
-    assert!(matches!(eof.kind, TokenKind::Eof));
+    assert!(lexer.next_token().is_err());
 }
 
 #[test]

@@ -86,7 +86,6 @@ HirSnapshot {
                                                     offset: 0,
                                                 },
                                             },
-                                            is_variadic: false,
                                             span: Span {
                                                 line: 0,
                                                 column: 0,
@@ -107,7 +106,6 @@ HirSnapshot {
                                 offset: 71,
                             },
                         },
-                        is_variadic: false,
                         span: Span {
                             line: 7,
                             column: 7,
@@ -188,7 +186,6 @@ HirSnapshot {
                                                     offset: 0,
                                                 },
                                             },
-                                            is_variadic: false,
                                             span: Span {
                                                 line: 0,
                                                 column: 0,
@@ -205,7 +202,6 @@ HirSnapshot {
                                                     offset: 0,
                                                 },
                                             },
-                                            is_variadic: false,
                                             span: Span {
                                                 line: 0,
                                                 column: 0,
@@ -226,7 +222,6 @@ HirSnapshot {
                                 offset: 131,
                             },
                         },
-                        is_variadic: false,
                         span: Span {
                             line: 11,
                             column: 7,
@@ -324,7 +319,6 @@ HirSnapshot {
                                 offset: 168,
                             },
                         },
-                        is_variadic: false,
                         span: Span {
                             line: 14,
                             column: 7,
@@ -341,7 +335,6 @@ HirSnapshot {
                                 offset: 168,
                             },
                         },
-                        is_variadic: false,
                         span: Span {
                             line: 14,
                             column: 19,
@@ -358,7 +351,6 @@ HirSnapshot {
                                 offset: 168,
                             },
                         },
-                        is_variadic: false,
                         span: Span {
                             line: 14,
                             column: 31,
@@ -469,7 +461,6 @@ HirSnapshot {
                                                                         offset: 0,
                                                                     },
                                                                 },
-                                                                is_variadic: false,
                                                                 span: Span {
                                                                     line: 0,
                                                                     column: 0,
@@ -490,7 +481,6 @@ HirSnapshot {
                                                     offset: 0,
                                                 },
                                             },
-                                            is_variadic: false,
                                             span: Span {
                                                 line: 0,
                                                 column: 0,
@@ -511,7 +501,6 @@ HirSnapshot {
                                 offset: 270,
                             },
                         },
-                        is_variadic: false,
                         span: Span {
                             line: 17,
                             column: 18,
@@ -626,7 +615,6 @@ HirSnapshot {
                                 offset: 391,
                             },
                         },
-                        is_variadic: false,
                         span: Span {
                             line: 25,
                             column: 19,

@@ -1,0 +1,243 @@
+int: @int
+__rgo_737464__end: (_44___rgo_737464__end: T, ok:()){
+    ok()
+}
+
+__rgo_737464__pipe: (value: T, ok:(T)){
+    ok(value)
+}
+__rgo_737464__print: (value: str, ok:()){
+    @write(value, ok)
+}
+_47___rgo_737464__println: (ok:()){
+    _48: "\n"
+    @write(_48, ok)
+}
+
+__rgo_737464__println: (value: str, ok:()){
+    _49___rgo_737464__println: _47___rgo_737464__println(ok)
+    @write(value, _49___rgo_737464__println)
+}
+__rgo_7374642f6d617468__to_degrees: (radians: f64, ok:(f64)){
+    _51: 57.29577951308232
+    @mul_f64(radians, _51, ok)
+}
+__rgo_7374642f6d617468__to_radians: (degrees: f64, ok:(f64)){
+    _53: 0.017453292519943295
+    @mul_f64(degrees, _53, ok)
+}
+__rgo_7374642f6d617468__exp: (value: f64, ok:(f64)){
+    @exp_f64(value, ok)
+}
+__rgo_7374642f6d617468__exp2: (value: f64, ok:(f64)){
+    @exp2_f64(value, ok)
+}
+__rgo_7374642f6d617468__exp_m1: (value: f64, ok:(f64)){
+    @expm1_f64(value, ok)
+}
+__rgo_7374642f6d617468__abs: (value: f64, ok:(f64)){
+    @fabs_f64(value, ok)
+}
+__rgo_7374642f6d617468__copy_sign: (magnitude: f64, sign: f64, ok:(f64)){
+    @copysign_f64(magnitude, sign, ok)
+}
+__rgo_7374642f6d617468__dim: (a: f64, b: f64, ok:(f64)){
+    @fdim_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__max_f64: (a: f64, b: f64, ok:(f64)){
+    @fmax_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__min_f64: (a: f64, b: f64, ok:(f64)){
+    @fmin_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__mod: (dividend: f64, divisor: f64, ok:(f64)){
+    @fmod_f64(dividend, divisor, ok)
+}
+__rgo_7374642f6d617468__remainder: (dividend: f64, divisor: f64, ok:(f64)){
+    @remainder_f64(dividend, divisor, ok)
+}
+__rgo_7374642f6d617468__next_after: (value: f64, toward: f64, ok:(f64)){
+    @nextafter_f64(value, toward, ok)
+}
+__rgo_7374642f6d617468__ldexp: (value: f64, exponent: i32, ok:(f64)){
+    @ldexp_f64_i32(value, exponent, ok)
+}
+__rgo_7374642f6d617468__sinh: (value: f64, ok:(f64)){
+    @sinh_f64(value, ok)
+}
+__rgo_7374642f6d617468__cosh: (value: f64, ok:(f64)){
+    @cosh_f64(value, ok)
+}
+__rgo_7374642f6d617468__tanh: (value: f64, ok:(f64)){
+    @tanh_f64(value, ok)
+}
+__rgo_7374642f6d617468__asinh: (value: f64, ok:(f64)){
+    @asinh_f64(value, ok)
+}
+__rgo_7374642f6d617468__acosh: (value: f64, ok:(f64)){
+    @acosh_f64(value, ok)
+}
+__rgo_7374642f6d617468__atanh: (value: f64, ok:(f64)){
+    @atanh_f64(value, ok)
+}
+__rgo_7374642f6d617468__ln: (value: f64, ok:(f64)){
+    @log_f64(value, ok)
+}
+_77___rgo_7374642f6d617468__log: (value_logarithm: f64, ok:(f64), base_logarithm: f64){
+    @div_f64(value_logarithm, base_logarithm, ok)
+}
+
+_75___rgo_7374642f6d617468__log: (base: f64, ok:(f64), value_logarithm: f64){
+    _78___rgo_7374642f6d617468__log: _77___rgo_7374642f6d617468__log(value_logarithm, ok)
+    @log_f64(base, _78___rgo_7374642f6d617468__log)
+}
+
+__rgo_7374642f6d617468__log: (value: f64, base: f64, ok:(f64)){
+    _79___rgo_7374642f6d617468__log: _75___rgo_7374642f6d617468__log(base, ok)
+    @log_f64(value, _79___rgo_7374642f6d617468__log)
+}
+__rgo_7374642f6d617468__log2: (value: f64, ok:(f64)){
+    @log2_f64(value, ok)
+}
+__rgo_7374642f6d617468__log10: (value: f64, ok:(f64)){
+    @log10_f64(value, ok)
+}
+__rgo_7374642f6d617468__ln_1p: (value: f64, ok:(f64)){
+    @log1p_f64(value, ok)
+}
+_85___rgo_7374642f6d617468__min: (ok:(int), a: int){
+    ok(a)
+}
+
+_88___rgo_7374642f6d617468__min: (ok:(int), b: int){
+    ok(b)
+}
+
+__rgo_7374642f6d617468__min: (a: int, b: int, ok:(int)){
+    _86___rgo_7374642f6d617468__min: _85___rgo_7374642f6d617468__min(ok, a)
+    _89___rgo_7374642f6d617468__min: _88___rgo_7374642f6d617468__min(ok, b)
+    @lt(a, b, _86___rgo_7374642f6d617468__min, _89___rgo_7374642f6d617468__min)
+}
+_92___rgo_7374642f6d617468__max: (ok:(int), b: int){
+    ok(b)
+}
+
+_95___rgo_7374642f6d617468__max: (ok:(int), a: int){
+    ok(a)
+}
+
+__rgo_7374642f6d617468__max: (a: int, b: int, ok:(int)){
+    _93___rgo_7374642f6d617468__max: _92___rgo_7374642f6d617468__max(ok, b)
+    _96___rgo_7374642f6d617468__max: _95___rgo_7374642f6d617468__max(ok, a)
+    @lt(a, b, _93___rgo_7374642f6d617468__max, _96___rgo_7374642f6d617468__max)
+}
+__rgo_7374642f6d617468__pow: (base: f64, exponent: f64, ok:(f64)){
+    @pow_f64(base, exponent, ok)
+}
+__rgo_7374642f6d617468__sqrt: (value: f64, ok:(f64)){
+    @sqrt_f64(value, ok)
+}
+__rgo_7374642f6d617468__cbrt: (value: f64, ok:(f64)){
+    @cbrt_f64(value, ok)
+}
+__rgo_7374642f6d617468__hypot: (x: f64, y: f64, ok:(f64)){
+    @hypot_f64(x, y, ok)
+}
+__rgo_7374642f6d617468__ceil: (value: f64, ok:(f64)){
+    @ceil_f64(value, ok)
+}
+__rgo_7374642f6d617468__floor: (value: f64, ok:(f64)){
+    @floor_f64(value, ok)
+}
+__rgo_7374642f6d617468__round: (value: f64, ok:(f64)){
+    @round_f64(value, ok)
+}
+__rgo_7374642f6d617468__trunc: (value: f64, ok:(f64)){
+    @trunc_f64(value, ok)
+}
+__rgo_7374642f6d617468__sin: (radians: f64, ok:(f64)){
+    @sin_f64(radians, ok)
+}
+__rgo_7374642f6d617468__cos: (radians: f64, ok:(f64)){
+    @cos_f64(radians, ok)
+}
+__rgo_7374642f6d617468__tan: (radians: f64, ok:(f64)){
+    @tan_f64(radians, ok)
+}
+__rgo_7374642f6d617468__asin: (value: f64, ok:(f64)){
+    @asin_f64(value, ok)
+}
+__rgo_7374642f6d617468__acos: (value: f64, ok:(f64)){
+    @acos_f64(value, ok)
+}
+__rgo_7374642f6d617468__atan: (value: f64, ok:(f64)){
+    @atan_f64(value, ok)
+}
+__rgo_7374642f6d617468__atan2: (y: f64, x: f64, ok:(f64)){
+    @atan2_f64(y, x, ok)
+}
+_113_assert_eq: (){
+    _114: 1
+    @exit(_114)
+}
+
+assert_eq: (a: int, b: int, ok:()){
+    @eq_int(a, b, ok, _113_assert_eq)
+}
+_144_main: (){
+    _145: 0
+    @exit(_145)
+}
+
+_136_main: (min_b: int, max_a: int, max_b: int, piped: int){
+    _137: 3
+    _138: 3
+    _139: 7
+    _140: 7
+    _141: "std"
+    _142: " ok"
+    _147___rgo_737464__println: __rgo_737464__println(_142, _144_main)
+    _148___rgo_737464__print: __rgo_737464__print(_141, _147___rgo_737464__println)
+    _149_assert_eq: assert_eq(max_b, _140, _148___rgo_737464__print)
+    _150_assert_eq: assert_eq(max_a, _139, _149_assert_eq)
+    _151_assert_eq: assert_eq(min_b, _138, _150_assert_eq)
+    assert_eq(piped, _137, _151_assert_eq)
+}
+
+_134_main: (min_a: int, min_b: int, max_a: int, max_b: int){
+    _152_main: _136_main(min_b, max_a, max_b)
+    __rgo_737464__pipe(min_a, _152_main)
+}
+
+_130_main: (min_a: int, min_b: int, max_a: int){
+    _131: 7
+    _132: 3
+    _153_main: _134_main(min_a, min_b, max_a)
+    __rgo_7374642f6d617468__max(_131, _132, _153_main)
+}
+
+_126_main: (min_a: int, min_b: int){
+    _127: 3
+    _128: 7
+    _154_main: _130_main(min_a, min_b)
+    __rgo_7374642f6d617468__max(_127, _128, _154_main)
+}
+
+_122_main: (min_a: int){
+    _123: 7
+    _124: 3
+    _155_main: _126_main(min_a)
+    __rgo_7374642f6d617468__min(_123, _124, _155_main)
+}
+
+_118_main: (){
+    _119: 3
+    _120: 7
+    __rgo_7374642f6d617468__min(_119, _120, _122_main)
+}
+
+main: (){
+    _116: "unused"
+    __rgo_737464__end(_116, _118_main)
+}
+main()

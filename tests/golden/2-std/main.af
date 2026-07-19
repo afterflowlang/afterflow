@@ -1,0 +1,23 @@
+std: /std
+math: /std/math
+
+int: @int
+
+assert_eq: (a: int, b: int, ok: ()) {
+    @eq_int(a, b, ok, @exit(1))
+}
+
+main: () {
+    std.end("unused")
+    (min_a: int) = math.min(3, 7)
+    (min_b: int) = math.min(7, 3)
+    (max_a: int) = math.max(3, 7)
+    (max_b: int) = math.max(7, 3)
+    (piped: int) = std.pipe(min_a)
+    assert_eq(piped, 3)
+    assert_eq(min_b, 3)
+    assert_eq(max_a, 7)
+    assert_eq(max_b, 7)
+    std.print("std")
+    std.println(" ok", @exit(0))
+}

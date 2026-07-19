@@ -1,0 +1,4 @@
+[hir] `test_only` is not defined
+tests/failing/1-test-source-not-visible/main.af:2
+    test_only()
+    ^^^^^^^^^

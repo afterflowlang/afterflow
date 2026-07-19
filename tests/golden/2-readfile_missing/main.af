@@ -1,0 +1,18 @@
+fmt: /std/fmt
+str: @str
+bytes: @bytes
+
+file_read_str: (path: str, err: (), ok: (str)) {
+    @file_read(path, err, (contents: bytes) {
+        @str_from_utf8(contents, err, ok)
+    })
+}
+
+error: (msg: str) {
+    fmt.new("Error: %\n", @exit(1), fmt.str(msg) fmt.end, @write(ok: @exit(1)))
+}
+main: () {
+    file_read_str("tests/golden/2-readfile_missing/no_such_file.txt", error("cannot read file"), (contents: str){
+        @write(contents, @exit(0))
+    })
+}

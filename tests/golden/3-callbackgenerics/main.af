@@ -1,0 +1,20 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+foo: (p:(()), ok:()){
+	p(ok)
+}
+print1: (n:str, ok:()){
+	fmt.new("The losing number is %\n", @exit(1), fmt.str(n) fmt.end, @write(ok: ok))
+}
+print2: (n:str, ok:()){
+	fmt.new("The winning number is %\n", @exit(1), fmt.str(n) fmt.end, @write(ok: ok))
+}
+p1: (ok:()){print1("41", ok)}
+p2: (ok:()){print2("42", ok)}
+main: () {
+    foo(p1, (){
+    foo(p2, @exit(0))
+    })
+}

@@ -1,0 +1,32 @@
+int: @int
+_17_run: (res: int){
+    @exit(res)
+}
+
+_15_run: (a: int, b: int){
+    @add(a, b, _17_run)
+}
+
+_12_run: (add_three:(int, (int))!, a: int){
+    _13: 5
+    _19_run: _15_run(a)
+    add_three(_13, _19_run)
+}
+
+run: (add:(int, int, (int))){
+    _8: 2
+    _9: 3
+    _10: 4
+    add_three: add(_9)
+    _20_run: _12_run(add_three)
+    add_two: add(_8)
+    add_two(_10, _20_run)
+}
+_22_main: (_4_run: int, _5_run: int, _6_run:(int)){
+    @add(_4_run, _5_run, _6_run)
+}
+
+main: (){
+    run(_22_main)
+}
+main()

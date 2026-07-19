@@ -77,6 +77,24 @@ pub fn register_builtin_import(
     Ok(())
 }
 
+pub fn register_internal_builtin_import(
+    alias: &str,
+    builtin: builtins::Builtin,
+    comptime_param_index: Option<usize>,
+    symbols: &mut SymbolRegistry,
+) -> Result<(), Error> {
+    let mut signature = builtin.signature();
+    if let Some(index) = comptime_param_index {
+        signature.items[index].is_comptime = true;
+    }
+    symbols.declare_function(FunctionSig {
+        name: alias.to_string(),
+        params: signature.items,
+        generics: signature.generics,
+        builtin: Some(builtin),
+    })
+}
+
 pub fn builtin_function_sig(builtin_name: &str) -> Result<FunctionSig, Error> {
     let spec = builtins::get_spec(builtin_name).ok_or_else(|| {
         Error::new(

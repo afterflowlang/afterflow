@@ -1,0 +1,4 @@
+[hir] expected rune, found u32
+tests/failing/1-u32-is-not-rune/main.af:9
+    accept(value)
+           ^^^^^

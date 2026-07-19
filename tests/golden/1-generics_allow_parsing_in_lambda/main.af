@@ -1,0 +1,10 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+foo: <T>(x: int){
+    fmt.new("%", @exit(1), fmt.int(x) fmt.end, @write(ok: @exit(0)))
+}
+main: () {
+    foo(42)
+}

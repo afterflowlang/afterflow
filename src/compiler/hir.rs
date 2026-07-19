@@ -11,7 +11,6 @@ use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
 
 pub struct Lowerer {
     ready: VecDeque<BlockItem>,
-    variadic_functions: HashMap<String, ast::Lambda>,
 }
 
 impl Default for Lowerer {
@@ -24,22 +23,11 @@ impl Lowerer {
     pub fn new() -> Self {
         Self {
             ready: VecDeque::new(),
-            variadic_functions: HashMap::new(),
         }
     }
 
     pub fn produce(&mut self) -> Option<BlockItem> {
         self.ready.pop_front()
-    }
-
-    pub fn register_package_functions(&mut self, items: &[ast::BlockItem]) {
-        for item in items {
-            if let ast::BlockItem::FunctionDef { name, lambda, .. } = item {
-                if lambda.params.is_variadic() {
-                    self.variadic_functions.insert(name.clone(), lambda.clone());
-                }
-            }
-        }
     }
 
     pub fn consume(&mut self, ctx: &mut ctx::Context, block: ast::BlockItem) -> Result<(), Error> {
@@ -66,23 +54,11 @@ impl Lowerer {
                 ctx::register_import(ctx, &label, &path, Span::unknown())?;
             }
             ast::BlockItem::FunctionDef { name, lambda, .. } => {
-                if lambda.params.is_variadic() {
-                    self.variadic_functions.insert(name.clone(), lambda.clone());
-                }
                 let display_name = name.clone();
-                lower_function(
-                    ctx,
-                    name,
-                    Some(display_name),
-                    lambda,
-                    &mut self.ready,
-                    true,
-                    &self.variadic_functions,
-                )?;
+                lower_function(ctx, name, Some(display_name), lambda, &mut self.ready, true)?;
             }
             other => {
-                let lowered_items =
-                    lower_block_item(ctx, other, &mut self.ready, &self.variadic_functions)?;
+                let lowered_items = lower_block_item(ctx, other, &mut self.ready)?;
                 for item in lowered_items {
                     self.ready.push_back(item);
                 }
@@ -100,7 +76,6 @@ fn lower_function(
     lambda: ast::Lambda,
     hoisted: &mut VecDeque<BlockItem>,
     is_root_def: bool,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<(), Error> {
     let span = Span::unknown();
 
@@ -108,6 +83,7 @@ fn lower_function(
     let mut signature_ctx = outer_ctx.enter(&name, display_name.as_deref(), is_root_def);
     register_generic_placeholders(&mut signature_ctx, &lambda_params.generics)?;
     let signature = signature::resolve_signature(&lambda_params, &mut signature_ctx)?;
+    let has_comptime_params = signature.items.iter().any(|item| item.is_comptime);
     let new_name = outer_ctx.new_name_for_fn(display_name.as_deref());
     outer_ctx.add_sig(&name, &new_name, signature.clone(), span, false)?;
 
@@ -133,18 +109,10 @@ fn lower_function(
             }
             ast::BlockItem::FunctionDef { name, lambda, .. } => {
                 let display_name = name.clone();
-                lower_function(
-                    &mut ctx,
-                    name,
-                    Some(display_name),
-                    lambda,
-                    hoisted,
-                    false,
-                    variadic_functions,
-                )?;
+                lower_function(&mut ctx, name, Some(display_name), lambda, hoisted, false)?;
             }
             other => {
-                for item in lower_block_item(&mut ctx, other, hoisted, variadic_functions)? {
+                for item in lower_block_item(&mut ctx, other, hoisted)? {
                     lowered_items.push(item);
                 }
             }
@@ -163,6 +131,7 @@ fn lower_function(
         body: Block {
             items: lowered_items,
         },
+        has_comptime_params,
     };
     hoisted.push_back(BlockItem::FunctionDef(function));
 
@@ -264,18 +233,15 @@ fn lower_block_item(
     ctx: &mut ctx::Context,
     item: ast::BlockItem,
     hoisted: &mut VecDeque<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<Vec<BlockItem>, Error> {
     let span = item.span();
-    lower_block_item_inner(ctx, item, hoisted, variadic_functions)
-        .map_err(|error| error.with_span(span))
+    lower_block_item_inner(ctx, item, hoisted).map_err(|error| error.with_span(span))
 }
 
 fn lower_block_item_inner(
     ctx: &mut ctx::Context,
     item: ast::BlockItem,
     hoisted: &mut VecDeque<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<Vec<BlockItem>, Error> {
     let lowered_items = match item {
         ast::BlockItem::ScopeCapture {
@@ -292,13 +258,15 @@ fn lower_block_item_inner(
             };
             let callback_term = ast::Term::Lambda(lambda);
             let exec_term = append_scope_capture_arg(term, callback_term)?;
-            lower_exec(ctx, exec_term, hoisted, variadic_functions)
+            lower_exec_term(ctx, exec_term, hoisted)
         }
         ast::BlockItem::Ident(term) => {
-            lower_exec(ctx, ast::Term::Ident(term), hoisted, variadic_functions)
+            let span = term.span;
+            lower_exec(ctx, ast::Term::Ident(term), span, hoisted)
         }
         ast::BlockItem::Lambda(lambda) => {
-            lower_exec(ctx, ast::Term::Lambda(lambda), hoisted, variadic_functions)
+            let span = lambda.span;
+            lower_exec(ctx, ast::Term::Lambda(lambda), span, hoisted)
         }
         ast::BlockItem::LitDef { name, literal, .. } => {
             let literal = lower_lit(literal.value);
@@ -336,11 +304,13 @@ fn lower_block_item_inner(
         ast::BlockItem::IdentDef { name, ident, .. } => {
             if ident.args.is_empty() {
                 if let Some(builtin_name) = builtin_reference_name(&ident.name) {
-                    ctx::register_import(ctx, &name, builtin_name, Span::unknown())?;
-                    return Ok(vec![BlockItem::Import {
-                        label: name,
-                        path: builtin_name.to_string(),
-                    }]);
+                    if ctx.get(&ident.name).is_none_or(|entry| entry.is_builtin) {
+                        ctx::register_import(ctx, &name, builtin_name, Span::unknown())?;
+                        return Ok(vec![BlockItem::Import {
+                            label: name,
+                            path: builtin_name.to_string(),
+                        }]);
+                    }
                 }
             }
             if ident.args.is_empty() {
@@ -356,16 +326,29 @@ fn lower_block_item_inner(
                         Span::unknown(),
                     ))
                 }
+            } else if ctx
+                .get(&ident.name)
+                .is_some_and(|target| matches!(target.kind, SigKind::Str | SigKind::Bytes))
+            {
+                let span = ident.span;
+                let lambda = ast::Lambda {
+                    params: ast::Signature {
+                        items: Vec::new(),
+                        span,
+                        generics: BTreeSet::new(),
+                    },
+                    body: ast::Block {
+                        items: vec![ast::BlockItem::Ident(ident)],
+                        span,
+                    },
+                    args: Vec::new(),
+                    span,
+                };
+                lower_function(ctx, name.clone(), Some(name), lambda, hoisted, false)?;
+                Ok(Vec::new())
             } else {
                 let mut lowered_items = Vec::new();
-                let closure = lower_closure(
-                    ctx,
-                    name.clone(),
-                    ident,
-                    hoisted,
-                    &mut lowered_items,
-                    variadic_functions,
-                )?;
+                let closure = lower_closure(ctx, name.clone(), ident, hoisted, &mut lowered_items)?;
                 let result_type = if let Some(signature) =
                     signature::resolve_target_signature(&closure.of, ctx)
                 {
@@ -424,205 +407,31 @@ fn append_scope_capture_arg(term: ast::Term, callback: ast::Term) -> Result<ast:
     }
 }
 
-fn lower_variadic_inline_call(
+fn lower_exec_term(
     ctx: &mut ctx::Context,
-    lambda: ast::Lambda,
-    args: Vec<ast::Arg>,
+    term: ast::Term,
     hoisted: &mut VecDeque<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<Vec<BlockItem>, Error> {
-    let Some(expansion) = expand_variadic_lambda(lambda, args)? else {
-        return Err(error::new(
-            Code::HIR,
-            "cannot execute variadic function: not all fixed args have been provided",
-            Span::unknown(),
-        ));
-    };
-
-    let mut lowered_items = Vec::new();
-    for item in expansion.items {
-        lowered_items.extend(lower_block_item(ctx, item, hoisted, variadic_functions)?);
-    }
-    Ok(lowered_items)
-}
-
-struct VariadicExpansion {
-    fixed: HashMap<String, ast::Term>,
-    variadic_name: String,
-    variadic_terms: Vec<ast::Term>,
-}
-
-fn expand_variadic_lambda(
-    lambda: ast::Lambda,
-    args: Vec<ast::Arg>,
-) -> Result<Option<ast::Block>, Error> {
-    let Some(variadic_index) = lambda
-        .params
-        .items
-        .iter()
-        .position(|item| matches!(item.kind, ast::SigKind::Variadic))
-    else {
-        return Ok(None);
-    };
-    let fixed_count = lambda.params.items.len().saturating_sub(1);
-    if args.len() < fixed_count {
-        return Ok(None);
-    }
-
-    let suffix_count = lambda.params.items.len().saturating_sub(variadic_index + 1);
-    let variadic_count = args.len() - fixed_count;
-    let mut fixed = HashMap::new();
-
-    for (param, arg) in lambda
-        .params
-        .items
-        .iter()
-        .take(variadic_index)
-        .zip(args.iter())
-    {
-        fixed.insert(param.name.clone(), arg.term.clone());
-    }
-
-    let suffix_arg_start = args.len() - suffix_count;
-    for (param, arg) in lambda
-        .params
-        .items
-        .iter()
-        .skip(variadic_index + 1)
-        .zip(args.iter().skip(suffix_arg_start))
-    {
-        fixed.insert(param.name.clone(), arg.term.clone());
-    }
-
-    let variadic_name = lambda.params.items[variadic_index].name.clone();
-    let variadic_terms = args
-        .iter()
-        .skip(variadic_index)
-        .take(variadic_count)
-        .map(|arg| arg.term.clone())
-        .collect();
-    let expansion = VariadicExpansion {
-        fixed,
-        variadic_name,
-        variadic_terms,
-    };
-
-    Ok(Some(substitute_block(lambda.body, &expansion)))
-}
-
-fn substitute_block(block: ast::Block, expansion: &VariadicExpansion) -> ast::Block {
-    ast::Block {
-        items: block
-            .items
-            .into_iter()
-            .map(|item| substitute_block_item(item, expansion))
-            .collect(),
-        span: block.span,
-    }
-}
-
-fn substitute_block_item(item: ast::BlockItem, expansion: &VariadicExpansion) -> ast::BlockItem {
-    match item {
-        ast::BlockItem::Ident(ident) => ast::BlockItem::Ident(substitute_ident(ident, expansion)),
-        ast::BlockItem::Lambda(lambda) => {
-            ast::BlockItem::Lambda(substitute_lambda(lambda, expansion))
-        }
-        ast::BlockItem::ScopeCapture {
-            params,
-            continuation,
-            term,
-            span,
-        } => ast::BlockItem::ScopeCapture {
-            params,
-            continuation: substitute_block(continuation, expansion),
-            term: substitute_term(term, expansion),
-            span,
-        },
-        ast::BlockItem::IdentDef { name, ident, span } => ast::BlockItem::IdentDef {
-            name,
-            ident: substitute_ident(ident, expansion),
-            span,
-        },
-        ast::BlockItem::FunctionDef { name, lambda, span } => ast::BlockItem::FunctionDef {
-            name,
-            lambda: substitute_lambda(lambda, expansion),
-            span,
-        },
-        other => other,
-    }
-}
-
-fn substitute_lambda(lambda: ast::Lambda, expansion: &VariadicExpansion) -> ast::Lambda {
-    ast::Lambda {
-        params: lambda.params,
-        body: substitute_block(lambda.body, expansion),
-        args: substitute_args(lambda.args, expansion),
-        span: lambda.span,
-    }
-}
-
-fn substitute_term(term: ast::Term, expansion: &VariadicExpansion) -> ast::Term {
-    match term {
-        ast::Term::Ident(ident) if ident.args.is_empty() => expansion
-            .fixed
-            .get(&ident.name)
-            .cloned()
-            .unwrap_or(ast::Term::Ident(ident)),
-        ast::Term::Ident(ident) => ast::Term::Ident(substitute_ident(ident, expansion)),
-        ast::Term::Lambda(lambda) => ast::Term::Lambda(substitute_lambda(lambda, expansion)),
-        other => other,
-    }
-}
-
-fn substitute_ident(ident: ast::Ident, expansion: &VariadicExpansion) -> ast::Ident {
-    ast::Ident {
-        name: ident.name,
-        args: substitute_args(ident.args, expansion),
-        span: ident.span,
-    }
-}
-
-fn substitute_args(args: Vec<ast::Arg>, expansion: &VariadicExpansion) -> Vec<ast::Arg> {
-    let mut substituted = Vec::new();
-    for arg in args {
-        if arg.name.is_none() {
-            if let ast::Term::Ident(ident) = &arg.term {
-                if ident.args.is_empty() && ident.name == expansion.variadic_name {
-                    substituted.extend(expansion.variadic_terms.iter().cloned().map(|term| {
-                        ast::Arg {
-                            name: None,
-                            span: term.span(),
-                            term,
-                        }
-                    }));
-                    continue;
-                }
-            }
-        }
-        substituted.push(ast::Arg {
-            name: arg.name,
-            term: substitute_term(arg.term, expansion),
-            span: arg.span,
-        });
-    }
-    substituted
+    let span = term.span();
+    lower_exec(ctx, term, span, hoisted)
 }
 
 fn lower_exec(
     ctx: &mut ctx::Context,
     term: ast::Term,
+    span: Span,
     hoisted: &mut VecDeque<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<Vec<BlockItem>, Error> {
     if let ast::Term::Ident(ident) = &term {
-        if let Some(lambda) = variadic_functions.get(&ident.name) {
-            return lower_variadic_inline_call(
-                ctx,
-                lambda.clone(),
-                ident.args.clone(),
-                hoisted,
-                variadic_functions,
-            );
+        if !ident.args.is_empty() {
+            if let Some(target) = ctx.get(&ident.name) {
+                if matches!(target.kind, SigKind::Str) {
+                    return lower_str_exec(ctx, ident.clone(), hoisted);
+                }
+                if matches!(target.kind, SigKind::Bytes) {
+                    return lower_bytes_exec(ctx, ident.clone(), hoisted);
+                }
+            }
         }
     }
 
@@ -633,34 +442,248 @@ fn lower_exec(
             let ast::Ident { name, args, .. } = ast_ident;
             ensure_builtin_reference(ctx, &name, hoisted)?;
             maybe_capture_name(ctx, &name)?;
-            let (target, args) = resolve_target(
-                ctx,
-                &name,
-                args,
-                hoisted,
-                &mut lowered_items,
-                variadic_functions,
-            )?;
+            let is_comptime = ctx
+                .get(&name)
+                .is_some_and(|target| target_has_comptime_params(ctx, target));
+            let (target, args) = resolve_target(ctx, &name, args, hoisted, &mut lowered_items)?;
             ensure_exec_args_complete(ctx, &target, args.len())?;
             let of = emit_closure_for_term(ctx, &target.name, &mut lowered_items, &mut emitted);
             let args = args
                 .into_iter()
                 .map(|arg| emit_closure_for_term(ctx, &arg, &mut lowered_items, &mut emitted))
                 .collect();
-            Exec { of, args }
+            Exec {
+                of,
+                args,
+                is_comptime,
+                span,
+            }
         }
         ast::Term::Lambda(lambda) => {
-            let target_name =
-                lower_lambda_term(ctx, lambda, hoisted, &mut lowered_items, variadic_functions)?;
+            let target_name = lower_lambda_term(ctx, lambda, hoisted, &mut lowered_items)?;
+            let is_comptime = ctx
+                .get(&target_name)
+                .is_some_and(|target| target_has_comptime_params(ctx, target));
             let of = emit_closure_for_term(ctx, &target_name, &mut lowered_items, &mut emitted);
-            Exec { of, args: vec![] }
+            Exec {
+                of,
+                args: vec![],
+                is_comptime,
+                span,
+            }
         }
         other => unreachable!("expected exec term, got {:?}", other),
     };
-    // Builtins like sprintf and write rely on the AIR-level FFI bridge
-    // so continuations and variadic arguments are resolved consistently later.
+    // Backend operations such as write keep their continuations explicit in AIR.
     lowered_items.push(BlockItem::Exec(exec));
     Ok(lowered_items)
+}
+
+fn target_has_comptime_params(ctx: &ctx::Context, target: &ContextEntry) -> bool {
+    let mut targets = HashSet::new();
+    target_or_closure_has_comptime_params(ctx, target, &mut targets)
+}
+
+fn target_or_closure_has_comptime_params(
+    ctx: &ctx::Context,
+    target: &ContextEntry,
+    targets: &mut HashSet<String>,
+) -> bool {
+    if !targets.insert(target.name.clone()) {
+        return false;
+    }
+    let mut visited = HashSet::new();
+    if signature::signature_from_kind(&target.kind, ctx, &mut visited)
+        .is_some_and(|signature| signature.items.iter().any(|item| item.is_comptime))
+    {
+        return true;
+    }
+    ctx.closure_defs
+        .get(&target.name)
+        .and_then(|closure| ctx.get(&closure.of))
+        .is_some_and(|target| target_or_closure_has_comptime_params(ctx, target, targets))
+}
+
+fn lower_bytes_exec(
+    ctx: &mut ctx::Context,
+    value: ast::Ident,
+    hoisted: &mut VecDeque<BlockItem>,
+) -> Result<Vec<BlockItem>, Error> {
+    let inspector = &value.args[0].term;
+    let length_is_comptime = inspector_param_is_comptime(ctx, inspector, 0);
+    let length_builtin = ctx.new_name_for("bytes_len");
+    ctx::register_internal_builtin(
+        ctx,
+        &length_builtin,
+        builtins::Builtin::BytesLen,
+        length_is_comptime.then_some(1),
+        value.span,
+    )?;
+    hoisted.push_back(BlockItem::Import {
+        label: length_builtin.clone(),
+        path: if length_is_comptime {
+            "__bytes_len_comptime"
+        } else {
+            "__bytes_len"
+        }
+        .to_string(),
+    });
+    lower_descriptor_exec(
+        ctx,
+        value,
+        DescriptorExec {
+            type_name: "bytes",
+            length_name_hint: "bytes_len",
+            length_builtin,
+            nth_builtin: "@bytes_nth".to_string(),
+        },
+        hoisted,
+    )
+}
+
+fn lower_str_exec(
+    ctx: &mut ctx::Context,
+    value: ast::Ident,
+    hoisted: &mut VecDeque<BlockItem>,
+) -> Result<Vec<BlockItem>, Error> {
+    lower_descriptor_exec(
+        ctx,
+        value,
+        DescriptorExec {
+            type_name: "str",
+            length_name_hint: "str_rune_len",
+            length_builtin: "@str_rune_len".to_string(),
+            nth_builtin: "@str_rune_nth".to_string(),
+        },
+        hoisted,
+    )
+}
+
+struct DescriptorExec<'a> {
+    type_name: &'a str,
+    length_name_hint: &'a str,
+    length_builtin: String,
+    nth_builtin: String,
+}
+
+fn lower_descriptor_exec(
+    ctx: &mut ctx::Context,
+    mut value: ast::Ident,
+    descriptor: DescriptorExec<'_>,
+    hoisted: &mut VecDeque<BlockItem>,
+) -> Result<Vec<BlockItem>, Error> {
+    if value.args.len() != 1 {
+        return Err(error::new(
+            Code::HIR,
+            format!(
+                "a {} executes with exactly one inspector",
+                descriptor.type_name
+            ),
+            value.span,
+        ));
+    }
+
+    let inspector = value.args.remove(0).term;
+    let length_is_comptime = inspector_param_is_comptime(ctx, &inspector, 0);
+    let span = value.span;
+    let value_term = ast::Term::Ident(value);
+    let length_name = ctx.new_name_for(descriptor.length_name_hint);
+    let nth = ast::Term::Ident(ast::Ident {
+        name: descriptor.nth_builtin,
+        args: vec![ast_arg(value_term.clone())],
+        span,
+    });
+    let inspect = append_term_args(
+        inspector,
+        vec![
+            ast::Term::Ident(ast::Ident {
+                name: length_name.clone(),
+                args: Vec::new(),
+                span,
+            }),
+            nth,
+        ],
+    )?;
+    let continuation_item = match inspect {
+        ast::Term::Ident(ident) => ast::BlockItem::Ident(ident),
+        ast::Term::Lambda(lambda) => ast::BlockItem::Lambda(lambda),
+        ast::Term::Lit(_) => {
+            return Err(error::new(
+                Code::HIR,
+                format!("a {} inspector must be callable", descriptor.type_name),
+                span,
+            ));
+        }
+    };
+    let scope_capture = ast::BlockItem::ScopeCapture {
+        params: ast::Signature {
+            items: vec![ast::SigItem {
+                name: length_name,
+                kind: ast::SigKind::Ident(ast::SigIdent {
+                    name: "uint".to_string(),
+                    span,
+                }),
+                is_comptime: length_is_comptime,
+                span,
+            }],
+            span,
+            generics: BTreeSet::new(),
+        },
+        continuation: ast::Block {
+            items: vec![continuation_item],
+            span,
+        },
+        term: ast::Term::Ident(ast::Ident {
+            name: descriptor.length_builtin,
+            args: vec![ast_arg(value_term)],
+            span,
+        }),
+        span,
+    };
+    lower_block_item(ctx, scope_capture, hoisted)
+}
+
+fn inspector_param_is_comptime(ctx: &ctx::Context, inspector: &ast::Term, index: usize) -> bool {
+    match inspector {
+        ast::Term::Ident(ident) => ctx
+            .get(&ident.name)
+            .and_then(|entry| {
+                let mut seen = HashSet::new();
+                signature::signature_from_kind(&entry.kind, ctx, &mut seen)
+            })
+            .is_some_and(|signature| {
+                signature
+                    .items
+                    .get(ident.args.len() + index)
+                    .is_some_and(|item| item.is_comptime)
+            }),
+        ast::Term::Lambda(lambda) => lambda
+            .params
+            .items
+            .get(index)
+            .is_some_and(|item| item.is_comptime),
+        ast::Term::Lit(_) => false,
+    }
+}
+
+fn append_term_args(mut term: ast::Term, args: Vec<ast::Term>) -> Result<ast::Term, Error> {
+    let target_args = match &mut term {
+        ast::Term::Ident(ident) => &mut ident.args,
+        ast::Term::Lambda(lambda) => &mut lambda.args,
+        ast::Term::Lit(_) => {
+            return Err(error::new(Code::HIR, "value is not callable", term.span()));
+        }
+    };
+    target_args.extend(args.into_iter().map(ast_arg));
+    Ok(term)
+}
+
+fn ast_arg(term: ast::Term) -> ast::Arg {
+    ast::Arg {
+        name: None,
+        span: term.span(),
+        term,
+    }
 }
 
 fn lower_closure(
@@ -669,7 +692,6 @@ fn lower_closure(
     ident: ast::Ident,
     hoisted: &mut VecDeque<BlockItem>,
     lowered_items: &mut Vec<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<Closure, Error> {
     ensure_builtin_reference(ctx, &ident.name, hoisted)?;
     maybe_capture_name(ctx, &ident.name)?;
@@ -678,14 +700,7 @@ fn lower_closure(
         args: ast_args,
         ..
     } = ident;
-    let (target, args) = resolve_target(
-        ctx,
-        &target_name,
-        ast_args,
-        hoisted,
-        lowered_items,
-        variadic_functions,
-    )?;
+    let (target, args) = resolve_target(ctx, &target_name, ast_args, hoisted, lowered_items)?;
 
     Ok(Closure {
         name,
@@ -699,29 +714,13 @@ fn lower_lambda_term(
     lambda: ast::Lambda,
     hoisted: &mut VecDeque<BlockItem>,
     lowered_items: &mut Vec<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<String, Error> {
     let ast_args = lambda.args.clone(); // This is because I cheated to keep the AST simpler and made the lambda contain the args...
 
     let contextual_name = ctx.new_name();
-    lower_function(
-        ctx,
-        contextual_name.clone(),
-        None,
-        lambda,
-        hoisted,
-        false,
-        variadic_functions,
-    )?;
+    lower_function(ctx, contextual_name.clone(), None, lambda, hoisted, false)?;
 
-    let (target, args) = resolve_target(
-        ctx,
-        &contextual_name,
-        ast_args,
-        hoisted,
-        lowered_items,
-        variadic_functions,
-    )?;
+    let (target, args) = resolve_target(ctx, &contextual_name, ast_args, hoisted, lowered_items)?;
 
     let target_name = target.name.clone();
 
@@ -747,18 +746,10 @@ fn lower_arg(
     type_ctx: LowerArgTypeContext,
     hoisted: &mut VecDeque<BlockItem>,
     lowered_items: &mut Vec<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<String, Error> {
     let span = term.span();
-    lower_arg_inner(
-        ctx,
-        term,
-        type_ctx,
-        hoisted,
-        lowered_items,
-        variadic_functions,
-    )
-    .map_err(|error| error.with_span(span))
+    lower_arg_inner(ctx, term, type_ctx, hoisted, lowered_items)
+        .map_err(|error| error.with_span(span))
 }
 
 fn lower_arg_inner(
@@ -767,7 +758,6 @@ fn lower_arg_inner(
     type_ctx: LowerArgTypeContext,
     hoisted: &mut VecDeque<BlockItem>,
     lowered_items: &mut Vec<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<String, Error> {
     if let ast::Term::Ident(ident) = &term {
         ensure_builtin_reference(ctx, &ident.name, hoisted)?;
@@ -785,14 +775,8 @@ fn lower_arg_inner(
             ensure_builtin_reference(ctx, &ast_ident.name, hoisted)?;
             maybe_capture_name(ctx, &ast_ident.name)?;
 
-            let (target, args) = resolve_target(
-                ctx,
-                &ast_ident.name,
-                ast_ident.args,
-                hoisted,
-                lowered_items,
-                variadic_functions,
-            )?;
+            let (target, args) =
+                resolve_target(ctx, &ast_ident.name, ast_ident.args, hoisted, lowered_items)?;
 
             if args.is_empty() {
                 target.name
@@ -815,9 +799,7 @@ fn lower_arg_inner(
             });
             new_name
         }
-        ast::Term::Lambda(lambda) => {
-            lower_lambda_term(ctx, lambda, hoisted, lowered_items, variadic_functions)?
-        }
+        ast::Term::Lambda(lambda) => lower_lambda_term(ctx, lambda, hoisted, lowered_items)?,
     };
 
     let mut seen = HashSet::new();
@@ -854,7 +836,6 @@ fn resolve_target(
     ast_args: Vec<ast::Arg>,
     hoisted: &mut VecDeque<BlockItem>,
     lowered_items: &mut Vec<BlockItem>,
-    variadic_functions: &HashMap<String, ast::Lambda>,
 ) -> Result<(ContextEntry, Vec<String>), Error> {
     let target: ContextEntry = ctx.get(name).cloned().ok_or_else(|| {
         error::new(
@@ -908,19 +889,12 @@ fn resolve_target(
             active_generics: &active_generics,
             generic_bindings: &mut generic_bindings,
         };
-        lowered.push(lower_arg(
-            ctx,
-            term,
-            type_ctx,
-            hoisted,
-            lowered_items,
-            variadic_functions,
-        )?);
+        lowered.push(lower_arg(ctx, term, type_ctx, hoisted, lowered_items)?);
     }
 
     args.extend(lowered);
     let total_param_count = resolved.signature.items.len() + resolved.target.captures.len();
-    if !resolved.signature.is_variadic() && args.len() > total_param_count {
+    if args.len() > total_param_count {
         return Err(error::new(
             Code::HIR,
             format!(
@@ -1150,8 +1124,11 @@ fn create_named_arg_wrapper(
             items: vec![BlockItem::Exec(Exec {
                 of: target.name.clone(),
                 args: exec_args,
+                is_comptime: false,
+                span: Span::unknown(),
             })],
         },
+        has_comptime_params: false,
     }));
 
     let wrapper_target = ctx.get(&wrapper_name).cloned().ok_or_else(|| {
@@ -1181,16 +1158,7 @@ fn unique_param_name(
 }
 
 fn required_exec_arg_count(signature: &Signature, capture_count: usize) -> usize {
-    let is_variadic = signature
-        .items
-        .iter()
-        .any(|item| matches!(item.kind, SigKind::Variadic));
-    let param_count = if is_variadic {
-        signature.items.len().saturating_sub(1)
-    } else {
-        signature.items.len()
-    };
-    capture_count + param_count
+    capture_count + signature.items.len()
 }
 
 fn ensure_exec_args_complete(
@@ -1237,17 +1205,11 @@ fn maybe_wrap_builtin(
         return Ok(ast::Term::Ident(ident));
     };
 
-    if entry.is_builtin || entry_signature_is_variadic(&entry.kind, ctx) {
+    if entry.is_builtin {
         return new_builtin_wrapper(ctx, ident, signature);
     }
 
     Ok(ast::Term::Ident(ident))
-}
-
-fn entry_signature_is_variadic(kind: &SigKind, ctx: &ctx::Context) -> bool {
-    let mut seen = HashSet::new();
-    signature::signature_from_kind(kind, ctx, &mut seen)
-        .is_some_and(|signature| signature.is_variadic())
 }
 
 fn new_builtin_wrapper(
@@ -1313,10 +1275,6 @@ fn validate_input_type(
     let Some(expected) = expected_param else {
         return Ok(());
     };
-    if matches!(expected.kind, SigKind::Variadic) {
-        return Ok(());
-    }
-
     let normalized_expected = signature::normalize_sig_kind(&expected.kind, ctx);
     ensure_sig_kind_exists(ctx, &normalized_expected, active_generics)?;
 
@@ -1325,9 +1283,19 @@ fn validate_input_type(
     } else {
         false
     };
+    let actual_is_rune = match term {
+        ast::Term::Ident(ident) if ident.args.is_empty() => ctx
+            .get(&ident.name)
+            .map(|entry| signature::normalize_sig_kind(&entry.kind, ctx))
+            .is_some_and(|kind| matches!(kind, SigKind::Rune)),
+        _ => false,
+    };
     let allow_idents = expected.is_comptime
         || expected_is_unit_sig
-        || has_generic_kind(&normalized_expected, active_generics);
+        || has_generic_kind(&normalized_expected, active_generics)
+        || matches!(normalized_expected, SigKind::Bytes | SigKind::Str)
+        || matches!(normalized_expected, SigKind::Rune)
+        || actual_is_rune;
 
     let Some(mut actual) = term_type(ctx, term, allow_idents)? else {
         return Ok(());
@@ -1348,13 +1316,16 @@ fn validate_input_type(
 
     let normalized_actual = signature::normalize_sig_kind(&actual.kind, ctx);
 
+    let mut visiting = HashSet::new();
     if (!expected.is_comptime || actual.is_comptime)
         && kind_matches(
-            &normalized_actual,
-            &normalized_expected,
+            ctx,
+            &actual.kind,
+            &expected.kind,
             actual.is_integer_literal,
             active_generics,
             generic_bindings,
+            &mut visiting,
         )
     {
         return Ok(());
@@ -1445,7 +1416,7 @@ fn term_type(
             ..
         }) => Some(TermType {
             kind: SigKind::F64,
-            is_comptime: false,
+            is_comptime: true,
             is_integer_literal: false,
         }),
         ast::Term::Ident(ast_ident) => {
@@ -1455,6 +1426,17 @@ fn term_type(
                     is_comptime: entry.is_comptime,
                     is_integer_literal: false,
                 })
+            } else if let Some(signature) = remaining_signature_for_ident(ctx, ast_ident) {
+                let kind = SigKind::Sig(signature.clone());
+                if has_generic_kind(&kind, &signature.generics) {
+                    None
+                } else {
+                    Some(TermType {
+                        kind,
+                        is_comptime: true,
+                        is_integer_literal: false,
+                    })
+                }
             } else {
                 None
             }
@@ -1475,6 +1457,36 @@ fn term_type(
     })
 }
 
+fn remaining_signature_for_ident(ctx: &ctx::Context, ident: &ast::Ident) -> Option<Signature> {
+    if ident.args.is_empty() {
+        return None;
+    }
+
+    let mut signature = signature::resolve_target_signature(&ident.name, ctx)?;
+    let mut assigned = HashSet::new();
+    for arg in &ident.args {
+        let index = if let Some(name) = &arg.name {
+            signature
+                .items
+                .iter()
+                .position(|param| !param.name.is_empty() && param.name == *name)?
+        } else {
+            first_unassigned_param(signature.items.len(), &assigned)?
+        };
+        if !assigned.insert(index) {
+            return None;
+        }
+    }
+
+    signature.items = signature
+        .items
+        .into_iter()
+        .enumerate()
+        .filter_map(|(index, item)| (!assigned.contains(&index)).then_some(item))
+        .collect();
+    Some(signature)
+}
+
 fn lower_lit(lit: ast::Lit) -> Lit {
     match lit {
         ast::Lit::Str(value) => Lit::Str(value),
@@ -1484,11 +1496,13 @@ fn lower_lit(lit: ast::Lit) -> Lit {
 }
 
 fn kind_matches(
+    ctx: &ctx::Context,
     actual: &SigKind,
     expected: &SigKind,
     actual_is_integer_literal: bool,
     active_generics: &BTreeSet<String>,
     generic_bindings: &mut HashMap<String, SigKind>,
+    visiting: &mut HashSet<(SigKind, SigKind)>,
 ) -> bool {
     if expected == actual {
         return true;
@@ -1503,61 +1517,106 @@ fn kind_matches(
         }
     }
 
-    match expected {
-        SigKind::Byte | SigKind::UInt | SigKind::FixedInt(_) if actual_is_integer_literal => true,
-        SigKind::F64 if actual_is_integer_literal => true,
-        SigKind::Sig(expected_sig) => {
-            let SigKind::Sig(actual_sig) = actual else {
-                return false;
-            };
-            if actual_sig.items.len() != expected_sig.items.len() {
-                return false;
-            }
-            for (actual_item, expected_item) in
-                actual_sig.items.iter().zip(expected_sig.items.iter())
-            {
-                if !kind_matches(
-                    &actual_item.kind,
-                    &expected_item.kind,
-                    false,
+    let pair = (actual.clone(), expected.clone());
+    if !visiting.insert(pair.clone()) {
+        return true;
+    }
+
+    let is_match = match expected {
+        SigKind::Ident(ident) => ctx
+            .get(&ident.name)
+            .filter(|entry| entry.kind != *expected)
+            .is_some_and(|entry| {
+                kind_matches(
+                    ctx,
+                    actual,
+                    &entry.kind,
+                    actual_is_integer_literal,
                     active_generics,
                     generic_bindings,
-                ) || !comptime_matches(actual_item.is_comptime, expected_item.is_comptime)
-                {
-                    return false;
-                }
-            }
+                    visiting,
+                )
+            }),
+        _ if matches!(actual, SigKind::Ident(_)) => {
+            let SigKind::Ident(ident) = actual else {
+                unreachable!()
+            };
+            ctx.get(&ident.name)
+                .filter(|entry| entry.kind != *actual)
+                .is_some_and(|entry| {
+                    kind_matches(
+                        ctx,
+                        &entry.kind,
+                        expected,
+                        actual_is_integer_literal,
+                        active_generics,
+                        generic_bindings,
+                        visiting,
+                    )
+                })
+        }
+        SigKind::Byte | SigKind::UInt | SigKind::Rune | SigKind::FixedInt(_)
+            if actual_is_integer_literal =>
+        {
             true
+        }
+        SigKind::F64 if actual_is_integer_literal => true,
+        SigKind::Sig(expected_sig) => {
+            if let SigKind::Sig(actual_sig) = actual {
+                actual_sig.items.len() == expected_sig.items.len()
+                    && actual_sig.items.iter().zip(&expected_sig.items).all(
+                        |(actual_item, expected_item)| {
+                            kind_matches(
+                                ctx,
+                                &actual_item.kind,
+                                &expected_item.kind,
+                                false,
+                                active_generics,
+                                generic_bindings,
+                                visiting,
+                            ) && comptime_matches(
+                                actual_item.is_comptime,
+                                expected_item.is_comptime,
+                            )
+                        },
+                    )
+            } else {
+                false
+            }
         }
         SigKind::GenericInst {
             name: expected_name,
             args: expected_args,
         } => {
-            let SigKind::GenericInst {
+            if let SigKind::GenericInst {
                 name: actual_name,
                 args: actual_args,
             } = actual
-            else {
-                return false;
-            };
-            if expected_name != actual_name || expected_args.len() != actual_args.len() {
-                return false;
+            {
+                expected_name == actual_name
+                    && expected_args.len() == actual_args.len()
+                    && actual_args
+                        .iter()
+                        .zip(expected_args)
+                        .all(|(actual_arg, expected_arg)| {
+                            kind_matches(
+                                ctx,
+                                actual_arg,
+                                expected_arg,
+                                false,
+                                active_generics,
+                                generic_bindings,
+                                visiting,
+                            )
+                        })
+            } else {
+                false
             }
-            for (actual_arg, expected_arg) in actual_args.iter().zip(expected_args.iter()) {
-                if !kind_matches(
-                    actual_arg,
-                    expected_arg,
-                    false,
-                    active_generics,
-                    generic_bindings,
-                ) {
-                    return false;
-                }
-            }
-            true
         }
         _ => false,
-    }
+    };
+    visiting.remove(&pair);
+    is_match
 }
 
 fn has_generic_kind(kind: &SigKind, active_generics: &BTreeSet<String>) -> bool {
@@ -1602,9 +1661,8 @@ fn comptime_matches(actual: bool, expected: bool) -> bool {
 }
 
 fn format_kind_with_comptime(kind: &SigKind, is_comptime: bool) -> String {
-    let supports_comptime = kind.supports_comptime();
     let kind = format_hir::format_sig_kind(kind);
-    if is_comptime && supports_comptime {
+    if is_comptime {
         format!("{kind}!")
     } else {
         kind
@@ -1623,6 +1681,17 @@ fn validate_integer_literal(term: &ast::Term, expected: &SigKind) -> Result<(), 
     let (name, min, max) = match expected {
         SigKind::Byte => ("byte".to_string(), 0_i128, 255_i128),
         SigKind::UInt => ("uint".to_string(), 0_i128, u64::MAX as i128),
+        SigKind::Rune => {
+            let value = *value as i128;
+            if (0..=0x10ffff).contains(&value) && !(0xd800..=0xdfff).contains(&value) {
+                return Ok(());
+            }
+            return Err(error::new(
+                Code::HIR,
+                format!("rune literal must be a Unicode scalar value, found {value}"),
+                Span::unknown(),
+            ));
+        }
         SigKind::FixedInt(kind) => {
             let bit_width = kind.bit_width;
             let (min, max) = match kind.interpretation {

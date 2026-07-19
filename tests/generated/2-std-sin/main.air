@@ -1,0 +1,124 @@
+_111_main():
+    @exit($_112: int = 0)
+
+
+_111_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_111_main)
+
+
+_111_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_111_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_108_main($result: f64):
+    $_111_main = @newclosure<>(_111_main)
+    @write($_109: str = "sin ok\n", $_111_main)
+
+
+_108_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $result = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_108_main, $result: f64)
+
+
+_108_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_108_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+__rgo_7374642f6d617468__sin($radians: f64, $ok: ()):
+    @sin_f64($radians: f64, $ok)
+
+
+__rgo_7374642f6d617468__sin_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $radians = @field($__env_end, -2)
+    $ok = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(__rgo_7374642f6d617468__sin, $radians: f64, $ok: ())
+
+
+__rgo_7374642f6d617468__sin_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f6d617468__sin_release_skip_1, $__num_remaining, 0)
+    $__rgo_7374642f6d617468__sin_release_field_1 = @field($__env_end, -1)
+    @dropclosure($__rgo_7374642f6d617468__sin_release_field_1)
+__rgo_7374642f6d617468__sin_release_skip_1:
+    @release($__env_end)
+    @return()
+
+
+__rgo_7374642f6d617468__sin_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(__rgo_7374642f6d617468__sin_deepcopy_skip_1, $num_remaining, 0)
+    @deepcopy($__rgo_7374642f6d617468__sin_deepcopy_field_1, $__env_end, -1)
+__rgo_7374642f6d617468__sin_deepcopy_skip_1:
+    @return()
+
+
+_106_main($value: f64):
+    $_108_main = @newclosure<f64>(_108_main)
+    @jumpargs(__rgo_7374642f6d617468__sin, $value: f64, $_108_main: ())
+
+
+_106_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_106_main, $value: f64)
+
+
+_106_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_106_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+main():
+    $_106_main = @newclosure<f64>(_106_main)
+    @jumpargs(__rgo_7374642f6d617468__sin, $_104: f64 = 1, $_106_main: ())
+
+
+main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(main)
+
+
+main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_start():
+    @jumpargs(main)
+

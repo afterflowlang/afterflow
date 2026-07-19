@@ -1,0 +1,5 @@
+std: /std
+
+main: () {
+    std.end(42, @exit(0))
+}

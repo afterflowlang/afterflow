@@ -4,6 +4,7 @@ use std::io::Cursor;
 use std::path::{Component, Path, PathBuf};
 
 use crate::compiler::ast;
+use crate::compiler::builtins;
 use crate::compiler::error::{Code, Error, Source};
 use crate::compiler::lexer::Lexer;
 use crate::compiler::parser::Parser;
@@ -27,12 +28,16 @@ struct Module {
 }
 
 pub fn load(entry_path: &Path, target: &str) -> Result<Project, Error> {
+    let entry_path = entry_path.canonicalize()?;
     let project_root = entry_path
         .parent()
         .ok_or_else(|| source_error("entry source must have a containing folder"))?
         .canonicalize()?;
+    let is_test = is_test_source(&entry_path);
     let mut loader = Loader {
         project_root: project_root.clone(),
+        entry_path,
+        is_test,
         visiting: Vec::new(),
         loaded: HashSet::new(),
         modules: Vec::new(),
@@ -55,8 +60,20 @@ pub fn load(entry_path: &Path, target: &str) -> Result<Project, Error> {
             (module.path.clone(), names)
         })
         .collect::<HashMap<PathBuf, HashMap<String, String>>>();
-
-    let target = declarations
+    let public_declarations = loader
+        .modules
+        .iter()
+        .map(|module| {
+            let names = module
+                .declarations
+                .iter()
+                .filter(|(_, source)| !is_private_source(source))
+                .map(|(name, _)| (name.clone(), qualify(&project_root, &module.path, name)))
+                .collect();
+            (module.path.clone(), names)
+        })
+        .collect::<HashMap<PathBuf, HashMap<String, String>>>();
+    let target = public_declarations
         .get(&project_root)
         .and_then(|names| names.get(target))
         .cloned()
@@ -64,8 +81,14 @@ pub fn load(entry_path: &Path, target: &str) -> Result<Project, Error> {
     let mut items = Vec::new();
     let sources = loader.sources;
     for module in loader.modules {
-        rewrite_module(&project_root, module, &declarations, &mut items)
-            .map_err(|error| attach_source(error, &sources))?;
+        rewrite_module(
+            &project_root,
+            module,
+            &declarations,
+            &public_declarations,
+            &mut items,
+        )
+        .map_err(|error| attach_source(error, &sources))?;
     }
     let (functions, mut non_functions): (Vec<_>, Vec<_>) = items
         .into_iter()
@@ -80,6 +103,8 @@ pub fn load(entry_path: &Path, target: &str) -> Result<Project, Error> {
 
 struct Loader {
     project_root: PathBuf,
+    entry_path: PathBuf,
+    is_test: bool,
     visiting: Vec<PathBuf>,
     loaded: HashSet<PathBuf>,
     modules: Vec<Module>,
@@ -108,6 +133,8 @@ impl Loader {
         let module = read_module(
             &self.project_root,
             &path,
+            &self.entry_path,
+            self.is_test && path == self.project_root,
             &mut self.next_offset,
             &mut self.sources,
         )?;
@@ -136,6 +163,8 @@ impl Loader {
 fn read_module(
     project_root: &Path,
     path: &Path,
+    entry_path: &Path,
+    include_tests: bool,
     next_offset: &mut usize,
     sources: &mut Vec<Source>,
 ) -> Result<Module, Error> {
@@ -149,13 +178,14 @@ fn read_module(
         .filter_map(|entry| entry.ok().map(|entry| entry.path()))
         .filter(|path| {
             path.is_file()
-                && path.extension().and_then(|extension| extension.to_str()) == Some("rgo")
+                && path.extension().and_then(|extension| extension.to_str()) == Some("af")
+                && (include_tests || !is_test_source(path))
         })
         .collect::<Vec<_>>();
     paths.sort();
     if paths.is_empty() {
         return Err(source_error(format!(
-            "source folder '{}' contains no .rgo files",
+            "source folder '{}' contains no .af files",
             path.display()
         )));
     }
@@ -178,6 +208,7 @@ fn read_module(
             let mut items = Vec::new();
             while let Some(item) = parser.next_block_item()? {
                 reject_root_execution(&item)?;
+                validate_builtin_override(&item, &file_path, entry_path)?;
                 if let Some(name) = declaration_name(&item) {
                     if let Some(previous) = bindings.insert(name.to_string(), file_path.clone()) {
                         return Err(Error::new(
@@ -257,9 +288,15 @@ fn resolve_import(project_root: &Path, import: &str, span: Span) -> Result<PathB
             }
         }
     }
-    let resolved = project_root
-        .join(relative)
+    let project_path = project_root.join(&relative);
+    let resolved = project_path
         .canonicalize()
+        .or_else(|project_error| {
+            bundled_library_root()
+                .join(&relative)
+                .canonicalize()
+                .map_err(|_| project_error)
+        })
         .map_err(|error| {
             Error::new(
                 Code::Io,
@@ -267,7 +304,7 @@ fn resolve_import(project_root: &Path, import: &str, span: Span) -> Result<PathB
                 span,
             )
         })?;
-    if !resolved.starts_with(project_root) {
+    if !resolved.starts_with(project_root) && !resolved.starts_with(bundled_library_root()) {
         return Err(Error::new(
             Code::Resolve,
             format!("source import '{import}' escapes the project root"),
@@ -281,6 +318,7 @@ fn rewrite_module(
     project_root: &Path,
     module: Module,
     declarations: &HashMap<PathBuf, HashMap<String, String>>,
+    public_declarations: &HashMap<PathBuf, HashMap<String, String>>,
     output: &mut Vec<ast::BlockItem>,
 ) -> Result<(), Error> {
     let qualified = declarations
@@ -303,13 +341,15 @@ fn rewrite_module(
         let sibling_names = module
             .declarations
             .iter()
-            .filter(|(_, owner)| *owner != &file.path)
+            .filter(|(_, owner)| {
+                *owner != &file.path && (is_test_source(&file.path) || !is_test_source(owner))
+            })
             .map(|(name, _)| name.clone())
             .collect::<HashSet<_>>();
         let mut state = RewriteState {
             project_root,
             file_path: &file.path,
-            declarations,
+            public_declarations,
             owners: &module.declarations,
             qualified,
             available: sibling_names,
@@ -345,7 +385,7 @@ fn rewrite_module(
 struct RewriteState<'a> {
     project_root: &'a Path,
     file_path: &'a Path,
-    declarations: &'a HashMap<PathBuf, HashMap<String, String>>,
+    public_declarations: &'a HashMap<PathBuf, HashMap<String, String>>,
     owners: &'a BTreeMap<String, PathBuf>,
     qualified: &'a HashMap<String, String>,
     available: HashSet<String>,
@@ -564,7 +604,7 @@ impl RewriteState<'_> {
                 ));
             }
             return self
-                .declarations
+                .public_declarations
                 .get(module_path)
                 .and_then(|names| names.get(parts[1]))
                 .cloned()
@@ -598,6 +638,18 @@ impl RewriteState<'_> {
                 span,
             ));
         }
+        if !is_test_source(self.file_path)
+            && self
+                .owners
+                .get(name)
+                .is_some_and(|owner| is_test_source(owner))
+        {
+            return Err(Error::new(
+                Code::Resolve,
+                format!("`{name}` is only available to _test.af sources"),
+                span,
+            ));
+        }
         Ok(name.to_string())
     }
 }
@@ -615,10 +667,51 @@ fn declaration_name(item: &ast::BlockItem) -> Option<&str> {
     }
 }
 
+fn validate_builtin_override(
+    item: &ast::BlockItem,
+    source_path: &Path,
+    entry_path: &Path,
+) -> Result<(), Error> {
+    let Some(name) = declaration_name(item).filter(|name| name.starts_with('@')) else {
+        return Ok(());
+    };
+    if source_path != entry_path || !is_test_source(source_path) {
+        return Err(Error::new(
+            Code::Parse,
+            "builtin overrides are only allowed in the selected _test.af entry source",
+            item.span(),
+        ));
+    }
+    let builtin = name.trim_start_matches('@');
+    if builtins::function_from_name(builtin).is_none() {
+        return Err(Error::new(
+            Code::Resolve,
+            format!("only callable builtins can be overridden; '@{builtin}' is not callable"),
+            item.span(),
+        ));
+    }
+    if !matches!(item, ast::BlockItem::IdentDef { ident, .. } if ident.args.is_empty()) {
+        return Err(Error::new(
+            Code::Parse,
+            format!("builtin override '@{builtin}' must alias a function"),
+            item.span(),
+        ));
+    }
+    Ok(())
+}
+
+fn is_private_source(path: &Path) -> bool {
+    path.file_name()
+        .is_some_and(|name| name.as_encoded_bytes().starts_with(b"_"))
+}
+
+fn is_test_source(path: &Path) -> bool {
+    path.file_name()
+        .is_some_and(|name| name.as_encoded_bytes().ends_with(b"_test.af"))
+}
+
 fn qualify(project_root: &Path, module_path: &Path, name: &str) -> String {
-    let relative = module_path
-        .strip_prefix(project_root)
-        .unwrap_or(module_path);
+    let relative = module_relative(project_root, module_path);
     if relative.as_os_str().is_empty() {
         return name.to_string();
     }
@@ -632,8 +725,21 @@ fn qualify(project_root: &Path, module_path: &Path, name: &str) -> String {
 }
 
 fn display_module(project_root: &Path, path: &Path) -> String {
-    let relative = path.strip_prefix(project_root).unwrap_or(path);
+    let relative = module_relative(project_root, path);
     format!("/{}", relative.display())
+}
+
+fn bundled_library_root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("compiler manifest must be inside the repository")
+        .join("lib")
+}
+
+fn module_relative<'a>(project_root: &'a Path, path: &'a Path) -> &'a Path {
+    path.strip_prefix(project_root)
+        .or_else(|_| path.strip_prefix(bundled_library_root()))
+        .unwrap_or(path)
 }
 
 fn reject_root_execution(item: &ast::BlockItem) -> Result<(), Error> {
@@ -677,7 +783,5 @@ fn relative_path(project_root: &Path, path: &Path) -> PathBuf {
     {
         return relative.to_path_buf();
     }
-    path.strip_prefix(project_root)
-        .unwrap_or(path)
-        .to_path_buf()
+    module_relative(project_root, path).to_path_buf()
 }

@@ -1,0 +1,12 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+foo: (ok:(())){
+    ok(@exit(0))
+}
+main: () {
+    foo((ok:()) {
+        fmt.new("result: %", @exit(1), fmt.int(1) fmt.end, @write(ok: ok))
+    })
+}

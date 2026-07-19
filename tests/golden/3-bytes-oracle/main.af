@@ -1,0 +1,40 @@
+str: @str
+bytes: @bytes
+uint: @uint
+u8: @u8
+b8: @b8
+
+unexpected: (u8) {
+    @exit(1)
+}
+
+inspect: (ok: (), l: uint, nth: (idx: uint, empty: (), one: (u8))) {
+    @eq_uint(l, 4, () {
+        (value: u8) = nth(2, @exit(1))
+        (value_bits: b8) = @b8_from_u8(value)
+        (expected_bits: b8) = @b8_from_u8(120)
+        @eq_b8(
+            value_bits,
+            expected_bits,
+            () {
+                nth(4, () {
+                    @write("bytes ok\n", ok)
+                }, unexpected)
+            },
+            @exit(1)
+        )
+    }, @exit(1))
+}
+
+main: () {
+    (value: bytes) = @bytes_from_str("text")
+    labelled: value inspect(@exit(0))
+    value((l: uint, nth: (uint, (), (u8))) {
+        @eq_uint(l, 4, () {
+            (first: u8) = nth(0, @exit(1))
+            (first_bits: b8) = @b8_from_u8(first)
+            (expected_bits: b8) = @b8_from_u8(116)
+            @eq_b8(first_bits, expected_bits, labelled, @exit(1))
+        }, @exit(1))
+    })
+}

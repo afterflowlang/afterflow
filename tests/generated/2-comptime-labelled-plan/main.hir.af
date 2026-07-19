@@ -1,0 +1,15 @@
+int: @int
+build: (value: int!, run:(int)){
+    _2: 1
+    @add(value, _2, run)
+}
+_5_main: (_1_build: int){
+    @exit(_1_build)
+}
+
+main: (){
+    _3: 2
+    q: build(_3)
+    q(_5_main)
+}
+main()

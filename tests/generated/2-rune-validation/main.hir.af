@@ -1,0 +1,71 @@
+str: @str
+rune: @rune
+u32: @u32
+_2_print: (ok:()){
+    _3: " valid\n"
+    @write(_3, ok)
+}
+
+print: (label: str!, value: u32, ok:()){
+    _4_print: _2_print(ok)
+    @write(label, _4_print)
+}
+literal_roundtrip: (value: rune!, ok:(u32)){
+    @u32_from_rune(value, ok)
+}
+_10_unexpected: (){
+    _11: 1
+    @exit(_11)
+}
+
+_7_unexpected: (scalar: u32){
+    _8: "unexpected"
+    print(_8, scalar, _10_unexpected)
+}
+
+unexpected: (value: rune){
+    @u32_from_rune(value, _7_unexpected)
+}
+_22_main: (){
+    _23: 1
+    @exit(_23)
+}
+_37_main: (){
+    _38: 0
+    @exit(_38)
+}
+
+_34_main: (){
+    _35: 1114112
+    @rune_from_u32(_35, _37_main, unexpected)
+}
+
+_31_main: (){
+    _32: 55296
+    @rune_from_u32(_32, _34_main, unexpected)
+}
+
+_28_main: (roundtrip: u32){
+    _29: "runtime"
+    print(_29, roundtrip, _31_main)
+}
+
+_26_main: (value: rune){
+    @u32_from_rune(value, _28_main)
+}
+
+_19_main: (){
+    _20: 128512
+    @rune_from_u32(_20, _22_main, _26_main)
+}
+
+_16_main: (literal: u32){
+    _17: "literal"
+    print(_17, literal, _19_main)
+}
+
+main: (){
+    _14: 128512
+    literal_roundtrip(_14, _16_main)
+}
+main()

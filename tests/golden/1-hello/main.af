@@ -1,0 +1,7 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+main: () {
+    fmt.new("Hello, world!\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+}

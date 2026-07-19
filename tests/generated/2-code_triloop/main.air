@@ -14,7 +14,7 @@ baz_deep_release($env_end: int):
     $__num_remaining = @field($__env_end, 5)
     @gt(baz_release_skip_0, $__num_remaining, 0)
     $baz_release_field_0 = @field($__env_end, -1)
-    @callptr($baz_release_field_0)
+    @dropclosure($baz_release_field_0)
 baz_release_skip_0:
     @release($__env_end)
     @return()
@@ -45,7 +45,7 @@ bar_deep_release($env_end: int):
     $__num_remaining = @field($__env_end, 5)
     @gt(bar_release_skip_0, $__num_remaining, 0)
     $bar_release_field_0 = @field($__env_end, -1)
-    @callptr($bar_release_field_0)
+    @dropclosure($bar_release_field_0)
 bar_release_skip_0:
     @release($__env_end)
     @return()

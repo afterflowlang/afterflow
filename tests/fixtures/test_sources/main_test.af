@@ -1,0 +1,12 @@
+std: /std
+support: /support
+
+discard: (message: @str, ok: ()) {
+    std.end(message, ok)
+}
+
+@write: discard
+
+main: () {
+    emit(support.finish)
+}

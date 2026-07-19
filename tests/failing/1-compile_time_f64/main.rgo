@@ -1,5 +1,0 @@
-f64: @f64
-
-main: (value: f64!) {
-    @exit(0)
-}

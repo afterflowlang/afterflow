@@ -1,0 +1,17 @@
+math: /std/math
+
+main: () {
+    math.cos(0.0, (cosine: @f64) {
+        math.sqrt(9.0, (root: @f64) {
+            math.ldexp(0.5, 4, (scaled: @f64) {
+                math.pow(2.0, scaled, (power: @f64) {
+                    math.log(power, 2.0, (logarithm: @f64) {
+                        math.ln(logarithm, (natural_logarithm: @f64) {
+                            @write("math functions ok\n", @exit(0))
+                        })
+                    })
+                })
+            })
+        })
+    })
+}

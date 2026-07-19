@@ -91,7 +91,21 @@ impl<R: BufRead> Parser<R> {
                 // Must be an exec
                 self.peeked.push_front(ident); // restore token to attempt exec parse
             }
-            TokenKind::Builtin(_) => {}
+            TokenKind::Builtin(name) => {
+                let builtin = self.bump()?;
+                if matches!(self.peek_token()?.kind, TokenKind::Colon) {
+                    if self.block_depth != 0 {
+                        return Err(Error::new(
+                            Code::Parse,
+                            "builtin overrides are only allowed at the file root",
+                            span,
+                        ));
+                    }
+                    self.bump()?;
+                    return self.parse_bind(format!("@{name}"), span);
+                }
+                self.peeked.push_front(builtin);
+            }
             TokenKind::LParen => {
                 return self.parse_lambda_or_scope_capture();
             }
@@ -100,6 +114,10 @@ impl<R: BufRead> Parser<R> {
         }
 
         let term = self.parse_value(None)?;
+        self.block_item_from_exec_term(term)
+    }
+
+    fn block_item_from_exec_term(&self, term: Term) -> Result<BlockItem, Error> {
         match term {
             Term::Lit(literal) => Err(Error::new(
                 Code::Parse,
@@ -216,17 +234,14 @@ impl<R: BufRead> Parser<R> {
                 let brace = self.expect_token("{", |kind| matches!(kind, TokenKind::LBrace))?;
                 let body = self.parse_body(brace.span)?;
                 self.expect_token("}", |kind| matches!(kind, TokenKind::RBrace))?;
-                let mut args = Vec::new();
-                while matches!(self.peek_token()?.kind, TokenKind::LParen) {
-                    self.bump()?;
-                    args.extend(self.parse_argument_list()?);
-                }
-                Ok(BlockItem::Lambda(Lambda {
+                let term = Term::Lambda(Lambda {
                     params,
                     body,
-                    args,
+                    args: Vec::new(),
                     span: brace.span,
-                }))
+                });
+                let term = self.parse_application_suffixes(term)?;
+                self.block_item_from_exec_term(term)
             }
 
             _ => Err(Error::new(
@@ -238,27 +253,15 @@ impl<R: BufRead> Parser<R> {
     }
 
     fn parse_term(&mut self) -> Result<Term, Error> {
-        let mut term = self.parse_head()?;
+        let term = self.parse_head()?;
+        self.parse_application_suffixes(term)
+    }
 
+    fn parse_application_suffixes(&mut self, mut term: Term) -> Result<Term, Error> {
         while matches!(self.peek_token()?.kind, TokenKind::LParen) {
             let lparen = self.bump()?; // consume '('
             let args = self.parse_argument_list()?;
-
-            match &mut term {
-                Term::Ident(ident) => {
-                    ident.args.extend(args);
-                }
-                Term::Lambda(lambda) => {
-                    lambda.args.extend(args);
-                }
-                _ => {
-                    return Err(Error::new(
-                        Code::Parse,
-                        "expected identifier or lambda before argument list",
-                        lparen.span,
-                    ));
-                }
-            }
+            Self::append_args(&mut term, args, lparen.span)?;
         }
 
         Ok(term)
@@ -274,19 +277,25 @@ impl<R: BufRead> Parser<R> {
                 term: argument,
                 span,
             };
-            match &mut term {
-                Term::Ident(ident) => ident.args.push(arg),
-                Term::Lambda(lambda) => lambda.args.push(arg),
-                Term::Lit(_) => {
-                    return Err(Error::new(
-                        Code::Parse,
-                        "expected identifier or lambda before whitespace application",
-                        term.span(),
-                    ));
-                }
-            }
+            let term_span = term.span();
+            Self::append_args(&mut term, vec![arg], term_span)?;
         }
         Ok(term)
+    }
+
+    fn append_args(term: &mut Term, args: Vec<ast::Arg>, span: Span) -> Result<(), Error> {
+        match term {
+            Term::Ident(ident) => ident.args.extend(args),
+            Term::Lambda(lambda) => lambda.args.extend(args),
+            Term::Lit(_) => {
+                return Err(Error::new(
+                    Code::Parse,
+                    "expected identifier or lambda before argument list",
+                    span,
+                ));
+            }
+        }
+        Ok(())
     }
 
     fn consume_value_whitespace(&mut self, newline_boundary: Option<usize>) -> Result<bool, Error> {
@@ -349,7 +358,6 @@ impl<R: BufRead> Parser<R> {
         }
     }
 
-    // parse_head parses primary terms: literals, variables, and lambdas before any curried args.
     fn parse_head(&mut self) -> Result<Term, Error> {
         self.skip_newlines()?;
         let token = self.bump()?;
@@ -382,7 +390,7 @@ impl<R: BufRead> Parser<R> {
                 token.span,
             )),
             TokenKind::LParen => {
-                // ( ... ) { ... } → lambda with params
+                // (parameters) { body } → lambda with params
                 self.peeked.push_front(token.clone());
                 let params = self.parse_params(ParamContext::Lambda)?;
                 let brace = self.expect_token("{", |kind| matches!(kind, TokenKind::LBrace))?;
@@ -652,7 +660,6 @@ impl<R: BufRead> Parser<R> {
                 "source packages are only valid as file-root namespace bindings",
                 span,
             )),
-            TokenKind::Ellipsis => Ok(SigKind::Variadic),
             _ => Err(Error::new(Code::Parse, "expected a type", span)),
         }
     }
@@ -874,6 +881,18 @@ mod tests {
     use std::io::Cursor;
 
     #[test]
+    fn parse_accepts_every_registered_builtin() {
+        for name in builtins::registered_names() {
+            let source = format!("value: @{name}");
+            let mut parser = Parser::new(Lexer::new(Cursor::new(source)));
+            parser
+                .next_block_item()
+                .unwrap_or_else(|error| panic!("registered builtin '@{name}' failed: {error}"))
+                .unwrap_or_else(|| panic!("registered builtin '@{name}' produced no item"));
+        }
+    }
+
+    #[test]
     fn parse_body_rejects_empty_block() {
         let mut parser = Parser::new(Lexer::new(Cursor::new("{}")));
         let brace = parser
@@ -1033,5 +1052,30 @@ mod tests {
             panic!("expected value argument");
         };
         assert_eq!(value.name, "value");
+    }
+
+    #[test]
+    fn type_bang_marks_scalar_and_callable_parameters() {
+        let source = "new: (source: @str, invalid: ()!, args: arg!, run: (calculation)){ run }";
+        let mut parser = Parser::new(Lexer::new(Cursor::new(source)));
+        let item = parser
+            .next_block_item()
+            .expect("function should parse")
+            .expect("function should exist");
+        let BlockItem::FunctionDef { lambda, .. } = item else {
+            panic!("expected function definition");
+        };
+        assert!(!lambda.params.items[0].is_comptime);
+        assert!(lambda.params.items[1].is_comptime);
+        assert!(lambda.params.items[2].is_comptime);
+        assert!(!lambda.params.items[3].is_comptime);
+    }
+
+    #[test]
+    fn call_bang_is_not_source_syntax() {
+        let source = "main: (){ q!() }";
+        let mut parser = Parser::new(Lexer::new(Cursor::new(source)));
+
+        assert!(parser.next_block_item().is_err());
     }
 }

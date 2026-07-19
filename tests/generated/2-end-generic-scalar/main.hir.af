@@ -1,0 +1,29 @@
+__rgo_737464__end: (_2___rgo_737464__end: T, ok:()){
+    ok()
+}
+
+__rgo_737464__pipe: (value: T, ok:(T)){
+    ok(value)
+}
+__rgo_737464__print: (value: str, ok:()){
+    @write(value, ok)
+}
+_5___rgo_737464__println: (ok:()){
+    _6: "\n"
+    @write(_6, ok)
+}
+
+__rgo_737464__println: (value: str, ok:()){
+    _7___rgo_737464__println: _5___rgo_737464__println(ok)
+    @write(value, _7___rgo_737464__println)
+}
+_10_main: (){
+    _11: 0
+    @exit(_11)
+}
+
+main: (){
+    _8: 42
+    __rgo_737464__end(_8, _10_main)
+}
+main()

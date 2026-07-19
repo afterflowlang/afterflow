@@ -89,10 +89,10 @@ main():
     $_11_main = @newclosure<>(_11_main)
     @eq_int(eq_int__3_main_true_0_0, $_0: int = 1, $_1: int = 0)
 eq_int__11_main_false_0_0:
-    @release($_3_main)
+    @dropclosure($_3_main)
     @jumpclosure($_11_main)
 eq_int__3_main_true_0_0:
-    @release($_11_main)
+    @dropclosure($_11_main)
     @jumpclosure($_3_main)
 
 

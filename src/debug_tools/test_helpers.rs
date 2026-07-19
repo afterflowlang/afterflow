@@ -15,7 +15,6 @@ pub fn generate_hir_block_items(path: &Path, target: &str) -> Result<Vec<hir::Bl
     crate::compiler::predeclare_package(&mut ctx, &project.items)
         .map_err(|error| source::attach_source(error, &sources))?;
     let mut lowerer = hir::Lowerer::new();
-    lowerer.register_package_functions(&project.items);
     let mut items = Vec::new();
 
     for item in project.items {
@@ -48,11 +47,15 @@ pub fn generate_air_functions(items: &[hir::BlockItem]) -> Result<Vec<air::AirFu
     let mut functions = Vec::new();
     let mut entry_items = Vec::new();
     let mut hir_functions = HashMap::new();
+    let mut builtin_aliases = HashMap::new();
 
     for item in items {
         match item {
             hir::BlockItem::Import { label, path } => {
                 symbol::register_builtin_import(label, path, &mut symbols)?;
+                if let Some(builtin) = crate::compiler::builtins::function_from_name(path) {
+                    builtin_aliases.insert(label.clone(), builtin);
+                }
             }
             hir::BlockItem::SigDef { name, sig } => {
                 symbols.install_type(name.to_string(), air::SigKind::Sig(sig.clone()))?;
@@ -66,6 +69,7 @@ pub fn generate_air_functions(items: &[hir::BlockItem]) -> Result<Vec<air::AirFu
     }
 
     if !entry_items.is_empty() {
+        crate::compiler::comptime::rewrite(&mut hir_functions, &mut entry_items, &builtin_aliases)?;
         let mut function_lowerer = air::FunctionLowerer::new(hir_functions);
         let entry_funcs = air::entry_function(entry_items, &mut symbols, &mut function_lowerer)?;
         let mut generated = function_lowerer.take_generated_functions();

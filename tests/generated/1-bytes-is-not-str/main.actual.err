@@ -1,0 +1,4 @@
+[hir] expected str, found bytes
+tests/failing/1-bytes-is-not-str/main.af:10
+        consume(value)
+                ^^^^^

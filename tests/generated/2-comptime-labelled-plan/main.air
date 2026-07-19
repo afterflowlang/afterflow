@@ -1,0 +1,46 @@
+_5_main($_1_build: int):
+    @exit($_1_build: int)
+
+
+_5_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $_1_build = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_5_main, $_1_build: int)
+
+
+_5_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_5_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+main():
+    @jumpargs(_5_main, $__comptime_0: int = 3)
+
+
+main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(main)
+
+
+main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_start():
+    @jumpargs(main)
+

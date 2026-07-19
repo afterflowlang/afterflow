@@ -1,0 +1,20 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+new_point: (x:int, y:int, ok: (int, int)){
+    ok(x, y)
+}
+ok_exit: (){
+    @exit(0)
+}
+p_handle: (x: int, y: int){
+    fmt.new("got: %, %\n", @exit(1), fmt.int(x) fmt.int(y) fmt.end, @write(ok: ok_exit))
+}
+foo: (p:((int, int))){
+    p(p_handle)
+}
+p: new_point(1, 2)
+main: () {
+    foo(p)
+}

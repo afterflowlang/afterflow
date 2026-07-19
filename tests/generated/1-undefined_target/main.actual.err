@@ -1,4 +1,4 @@
 [hir] `foo` is not defined
-tests/failing/1-undefined_target/main.rgo:8
+tests/failing/1-undefined_target/main.af:2
     foo()
     ^^^

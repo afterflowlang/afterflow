@@ -1,7 +1,7 @@
 [
     Import {
-        label: "stdout",
-        path: "/stdout",
+        label: "fmt",
+        path: "/std/fmt",
         span: ,
     },
     IdentDef {
@@ -54,6 +54,236 @@
         },
         span: ,
     },
+    SigDef {
+        name: "chain",
+        sig: Signature {
+            items: [
+                SigItem {
+                    name: "",
+                    kind: Sig(
+                        Signature {
+                            items: [
+                                SigItem {
+                                    name: "",
+                                    kind: Ident(
+                                        SigIdent {
+                                            name: "chain",
+                                            span: ,
+                                        },
+                                    ),
+                                    is_comptime: false,
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                            generics: {},
+                        },
+                    ),
+                    is_comptime: false,
+                    span: ,
+                },
+                SigItem {
+                    name: "",
+                    kind: Sig(
+                        Signature {
+                            items: [],
+                            span: ,
+                            generics: {},
+                        },
+                    ),
+                    is_comptime: false,
+                    span: ,
+                },
+            ],
+            span: ,
+            generics: {},
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "done",
+        lambda: Lambda {
+            params: Signature {
+                items: [
+                    SigItem {
+                        name: "",
+                        kind: Sig(
+                            Signature {
+                                items: [
+                                    SigItem {
+                                        name: "",
+                                        kind: Ident(
+                                            SigIdent {
+                                                name: "chain",
+                                                span: ,
+                                            },
+                                        ),
+                                        is_comptime: false,
+                                        span: ,
+                                    },
+                                ],
+                                span: ,
+                                generics: {},
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                    SigItem {
+                        name: "done_case",
+                        kind: Sig(
+                            Signature {
+                                items: [],
+                                span: ,
+                                generics: {},
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                ],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "done_case",
+                            args: [],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "unexpected",
+        lambda: Lambda {
+            params: Signature {
+                items: [
+                    SigItem {
+                        name: "",
+                        kind: Ident(
+                            SigIdent {
+                                name: "chain",
+                                span: ,
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                ],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "@exit",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Lit(
+                                        Literal {
+                                            value: Int(
+                                                1,
+                                            ),
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
+    FunctionDef {
+        name: "accept",
+        lambda: Lambda {
+            params: Signature {
+                items: [
+                    SigItem {
+                        name: "value",
+                        kind: Ident(
+                            SigIdent {
+                                name: "chain",
+                                span: ,
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                    SigItem {
+                        name: "ok",
+                        kind: Sig(
+                            Signature {
+                                items: [],
+                                span: ,
+                                generics: {},
+                            },
+                        ),
+                        is_comptime: false,
+                        span: ,
+                    },
+                ],
+                span: ,
+                generics: {},
+            },
+            body: Block {
+                items: [
+                    Ident(
+                        Ident {
+                            name: "value",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "unexpected",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "ok",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
+                            span: ,
+                        },
+                    ),
+                ],
+                span: ,
+            },
+            args: [],
+            span: ,
+        },
+        span: ,
+    },
     FunctionDef {
         name: "identity",
         lambda: Lambda {
@@ -78,7 +308,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "stdout.printf",
+                            name: "fmt.new",
                             args: [
                                 Arg {
                                     name: None,
@@ -103,8 +333,57 @@
                                                     term: Lit(
                                                         Literal {
                                                             value: Int(
-                                                                0,
+                                                                1,
                                                             ),
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "fmt.end",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "@write",
+                                            args: [
+                                                Arg {
+                                                    name: Some(
+                                                        "ok",
+                                                    ),
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "@exit",
+                                                            args: [
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Lit(
+                                                                        Literal {
+                                                                            value: Int(
+                                                                                0,
+                                                                            ),
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                            ],
                                                             span: ,
                                                         },
                                                     ),
@@ -140,7 +419,7 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "stdout.printf",
+                            name: "fmt.new",
                             args: [
                                 Arg {
                                     name: None,
@@ -165,8 +444,57 @@
                                                     term: Lit(
                                                         Literal {
                                                             value: Int(
-                                                                0,
+                                                                1,
                                                             ),
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "fmt.end",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "@write",
+                                            args: [
+                                                Arg {
+                                                    name: Some(
+                                                        "ok",
+                                                    ),
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "@exit",
+                                                            args: [
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Lit(
+                                                                        Literal {
+                                                                            value: Int(
+                                                                                0,
+                                                                            ),
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                            ],
                                                             span: ,
                                                         },
                                                     ),
@@ -202,8 +530,31 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "hello",
-                            args: [],
+                            name: "accept",
+                            args: [
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "done",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                                Arg {
+                                    name: None,
+                                    term: Ident(
+                                        Ident {
+                                            name: "hello",
+                                            args: [],
+                                            span: ,
+                                        },
+                                    ),
+                                    span: ,
+                                },
+                            ],
                             span: ,
                         },
                     ),

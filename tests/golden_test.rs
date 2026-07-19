@@ -2,6 +2,7 @@ use std::fs;
 use std::io::{Cursor, Write};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::OnceLock;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use compiler::compiler::error::{self, Code, Error};
@@ -103,7 +104,7 @@ fn assert_complexity_prefix(name: &str, dir: &Path) {
 }
 
 fn entry_source_path(dir: &Path) -> Option<PathBuf> {
-    let main_path = dir.join("main.rgo");
+    let main_path = dir.join("main.af");
     if main_path.exists() {
         return Some(main_path);
     }
@@ -112,7 +113,7 @@ fn entry_source_path(dir: &Path) -> Option<PathBuf> {
         .expect("test directory should exist")
         .filter_map(|entry| {
             let path = entry.ok()?.path();
-            if path.is_file() && path.extension().and_then(|ext| ext.to_str()) == Some("rgo") {
+            if path.is_file() && path.extension().and_then(|ext| ext.to_str()) == Some("af") {
                 Some(path)
             } else {
                 None
@@ -124,7 +125,7 @@ fn entry_source_path(dir: &Path) -> Option<PathBuf> {
         [] => None,
         [path] => Some(path.clone()),
         _ => panic!(
-            "{} contains multiple .rgo files; add main.rgo to choose the entrypoint",
+            "{} contains multiple .af files; add main.af to choose the entrypoint",
             dir.display()
         ),
     }
@@ -236,7 +237,7 @@ fn write_artifacts(
         &artifacts.parser_output,
     )?;
     fs::write(
-        out_dir.join(format!("{stem}.hir.rgo")),
+        out_dir.join(format!("{stem}.hir.af")),
         &artifacts.normalized_hir,
     )?;
     fs::write(out_dir.join(format!("{stem}.air")), &artifacts.air)?;
@@ -284,24 +285,39 @@ fn verify_expected_runtime_outputs(tests_dir: &Path, bin_dir: &Path) {
         let bin_path = bin_dir.join(&test.name);
         let mut ld_cmd = Command::new("ld");
         ld_cmd
-            .arg("-dynamic-linker")
-            .arg("/lib64/ld-linux-x86-64.so.2")
-            .arg("-lc")
-            .arg(&obj_path)
-            .arg("-o")
-            .arg(&bin_path);
+            .arg("--gc-sections")
+            .arg("--strip-debug")
+            .arg(&obj_path);
+        let assembly =
+            fs::read_to_string(&asm_path).expect("generated assembly should be readable");
+        let mut archives = Vec::new();
+        if assembly.contains("extern freestanding_format_") {
+            archives.push(freestanding_format_archive());
+        }
+        if assembly.contains("extern freestanding_math_") {
+            archives.push(freestanding_math_archive());
+        }
+        for archive in &archives {
+            ld_cmd.arg(archive);
+        }
+        ld_cmd.arg("-o").arg(&bin_path);
+        let archive_args = archives
+            .iter()
+            .map(|archive| format!(" {}", archive.display()))
+            .collect::<String>();
         run_command(
             &mut ld_cmd,
             &format!(
-                "ld -dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc {} -o {}",
+                "ld --gc-sections --strip-debug {}{} -o {}",
                 obj_path.display(),
+                archive_args,
                 bin_path.display()
             ),
         );
 
         let mut run_cmd = Command::new(&bin_path);
         log_breadcrumb(
-            "v1-golden-run",
+            "compile-direct-golden-run",
             &format!("test={} command={}", test.name, bin_path.display()),
         );
         let output = run_cmd
@@ -328,6 +344,30 @@ fn verify_expected_runtime_outputs(tests_dir: &Path, bin_dir: &Path) {
             test.name
         );
     }
+}
+
+fn freestanding_math_archive() -> &'static Path {
+    static ARCHIVE: OnceLock<PathBuf> = OnceLock::new();
+    ARCHIVE.get_or_init(|| freestanding_archive("freestanding-math", "libfreestanding_math.a"))
+}
+
+fn freestanding_format_archive() -> &'static Path {
+    static ARCHIVE: OnceLock<PathBuf> = OnceLock::new();
+    ARCHIVE.get_or_init(|| freestanding_archive("freestanding-format", "libfreestanding_format.a"))
+}
+
+fn freestanding_archive(package: &str, filename: &str) -> PathBuf {
+    let repo_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .expect("compiler package should have a workspace root");
+    let mut cmd = Command::new("cargo");
+    cmd.current_dir(repo_root)
+        .arg("build")
+        .arg("-p")
+        .arg(package)
+        .arg("--release");
+    run_command(&mut cmd, &format!("cargo build -p {package} --release"));
+    repo_root.join("target/release").join(filename)
 }
 
 fn parse_hex_output(path: &Path) -> Vec<u8> {
@@ -415,7 +455,7 @@ fn reject_root_execution(item: &compiler::compiler::ast::BlockItem) -> Result<()
 }
 
 fn run_command(cmd: &mut Command, description: &str) {
-    log_breadcrumb("v1-command-start", description);
+    log_breadcrumb("compile-direct-command-start", description);
     let output = cmd
         .output()
         .unwrap_or_else(|err| panic!("{description} failed to start: {err}"));
@@ -431,7 +471,7 @@ fn run_command(cmd: &mut Command, description: &str) {
 }
 
 fn capture_compile_failure_output(cmd: &mut Command, description: &str) -> String {
-    log_breadcrumb("v1-command-start", description);
+    log_breadcrumb("compile-direct-command-start", description);
     let output = cmd
         .output()
         .unwrap_or_else(|err| panic!("{description} failed to start: {err}"));

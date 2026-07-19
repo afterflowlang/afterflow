@@ -1,0 +1,13 @@
+f64: @f64
+
+accept: (value: f64!, run: (f64)) {
+    run(value)
+}
+
+main: () {
+    accept(1.5, (value: f64) {
+        @add_f64(value, 0.0, (@f64) {
+            @write("f64!\n", @exit(0))
+        })
+    })
+}

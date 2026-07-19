@@ -1,9 +1,4 @@
 [
-    Import {
-        label: "stdout",
-        path: "/stdout",
-        span: ,
-    },
     IdentDef {
         name: "uint",
         ident: Ident {
@@ -49,26 +44,15 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "stdout.printf",
+                            name: "@write",
                             args: [
                                 Arg {
                                     name: None,
                                     term: Lit(
                                         Literal {
                                             value: Str(
-                                                "uint %lu\n",
+                                                "uint 42\n",
                                             ),
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "value",
-                                            args: [],
                                             span: ,
                                         },
                                     ),

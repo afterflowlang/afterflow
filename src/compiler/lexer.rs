@@ -108,21 +108,7 @@ impl<R: BufRead> Lexer<R> {
                 let dot_count = self.collect_dots(span)?;
                 match dot_count {
                     1 => Token::new(TokenKind::Dot, span),
-                    2 => {
-                        return Err(Error::new(
-                            Code::Lex,
-                            "invalid token: expected '.' or '...'",
-                            span,
-                        ))
-                    }
-                    3 => Token::new(TokenKind::Ellipsis, span),
-                    _ => {
-                        return Err(Error::new(
-                            Code::Lex,
-                            "invalid token: expected '.' or '...'",
-                            span,
-                        ))
-                    }
+                    _ => return Err(Error::new(Code::Lex, "invalid token: expected '.'", span)),
                 }
             }
             '+' => Token::new(TokenKind::Plus, span),
@@ -199,10 +185,10 @@ impl<R: BufRead> Lexer<R> {
             if ch == '.' {
                 count += 1;
 
-                if count > 3 {
+                if count > 1 {
                     return Err(Error::new(
                         Code::Lex,
-                        "too many dots (maximum is 3)",
+                        "too many dots (maximum is 1)",
                         start_span,
                     ));
                 }
@@ -426,9 +412,30 @@ impl<R: BufRead> Lexer<R> {
                 self.column = 1;
                 Ok(Some(('\n', span)))
             }
-            _ => {
+            0..=0x7f => {
                 self.column += 1;
                 Ok(Some((byte as char, span)))
+            }
+            _ => {
+                let width = match byte {
+                    0xc2..=0xdf => 2,
+                    0xe0..=0xef => 3,
+                    0xf0..=0xf4 => 4,
+                    _ => return Err(invalid_utf8_source()),
+                };
+                let mut encoded = [0_u8; 4];
+                encoded[0] = byte;
+                for slot in encoded.iter_mut().take(width).skip(1) {
+                    let (continuation, _) = self.read_byte()?.ok_or_else(invalid_utf8_source)?;
+                    *slot = continuation;
+                }
+                let value = std::str::from_utf8(&encoded[..width])
+                    .map_err(|_| invalid_utf8_source())?
+                    .chars()
+                    .next()
+                    .ok_or_else(invalid_utf8_source)?;
+                self.column += 1;
+                Ok(Some((value, span)))
             }
         }
     }
@@ -470,4 +477,8 @@ impl<R: BufRead> Lexer<R> {
     fn io_error(&self, err: io::Error) -> Error {
         Error::new(Code::Io, err.to_string(), self.current_span())
     }
+}
+
+fn invalid_utf8_source() -> io::Error {
+    io::Error::new(io::ErrorKind::InvalidData, "source is not valid UTF-8")
 }

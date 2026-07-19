@@ -1,0 +1,15 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+print_summary: (name: str, count: int, ok: ()) {
+    fmt.new(
+        "😀 %, count %, 100%%\n",
+        @compile_error("invalid format", @exit(1)),
+        fmt.str(name) fmt.int(count) fmt.end, @write(ok: ok)
+    )
+}
+
+main: () {
+    print_summary("Alice", 42, @exit(0))
+}

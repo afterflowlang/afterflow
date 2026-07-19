@@ -1,0 +1,20 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+point: (x:int, y:int)
+// This is a struct function
+new_point: (x:int, y:int, ok:point){
+    ok(x, y)
+}
+bar: (p:(point)){ // This might not be a struct function
+    (x:int, y:int) = p
+    fmt.new("x: %, y: %", @exit(1), fmt.int(x) fmt.int(y) fmt.end, @write(ok: @exit(0)))
+}
+foo: (){
+    p: new_point(1, 2)
+    bar(p)
+}
+main: () {
+    foo()
+}

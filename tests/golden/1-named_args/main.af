@@ -1,0 +1,9 @@
+fmt: /std/fmt
+str: @str
+
+foo: (a: str, b: str){
+    fmt.new("% %", @exit(1), fmt.str(a) fmt.str(b) fmt.end, @write(ok: @exit(0)))
+}
+main: () {
+    foo(b: "world", a: "hello")
+}

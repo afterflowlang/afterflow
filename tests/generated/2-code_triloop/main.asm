@@ -1,6 +1,17 @@
 bits 64
 default rel
 section .text
+global release_descriptor_ptr
+release_descriptor_ptr:
+    mov rax, [rdi+16] ; load owned mapping base
+    test rax, rax ; static descriptors have no owner
+    jz release_descriptor_ptr_done
+    mov rsi, [rdi+24] ; mapping size
+    mov rdi, rax ; mapping base
+    mov rax, 11 ; munmap syscall
+    syscall
+release_descriptor_ptr_done:
+    ret
 global baz
 baz:
     push rbp ; save executor frame pointer
@@ -13,7 +24,12 @@ baz:
     mov rsi, [rdi] ; string data pointer
     mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
-    call write ; invoke libc write
+    mov rax, 1 ; write syscall
+    syscall
+    push r12 ; preserve current environment
+    lea rdi, [rel _1] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
     mov r12, [rbp-8] ; load continuation env_end pointer
     mov rax, [r12+0] ; load continuation entry point
     mov rdi, r12 ; pass env_end pointer to continuation
@@ -66,8 +82,11 @@ baz_deep_release:
     jg baz_release_skip_0
     mov rax, [r12-8] ; load baz_release_field_0 env field
     mov [rbp-24], rax ; store value
+    push r12 ; preserve current environment
     mov rdi, [rbp-24] ; load operand
-    call release_heap_ptr ; release heap pointer
+    mov rax, [rdi+8] ; load closure release helper
+    call rax ; recursively release closure
+    pop r12 ; restore current environment
 baz_release_skip_0:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
@@ -145,7 +164,7 @@ baz_deepcopy:
     jg baz_deepcopy_skip_0
     mov rcx, [r12-8] ; load field pointer
     mov rdi, rcx ; copy pointer argument for deepcopy
-    call deepcopy_heap_ptr ; duplicate heap pointer
+    call deepcopy_heap_ptr ; duplicate owned pointer
     mov [r12-8], rax ; store duplicated pointer
     mov [rbp-24], rax ; store value
 baz_deepcopy_skip_0:
@@ -164,7 +183,12 @@ bar:
     mov rsi, [rdi] ; string data pointer
     mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
-    call write ; invoke libc write
+    mov rax, 1 ; write syscall
+    syscall
+    push r12 ; preserve current environment
+    lea rdi, [rel _0] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
     mov r12, [rbp-8] ; load continuation env_end pointer
     mov rax, [r12+0] ; load continuation entry point
     mov rdi, r12 ; pass env_end pointer to continuation
@@ -201,8 +225,11 @@ bar_deep_release:
     jg bar_release_skip_0
     mov rax, [r12-8] ; load bar_release_field_0 env field
     mov [rbp-24], rax ; store value
+    push r12 ; preserve current environment
     mov rdi, [rbp-24] ; load operand
-    call release_heap_ptr ; release heap pointer
+    mov rax, [rdi+8] ; load closure release helper
+    call rax ; recursively release closure
+    pop r12 ; restore current environment
 bar_release_skip_0:
     mov rdi, r12 ; use pinned __env_end env_end pointer
     call release_heap_ptr ; release __env_end closure environment
@@ -224,7 +251,7 @@ bar_deepcopy:
     jg bar_deepcopy_skip_0
     mov rcx, [r12-8] ; load field pointer
     mov rdi, rcx ; copy pointer argument for deepcopy
-    call deepcopy_heap_ptr ; duplicate heap pointer
+    call deepcopy_heap_ptr ; duplicate owned pointer
     mov [r12-8], rax ; store duplicated pointer
     mov [rbp-24], rax ; store value
 bar_deepcopy_skip_0:
@@ -269,38 +296,7 @@ foo:
     syscall ; allocate env pages
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-8] ; load operand
-    mov r12, rax ; shadow closure env_end pointer
-    push rbx ; save env base pointer
-    mov rbx, r12 ; clone source env_end pointer
-    mov r13, [rbx+24] ; load env size metadata for clone
-    mov r14, [rbx+32] ; load heap size metadata for clone
-    mov r12, rbx ; compute env base pointer for clone
-    sub r12, r13 ; env base pointer for clone source
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags: private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
-    mov r15, rax ; cloned closure env base pointer
-    mov rsi, r12 ; source env base for clone copy
-    mov rdi, r15 ; destination env base for clone copy
-    mov rcx, r14 ; bytes to copy for cloned env
-    cld ; ensure forward copy for env clone
-    rep movsb ; duplicate closure env data
-    mov rbx, r15 ; start from cloned env base
-    add rbx, r13 ; compute cloned env_end pointer
-    mov r12, rbx ; cloned env_end pointer
-    mov rax, [r12+16] ; load deepcopy helper entry point
-    push r12 ; preserve cloned env_end pointer
-    mov rdi, r12 ; pass env_end pointer to deepcopy helper
-    call rax ; deepcopy reference fields
-    pop r12 ; restore cloned env_end pointer
-    mov rax, r12 ; copy closure env_end to rax
-    pop rbx ; restore env base pointer
-    mov [rbx+0], r12 ; capture cloned closure pointer
+    mov [rbx+0], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 8 ; move pointer past env payload
     mov rax, 8 ; store env size metadata
@@ -326,38 +322,7 @@ foo:
     syscall ; allocate env pages
     mov rbx, rax ; closure env base pointer
     mov rax, [rbp-16] ; load operand
-    mov r12, rax ; shadow closure env_end pointer
-    push rbx ; save env base pointer
-    mov rbx, r12 ; clone source env_end pointer
-    mov r13, [rbx+24] ; load env size metadata for clone
-    mov r14, [rbx+32] ; load heap size metadata for clone
-    mov r12, rbx ; compute env base pointer for clone
-    sub r12, r13 ; env base pointer for clone source
-    mov rax, 9 ; mmap syscall
-    xor rdi, rdi ; addr hint for kernel base selection
-    mov rsi, r14 ; length for cloned environment
-    mov rdx, 3 ; prot = read/write
-    mov r10, 34 ; flags: private & anonymous
-    mov r8, -1 ; fd = -1
-    xor r9, r9 ; offset = 0
-    syscall ; allocate cloned env pages
-    mov r15, rax ; cloned closure env base pointer
-    mov rsi, r12 ; source env base for clone copy
-    mov rdi, r15 ; destination env base for clone copy
-    mov rcx, r14 ; bytes to copy for cloned env
-    cld ; ensure forward copy for env clone
-    rep movsb ; duplicate closure env data
-    mov rbx, r15 ; start from cloned env base
-    add rbx, r13 ; compute cloned env_end pointer
-    mov r12, rbx ; cloned env_end pointer
-    mov rax, [r12+16] ; load deepcopy helper entry point
-    push r12 ; preserve cloned env_end pointer
-    mov rdi, r12 ; pass env_end pointer to deepcopy helper
-    call rax ; deepcopy reference fields
-    pop r12 ; restore cloned env_end pointer
-    mov rax, r12 ; copy closure env_end to rax
-    pop rbx ; restore env base pointer
-    mov [rbx+0], r12 ; capture cloned closure pointer
+    mov [rbx+0], rax ; move closure pointer into environment
     mov r12, rbx ; env_end pointer before metadata
     add r12, 8 ; move pointer past env payload
     mov rax, 8 ; store env size metadata
@@ -379,7 +344,12 @@ foo:
     mov rsi, [rdi] ; string data pointer
     mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
-    call write ; invoke libc write
+    mov rax, 1 ; write syscall
+    syscall
+    push r12 ; preserve current environment
+    lea rdi, [rel _2] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
     mov r12, [rbp-24] ; load continuation env_end pointer
     mov rax, [r12+0] ; load continuation entry point
     mov rdi, r12 ; pass env_end pointer to continuation
@@ -463,17 +433,16 @@ _start:
     mov rbp, rsp ; establish new frame base
     leave ; unwind before named jump
     jmp main
-extern write
 section .rodata
 _1:
-    dq _1_data, 4 ; string data pointer and byte length
+    dq _1_data, 4, 0, 0 ; data, byte length, heap base, heap size
 _1_data:
     db "baz,", 0
 _0:
-    dq _0_data, 4 ; string data pointer and byte length
+    dq _0_data, 4, 0, 0 ; data, byte length, heap base, heap size
 _0_data:
     db "bar,", 0
 _2:
-    dq _2_data, 4 ; string data pointer and byte length
+    dq _2_data, 4, 0, 0 ; data, byte length, heap base, heap size
 _2_data:
     db "foo,", 0

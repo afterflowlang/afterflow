@@ -1,4 +1,4 @@
-[hir] expected int, found f64
-tests/failing/1-int_op_float_literal/main.rgo:4
+[hir] expected int, found f64!
+tests/failing/1-int_op_float_literal/main.af:4
     @add(1.5, 2, (res: int){
          ^^^

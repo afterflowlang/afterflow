@@ -1,8 +1,0 @@
-stdout: /stdout
-
-str: @str
-int: @int
-
-main: () {
-    stdout.printf("hello %s\n", "world", @exit(0))
-}

@@ -1,0 +1,24 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+array3: (a:str, b:str, c:str, ok:(len:int, nth:(index:int, one:(str), none:()))){
+    ok(3, (index:int, one:(str), none:()){
+        @eq_int(index, 0, () {one(a)}, () {
+            @eq_int(index, 1, () {one(b)}, () {
+                @eq_int(index, 2, () {one(c)}, none)
+            })
+        })
+    })
+}
+main: () {
+    array3("alice", "bob", "charlie", (len:int, nth:(index:int, one:(str), none:())){
+        fmt.new("array has % elements\n", @exit(1), fmt.int(len) fmt.end, @write(ok: () {
+            nth(1, (s:str){
+                fmt.new("element at index 1 is %\n", @exit(1), fmt.str(s) fmt.end, @write(ok: @exit(0)))
+            }, () {
+                fmt.new("index out of bounds\n", @exit(1), fmt.end, @write(ok: @exit(0)))
+            })
+        }))
+    })
+}

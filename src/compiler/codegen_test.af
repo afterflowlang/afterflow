@@ -1,0 +1,10 @@
+int: @int
+
+foo: (a: int, b: int) {
+    @add(a, b, (n: int){
+        @write("3", @exit(0))
+    })
+}
+main: () {
+    foo(1, 2)
+}

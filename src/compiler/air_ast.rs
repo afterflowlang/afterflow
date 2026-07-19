@@ -14,12 +14,6 @@ impl FunctionSig {
     pub fn param_kinds(&self) -> Vec<SigKind> {
         self.params.iter().map(|item| item.kind.clone()).collect()
     }
-
-    pub fn is_variadic(&self) -> bool {
-        self.params
-            .iter()
-            .any(|param| matches!(param.kind, SigKind::Variadic))
-    }
 }
 
 #[derive(Clone, Debug)]
@@ -146,31 +140,50 @@ pub enum AirOp {
     JumpClosure(AirJumpClosure),
     JumpEqInt(AirJumpEq),
     JumpEqStr(AirJumpEq),
+    JumpEqUInt(AirJumpEq),
+    JumpEqBits(AirJumpEq),
     JumpLt(AirJumpLt),
+    JumpLtUInt(AirJumpLt),
     JumpGt(AirJumpGt),
 
     Add(AirAdd),
+    AddUInt(AirAdd),
     AddBits(AirBinaryBits),
     Sub(AirSub),
+    SubUInt(AirSub),
     SubBits(AirBinaryBits),
     Mul(AirMul),
     MulBits(AirBinaryBits),
     DivInt(AirDivInt),
     DivBits(AirDivBits),
     AddF64(AirAddF64),
+    SubF64(AirSubF64),
     MulF64(AirMulF64),
     DivF64(AirDivF64),
+    NativeCall(AirNativeCall),
     ConvertFixed(AirConvertFixed),
+    RuneFromU32(AirRuneFromU32),
+    U32FromRune(AirU32FromRune),
+    StrRuneLen(AirStrRuneLen),
+    StrRuneNth(AirStrRuneNth),
+    StrFromUtf8(AirStrFromUtf8),
+    BytesLen(AirBytesLen),
+    BytesNth(AirBytesNth),
+    BytesFromStr(AirBytesFromStr),
+    BytesBuild(AirBytesBuild),
+    IntToU8(AirIntToU8),
 
     SysExit(AirSysExit),
 
-    Sprintf(AirSprintf),
     Write(AirWrite),
-    ReadFile(AirReadFile),
+    FileRead(AirFileRead),
 
-    CallPtr(AirCallPtr),
+    DropClosure(AirDropClosure),
     NewClosure(AirNewClosure),
     CloneClosure(AirCloneClosure),
+    CloneDescriptor(AirCloneDescriptor),
+    MoveClosure(AirMoveClosure),
+    DropDescriptor(AirDropDescriptor),
     ReleaseHeap(AirReleaseHeap),
     Pin(AirPin),
     Field(AirField),
@@ -183,6 +196,23 @@ pub struct AirCloneClosure {
     pub src: String,
     pub dst: String,
     pub remaining: Vec<SigKind>, // TODO: Why does it need this?
+}
+
+#[derive(Clone, Debug)]
+pub struct AirMoveClosure {
+    pub src: String,
+    pub dst: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirCloneDescriptor {
+    pub src: String,
+    pub dst: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirDropDescriptor {
+    pub name: String,
 }
 
 #[derive(Clone, Debug)]
@@ -248,6 +278,13 @@ pub struct AirAddF64 {
 }
 
 #[derive(Clone, Debug)]
+pub struct AirSubF64 {
+    pub input_a: AirArg,
+    pub input_b: AirArg,
+    pub target: String,
+}
+
+#[derive(Clone, Debug)]
 pub struct AirMulF64 {
     pub input_a: AirArg,
     pub input_b: AirArg,
@@ -262,6 +299,13 @@ pub struct AirDivF64 {
 }
 
 #[derive(Clone, Debug)]
+pub struct AirNativeCall {
+    pub function: &'static builtins::NativeFunction,
+    pub inputs: Vec<AirArg>,
+    pub target: String,
+}
+
+#[derive(Clone, Debug)]
 pub struct AirConvertFixed {
     pub input: AirArg,
     pub target: String,
@@ -270,16 +314,77 @@ pub struct AirConvertFixed {
 }
 
 #[derive(Clone, Debug)]
-pub struct AirJumpGt {
-    pub left: AirValue,
-    pub right: AirValue,
+pub struct AirRuneFromU32 {
+    pub input: AirArg,
+    pub invalid_target: String,
+    pub ok_target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirU32FromRune {
+    pub input: AirArg,
     pub target: String,
 }
 
 #[derive(Clone, Debug)]
-pub struct AirSprintf {
-    pub args: Vec<AirArg>,
-    pub arg_kinds: Vec<SigKind>,
+pub struct AirStrRuneLen {
+    pub value: AirArg,
+    pub target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirStrRuneNth {
+    pub value: AirArg,
+    pub idx: AirArg,
+    pub empty_target: String,
+    pub one_target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirStrFromUtf8 {
+    pub value: AirArg,
+    pub invalid_target: String,
+    pub ok_target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirBytesLen {
+    pub value: AirArg,
+    pub target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirBytesNth {
+    pub value: AirArg,
+    pub idx: AirArg,
+    pub empty_target: String,
+    pub one_target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirBytesFromStr {
+    pub value: AirArg,
+    pub target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirBytesBuild {
+    pub source: AirArg,
+    pub invalid_target: String,
+    pub ok_target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirIntToU8 {
+    pub value: AirArg,
+    pub invalid_target: String,
+    pub ok_target: String,
+}
+
+#[derive(Clone, Debug)]
+pub struct AirJumpGt {
+    pub left: AirValue,
+    pub right: AirValue,
     pub target: String,
 }
 
@@ -291,7 +396,7 @@ pub struct AirWrite {
 }
 
 #[derive(Clone, Debug)]
-pub struct AirReadFile {
+pub struct AirFileRead {
     pub path: AirArg,
     pub err_target: String,
     pub ok_target: String,
@@ -303,13 +408,8 @@ pub struct AirSysExit {
 }
 
 #[derive(Clone, Debug)]
-pub enum AirCallPtrTarget {
-    Binding(String),
-}
-
-#[derive(Clone, Debug)]
-pub struct AirCallPtr {
-    pub target: AirCallPtrTarget,
+pub struct AirDropClosure {
+    pub name: String,
 }
 
 #[derive(Clone, Debug)]

@@ -1,0 +1,10 @@
+int: @int
+
+build: (value: int!, run: (int)) {
+    @add(value, 1, run)
+}
+
+main: () {
+    q: build(2)
+    q(@exit)
+}

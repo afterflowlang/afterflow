@@ -1,0 +1,139 @@
+str: @str
+bytes: @bytes
+uint: @uint
+u8: @u8
+b8: @b8
+unexpected: (_2_unexpected: u8){
+    _3: 1
+    @exit(_3)
+}
+_10_inspect: (){
+    _11: 1
+    @exit(_11)
+}
+_24_inspect: (ok:()){
+    _25: "bytes ok\n"
+    @write(_25, ok)
+}
+
+_21_inspect: (nth:(uint, (), (u8)), ok:()){
+    _22: 4
+    _26_inspect: _24_inspect(ok)
+    nth(_22, _26_inspect, unexpected)
+}
+
+_29_inspect: (){
+    _30: 1
+    @exit(_30)
+}
+
+_19_inspect: (value_bits: b8, nth:(uint, (), (u8)), ok:(), expected_bits: b8){
+    _27_inspect: _21_inspect(nth, ok)
+    @eq_b8(value_bits, expected_bits, _27_inspect, _29_inspect)
+}
+
+_16_inspect: (nth:(uint, (), (u8)), ok:(), value_bits: b8){
+    _17: 120
+    _32_inspect: _19_inspect(value_bits, nth, ok)
+    @b8_from_u8(_17, _32_inspect)
+}
+
+_14_inspect: (nth:(uint, (), (u8)), ok:(), value: u8){
+    _33_inspect: _16_inspect(nth, ok)
+    @b8_from_u8(value, _33_inspect)
+}
+
+_7_inspect: (nth:(uint, (), (u8)), ok:()){
+    _8: 2
+    _34_inspect: _14_inspect(nth, ok)
+    nth(_8, _10_inspect, _34_inspect)
+}
+_37_inspect: (){
+    _38: 1
+    @exit(_38)
+}
+
+inspect: (ok:(), l: uint, nth:(uint, (), (u8))){
+    _5: 4
+    _35_inspect: _7_inspect(nth, ok)
+    @eq_uint(l, _5, _35_inspect, _37_inspect)
+}
+_44_bytes_len: @__bytes_len
+_49_main_labelled: (){
+    _50: 0
+    @exit(_50)
+}
+_53_main_labelled: (value: bytes, idx: uint, empty:(), one:(u8)){
+    @bytes_nth(value, idx, empty, one)
+}
+
+_47_main_labelled: (value: bytes, _45_bytes_len: uint){
+    _54_main_labelled: _53_main_labelled(value)
+    inspect(_49_main_labelled, _45_bytes_len, _54_main_labelled)
+}
+
+_43_main_labelled: (value: bytes){
+    _55_main_labelled: _47_main_labelled(value)
+    _44_bytes_len(value, _55_main_labelled)
+}
+_56_bytes_len: @__bytes_len
+_71_main: (){
+    _72: 1
+    @exit(_72)
+}
+_83_main: (){
+    _84: 1
+    @exit(_84)
+}
+
+_80_main: (first_bits: b8, value: bytes, expected_bits: b8){
+    _81_labelled: _43_main_labelled(value)
+    @eq_b8(first_bits, expected_bits, _81_labelled, _83_main)
+}
+
+_77_main: (value: bytes, first_bits: b8){
+    _78: 116
+    _86_main: _80_main(first_bits, value)
+    @b8_from_u8(_78, _86_main)
+}
+
+_75_main: (value: bytes, first: u8){
+    _87_main: _77_main(value)
+    @b8_from_u8(first, _87_main)
+}
+
+_68_main: (nth:(uint, (), (u8)), value: bytes){
+    _69: 0
+    _88_main: _75_main(value)
+    nth(_69, _71_main, _88_main)
+}
+_91_main: (){
+    _92: 1
+    @exit(_92)
+}
+
+_65_main: (value: bytes, l: uint, nth:(uint, (), (u8))){
+    _66: 4
+    _89_main: _68_main(nth, value)
+    @eq_uint(l, _66, _89_main, _91_main)
+}
+_95_main: (value: bytes, _61_main: uint, _62_main:(), _63_main:(u8)){
+    @bytes_nth(value, _61_main, _62_main, _63_main)
+}
+
+_59_main: (value: bytes, _57_bytes_len: uint){
+    _96_main: _95_main(value)
+    _97_main: _65_main(value, _57_bytes_len, _96_main)
+    _97_main()
+}
+
+_42_main: (value: bytes){
+    _98_main: _59_main(value)
+    _56_bytes_len(value, _98_main)
+}
+
+main: (){
+    _40: "text"
+    @bytes_from_str(_40, _42_main)
+}
+main()

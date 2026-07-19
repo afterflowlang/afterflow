@@ -118,6 +118,18 @@ impl fmt::Debug for air::AirStmt {
                         format_sig_kinds_inline(&clone.remaining)
                     )
                 }
+                air::AirOp::CloneDescriptor(clone) => write!(
+                    f,
+                    "{} = @clonedescriptor({})",
+                    format_binding_name(&clone.dst),
+                    format_binding_name(&clone.src)
+                ),
+                air::AirOp::MoveClosure(moved) => write!(
+                    f,
+                    "{} = @moveclosure({})",
+                    format_binding_name(&moved.dst),
+                    format_binding_name(&moved.src)
+                ),
                 air::AirOp::JumpEqInt(eq) => {
                     let args = format_args_inline(&eq.args);
                     if args.is_empty() {
@@ -134,9 +146,32 @@ impl fmt::Debug for air::AirStmt {
                         write!(f, "@eq_str({}, {})", eq.target, args)
                     }
                 }
+                air::AirOp::JumpEqUInt(eq) => {
+                    let args = format_args_inline(&eq.args);
+                    if args.is_empty() {
+                        write!(f, "@eq_uint({})", eq.target)
+                    } else {
+                        write!(f, "@eq_uint({}, {})", eq.target, args)
+                    }
+                }
+                air::AirOp::JumpEqBits(eq) => {
+                    let args = format_args_inline(&eq.args);
+                    if args.is_empty() {
+                        write!(f, "@eq_b8({})", eq.target)
+                    } else {
+                        write!(f, "@eq_b8({}, {})", eq.target, args)
+                    }
+                }
                 air::AirOp::JumpLt(jump) => write!(
                     f,
                     "@lt({}, {}, {})",
+                    jump.target,
+                    format_operand(&jump.left),
+                    format_operand(&jump.right),
+                ),
+                air::AirOp::JumpLtUInt(jump) => write!(
+                    f,
+                    "@lt_uint({}, {}, {})",
                     jump.target,
                     format_operand(&jump.left),
                     format_operand(&jump.right),
@@ -148,11 +183,25 @@ impl fmt::Debug for air::AirStmt {
                         format_binary_instr_op("add", &op.input_a, &op.input_b, &op.target)
                     )
                 }
+                air::AirOp::AddUInt(op) => {
+                    write!(
+                        f,
+                        "{}",
+                        format_binary_instr_op("add_uint", &op.input_a, &op.input_b, &op.target)
+                    )
+                }
                 air::AirOp::AddF64(op) => {
                     write!(
                         f,
                         "{}",
                         format_binary_instr_op("add_f64", &op.input_a, &op.input_b, &op.target)
+                    )
+                }
+                air::AirOp::SubF64(op) => {
+                    write!(
+                        f,
+                        "{}",
+                        format_binary_instr_op("sub_f64", &op.input_a, &op.input_b, &op.target)
                     )
                 }
                 air::AirOp::AddBits(op) => {
@@ -172,6 +221,13 @@ impl fmt::Debug for air::AirStmt {
                         f,
                         "{}",
                         format_binary_instr_op("sub", &op.input_a, &op.input_b, &op.target)
+                    )
+                }
+                air::AirOp::SubUInt(op) => {
+                    write!(
+                        f,
+                        "{}",
+                        format_binary_instr_op("sub_uint", &op.input_a, &op.input_b, &op.target)
                     )
                 }
                 air::AirOp::SubBits(op) => {
@@ -240,6 +296,13 @@ impl fmt::Debug for air::AirStmt {
                         format_binary_instr_op("div_f64", &op.input_a, &op.input_b, &op.target)
                     )
                 }
+                air::AirOp::NativeCall(op) => {
+                    write!(f, "@{}(", op.function.name)?;
+                    for input in &op.inputs {
+                        write!(f, "{}, ", format_arg(input))?;
+                    }
+                    write!(f, "{})", format_binding_name(&op.target))
+                }
                 air::AirOp::ConvertFixed(op) => write!(
                     f,
                     "@{}({}, {})",
@@ -251,6 +314,19 @@ impl fmt::Debug for air::AirStmt {
                     format_arg(&op.input),
                     format_binding_name(&op.target),
                 ),
+                air::AirOp::RuneFromU32(op) => write!(
+                    f,
+                    "@rune_from_u32({}, {}, {})",
+                    op.ok_target,
+                    op.invalid_target,
+                    format_arg(&op.input),
+                ),
+                air::AirOp::U32FromRune(op) => write!(
+                    f,
+                    "@u32_from_rune({}, {})",
+                    format_arg(&op.input),
+                    format_binding_name(&op.target),
+                ),
                 air::AirOp::JumpGt(jump) => write!(
                     f,
                     "@gt({}, {}, {})",
@@ -258,18 +334,69 @@ impl fmt::Debug for air::AirStmt {
                     format_operand(&jump.left),
                     format_operand(&jump.right),
                 ),
-                air::AirOp::Sprintf(call) => {
-                    write!(f, "{}", format_call_op("sprintf", &call.args, &call.target))
-                }
                 air::AirOp::Write(call) => {
                     write!(f, "{}", format_call_op("write", &call.args, &call.target))
                 }
-                air::AirOp::ReadFile(op) => write!(
+                air::AirOp::FileRead(op) => write!(
                     f,
-                    "@readfile({}, {}, {})",
+                    "@file_read({}, {}, {})",
                     op.ok_target,
                     op.err_target,
                     format_arg(&op.path)
+                ),
+                air::AirOp::StrRuneLen(op) => {
+                    write!(f, "@str_rune_len({}, {})", op.target, format_arg(&op.value))
+                }
+                air::AirOp::StrRuneNth(op) => write!(
+                    f,
+                    "@str_rune_nth({}, {}, {}, {})",
+                    op.one_target,
+                    op.empty_target,
+                    format_arg(&op.value),
+                    format_arg(&op.idx)
+                ),
+                air::AirOp::StrFromUtf8(op) => write!(
+                    f,
+                    "@str_from_utf8({}, {}, {})",
+                    op.ok_target,
+                    op.invalid_target,
+                    format_arg(&op.value)
+                ),
+                air::AirOp::BytesLen(op) => {
+                    write!(
+                        f,
+                        "bytes_descriptor_len({}, {})",
+                        op.target,
+                        format_arg(&op.value)
+                    )
+                }
+                air::AirOp::BytesNth(op) => write!(
+                    f,
+                    "@bytes_nth({}, {}, {}, {})",
+                    op.one_target,
+                    op.empty_target,
+                    format_arg(&op.value),
+                    format_arg(&op.idx)
+                ),
+                air::AirOp::BytesFromStr(op) => write!(
+                    f,
+                    "@bytes_from_str({}, {})",
+                    format_arg(&op.value),
+                    op.target
+                ),
+                air::AirOp::BytesBuild(op) => write!(
+                    f,
+                    "@bytes_build({}, {}, {})",
+                    op.ok_target,
+                    op.invalid_target,
+                    format_arg(&op.source)
+                ),
+                air::AirOp::IntToU8(op) => write!(
+                    f,
+                    "@u8_from_int({}, {}, {})",
+                    op.ok_target,
+                    op.invalid_target,
+                    format_arg(&op.value)
                 ),
                 air::AirOp::JumpArgs(ja) => {
                     let args = format_args_inline(&ja.args);
@@ -284,11 +411,11 @@ impl fmt::Debug for air::AirStmt {
                         write!(f, "@jumpargs({target}, {args})")
                     }
                 }
-                air::AirOp::CallPtr(call) => {
-                    let target = match &call.target {
-                        air::AirCallPtrTarget::Binding(name) => format_binding_name(name),
-                    };
-                    write!(f, "@callptr({target})")
+                air::AirOp::DropClosure(drop) => {
+                    write!(f, "@dropclosure({})", format_binding_name(&drop.name))
+                }
+                air::AirOp::DropDescriptor(drop) => {
+                    write!(f, "@dropdescriptor({})", format_binding_name(&drop.name))
                 }
                 air::AirOp::SysExit(syscall) => {
                     let args = format_args_inline(&syscall.args);
@@ -354,10 +481,11 @@ fn format_sig_kind_inner(kind: &air::SigKind, show_names: bool) -> String {
         air::SigKind::Byte => "byte".to_string(),
         air::SigKind::Int => "int".to_string(),
         air::SigKind::UInt => "uint".to_string(),
+        air::SigKind::Rune => "rune".to_string(),
         air::SigKind::FixedInt(kind) => kind.name(),
+        air::SigKind::Bytes => "bytes".to_string(),
         air::SigKind::Str => "str".to_string(),
         air::SigKind::F64 => "f64".to_string(),
-        air::SigKind::Variadic => "...".to_string(),
         air::SigKind::Ident(ident) => ident.name.clone(),
         air::SigKind::Sig(sig) => {
             let items = sig

@@ -1,9 +1,10 @@
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 pub use crate::compiler::air_ast::*;
 use crate::compiler::builtins;
 use crate::compiler::error::{Code, Error};
 use crate::compiler::hir;
+use crate::compiler::signature;
 use crate::compiler::span::Span;
 use crate::compiler::symbol::{self, SymbolRegistry};
 
@@ -57,6 +58,8 @@ pub struct FunctionLowerer {
     pending: HashMap<String, hir::Function>,
     lowered: HashSet<String>,
     in_progress: HashSet<String>,
+    specializations: HashMap<(String, Vec<SigKind>), FunctionSig>,
+    next_specialization_id: usize,
     generated: Vec<AirFunction>,
 }
 
@@ -66,6 +69,8 @@ impl FunctionLowerer {
             pending: functions,
             lowered: HashSet::new(),
             in_progress: HashSet::new(),
+            specializations: HashMap::new(),
+            next_specialization_id: 0,
             generated: Vec::new(),
         }
     }
@@ -74,7 +79,7 @@ impl FunctionLowerer {
         if self.lowered.contains(name) || self.in_progress.contains(name) {
             return Ok(());
         }
-        let function = match self.pending.remove(name) {
+        let function = match self.pending.get(name).cloned() {
             Some(func) => func,
             None => {
                 return Ok(());
@@ -93,6 +98,61 @@ impl FunctionLowerer {
         }
     }
 
+    fn ensure_for_args(
+        &mut self,
+        target: &FunctionSig,
+        arg_kinds: &[SigKind],
+        symbols: &mut SymbolRegistry,
+    ) -> Result<FunctionSig, Error> {
+        let Some(function) = self.pending.get(&target.name).cloned() else {
+            return Ok(target.clone());
+        };
+        if function.sig.generics.is_empty() {
+            self.ensure(&target.name, symbols)?;
+            return Ok(target.clone());
+        }
+
+        let mut bindings = HashMap::new();
+        for (param, actual) in function.sig.items.iter().zip(arg_kinds) {
+            bind_generic_kinds(&param.kind, actual, &function.sig.generics, &mut bindings)?;
+        }
+        let concrete_kinds = function
+            .sig
+            .generics
+            .iter()
+            .map(|name| {
+                bindings
+                    .entry(name.clone())
+                    .or_insert_with(|| SigKind::Generic(name.clone()))
+                    .clone()
+            })
+            .collect::<Vec<_>>();
+        let key = (target.name.clone(), concrete_kinds);
+        if let Some(sig) = self.specializations.get(&key) {
+            return Ok(sig.clone());
+        }
+
+        let specialized_name = format!("{}__generic_{}", target.name, self.next_specialization_id);
+        self.next_specialization_id += 1;
+        let mut specialized = function;
+        specialized.name = specialized_name;
+        specialized.sig = signature::substitute_signature(&specialized.sig, &bindings);
+        let specialized_sig = function_sig_from_hir(&specialized);
+        self.specializations.insert(key, specialized_sig.clone());
+
+        self.in_progress.insert(specialized.name.clone());
+        let lowered = lower_function(&specialized, symbols, self);
+        self.in_progress.remove(&specialized.name);
+        match lowered {
+            Ok(funcs) => {
+                self.lowered.insert(specialized.name);
+                self.generated.extend(funcs);
+                Ok(specialized_sig)
+            }
+            Err(err) => Err(err),
+        }
+    }
+
     pub fn take_generated_functions(self) -> Vec<AirFunction> {
         self.generated
     }
@@ -103,7 +163,7 @@ pub struct AirLowerContext<'a> {
     function_lowerer: &'a mut FunctionLowerer,
     locals: HashSet<String>,
     generated_functions: Vec<AirFunction>,
-    unused_params: HashSet<String>,
+    owned_values: HashMap<String, SigKind>,
     literals: HashMap<String, Lit>,
     value_kinds: HashMap<String, SigKind>,
     closure_remaining: HashMap<String, Vec<SigKind>>, // TODO: Why is this needed?
@@ -121,7 +181,7 @@ impl<'a> AirLowerContext<'a> {
             function_lowerer,
             locals: HashSet::new(),
             generated_functions: Vec::new(),
-            unused_params: HashSet::new(),
+            owned_values: HashMap::new(),
             literals: HashMap::new(),
             value_kinds: HashMap::new(),
             closure_remaining: HashMap::new(),
@@ -148,34 +208,32 @@ impl<'a> AirLowerContext<'a> {
     }
 }
 
-fn collect_unused_param_refs(params: &[SigItem]) -> HashSet<String> {
+fn collect_owned_values(params: &[SigItem]) -> HashMap<String, SigKind> {
     params
         .iter()
-        .filter(|param| matches!(param.kind, SigKind::Sig(_)))
-        .map(|param| param.name.clone())
+        .filter(|param| is_owned_type(&param.kind))
+        .map(|param| (param.name.clone(), param.kind.clone()))
         .collect()
 }
 
-fn mark_target(unused: &mut HashSet<String>, target: &AirExecTarget) {
-    if let AirExecTarget::Closure { name } = target {
-        unused.remove(name);
+fn drop_owned_value(name: String, kind: &SigKind) -> AirStmt {
+    match kind {
+        SigKind::Sig(_) => AirStmt::op(AirOp::DropClosure(AirDropClosure { name })),
+        SigKind::Str | SigKind::Bytes => {
+            AirStmt::op(AirOp::DropDescriptor(AirDropDescriptor { name }))
+        }
+        _ => unreachable!("only owned values may be dropped"),
     }
 }
 
-fn mark_args(unused: &mut HashSet<String>, args: &[AirArg]) {
-    for arg in args {
-        unused.remove(&arg.name);
-    }
-}
-
-fn take_release_statements(unused: &mut HashSet<String>) -> Vec<AirStmt> {
-    let names: BTreeSet<_> = unused.drain().collect();
-    if names.is_empty() {
+fn take_drop_statements(owned: &mut HashMap<String, SigKind>) -> Vec<AirStmt> {
+    let values: BTreeMap<_, _> = owned.drain().collect();
+    if values.is_empty() {
         return Vec::new();
     }
-    names
+    values
         .into_iter()
-        .map(|name| AirStmt::op(AirOp::ReleaseHeap(AirReleaseHeap { name })))
+        .map(|(name, kind)| drop_owned_value(name, &kind))
         .collect()
 }
 
@@ -196,6 +254,9 @@ fn prepare_args(
             let remaining = closure.target.param_kinds();
             statements.push(AirStmt::op(AirOp::NewClosure(closure)));
             ctx.locals.insert(name.clone());
+            let kind = SigKind::Sig(hir::Signature::from_kinds(remaining.clone()));
+            ctx.owned_values.insert(name.clone(), kind.clone());
+            ctx.value_kinds.insert(name.clone(), kind);
             if !remaining.is_empty() {
                 ctx.closure_remaining.insert(name, remaining);
             }
@@ -288,7 +349,7 @@ pub fn lower_function(
                 .insert(param.name.clone(), signature.kinds());
         }
     }
-    ctx.unused_params = collect_unused_param_refs(&params);
+    ctx.owned_values = collect_owned_values(&params);
 
     let mut lowered_items: Vec<AirStmt> = Vec::new();
     for item in func.body.items.iter() {
@@ -303,17 +364,24 @@ pub fn lower_function(
 
     let mut functions: Vec<AirFunction> = vec![function.clone()];
     // TODO: Only generate these helpers if needed.
-    if let Some(f) = build_closure_unwrapper(&function) {
-        functions.push(f);
-    }
-    if let Some(f) = build_deep_release_helper(&function) {
-        functions.push(f);
-    }
-    if let Some(f) = build_deep_copy_helper(&function) {
-        functions.push(f);
-    }
+    functions.extend(build_closure_helpers(&function.sig));
     functions.extend(ctx.into_generated_functions());
     Ok(functions)
+}
+
+fn build_closure_helpers(sig: &FunctionSig) -> Vec<AirFunction> {
+    let function = AirFunction {
+        sig: sig.clone(),
+        items: Vec::new(),
+    };
+    [
+        build_closure_unwrapper(&function),
+        build_deep_release_helper(&function),
+        build_deep_copy_helper(&function),
+    ]
+    .into_iter()
+    .flatten()
+    .collect()
 }
 
 pub fn function_sig_from_hir(function: &hir::Function) -> FunctionSig {
@@ -338,8 +406,8 @@ fn air_sig_items_from_hir(items: &[SigItem], generics: &BTreeSet<String>) -> Vec
 
 fn air_sig_kind_from_hir(kind: &SigKind, generics: &BTreeSet<String>) -> SigKind {
     match kind {
-        SigKind::Generic(_) => generic_pointer_kind(),
-        SigKind::Ident(ident) if generics.contains(&ident.name) => generic_pointer_kind(),
+        SigKind::Generic(_) => kind.clone(),
+        SigKind::Ident(ident) if generics.contains(&ident.name) => kind.clone(),
         SigKind::Sig(signature) => SigKind::Sig(hir::Signature {
             items: air_sig_items_from_hir(&signature.items, generics),
             generics: signature.generics.clone(),
@@ -353,13 +421,6 @@ fn air_sig_kind_from_hir(kind: &SigKind, generics: &BTreeSet<String>) -> SigKind
         },
         other => other.clone(),
     }
-}
-
-fn generic_pointer_kind() -> SigKind {
-    SigKind::Sig(hir::Signature {
-        items: Vec::new(),
-        generics: BTreeSet::new(),
-    })
 }
 
 fn lower_block_item(
@@ -433,12 +494,87 @@ fn ensure_target(
     } else {
         resolve_target(target_name, ctx.symbols)?
     };
-    let args = extract_closure_sig_info(&target, args, &ctx.literals, &ctx.value_kinds);
     if let AirExecTarget::Function(sig) = &mut target {
-        ctx.function_lowerer.ensure(&sig.name, ctx.symbols)?;
+        if !sig.generics.is_empty() {
+            let arg_kinds = args
+                .iter()
+                .map(|arg| value_kind(ctx, arg))
+                .collect::<Result<Vec<_>, _>>()?;
+            *sig = ctx
+                .function_lowerer
+                .ensure_for_args(sig, &arg_kinds, ctx.symbols)?;
+        } else {
+            ctx.function_lowerer.ensure(&sig.name, ctx.symbols)?;
+        }
         create_closure(ctx, target_name, Some(sig))?;
     }
+    let args = extract_closure_sig_info(&target, args, &ctx.literals, &ctx.closure_remaining);
     Ok((block_items, target, args))
+}
+
+fn value_kind(ctx: &AirLowerContext, name: &str) -> Result<SigKind, Error> {
+    if let Some(kind) = ctx.value_kinds.get(name) {
+        return Ok(kind.clone());
+    }
+    if let Some(remaining) = ctx.closure_remaining.get(name) {
+        return Ok(SigKind::Sig(hir::Signature::from_kinds(remaining.clone())));
+    }
+    Err(Error::new(
+        Code::Internal,
+        format!("missing AIR type for argument '{name}'"),
+        Span::unknown(),
+    ))
+}
+
+fn bind_generic_kinds(
+    expected: &SigKind,
+    actual: &SigKind,
+    generics: &BTreeSet<String>,
+    bindings: &mut HashMap<String, SigKind>,
+) -> Result<(), Error> {
+    let generic_name = match expected {
+        SigKind::Generic(name) => Some(name),
+        SigKind::Ident(ident) if generics.contains(&ident.name) => Some(&ident.name),
+        _ => None,
+    };
+    if let Some(name) = generic_name {
+        if let Some(bound) = bindings.get(name) {
+            if bound != actual {
+                return Err(Error::new(
+                    Code::Internal,
+                    format!("inconsistent AIR types for generic parameter '{name}'"),
+                    Span::unknown(),
+                ));
+            }
+        } else {
+            bindings.insert(name.clone(), actual.clone());
+        }
+        return Ok(());
+    }
+
+    match (expected, actual) {
+        (SigKind::Sig(expected), SigKind::Sig(actual)) => {
+            for (expected, actual) in expected.items.iter().zip(&actual.items) {
+                bind_generic_kinds(&expected.kind, &actual.kind, generics, bindings)?;
+            }
+        }
+        (
+            SigKind::GenericInst {
+                name: expected_name,
+                args: expected_args,
+            },
+            SigKind::GenericInst {
+                name: actual_name,
+                args: actual_args,
+            },
+        ) if expected_name == actual_name => {
+            for (expected, actual) in expected_args.iter().zip(actual_args) {
+                bind_generic_kinds(expected, actual, generics, bindings)?;
+            }
+        }
+        _ => {}
+    }
+    Ok(())
 }
 
 fn closure_remaining_after_applying(
@@ -457,18 +593,59 @@ fn closure_remaining_after_applying(
     Some(remaining[applied..].to_vec())
 }
 
+fn prepare_owned_arguments(
+    ctx: &mut AirLowerContext,
+    args: Vec<AirArg>,
+    use_counts: &[usize],
+    owner: &str,
+    statements: &mut Vec<AirStmt>,
+) -> Result<Vec<AirArg>, Error> {
+    args.into_iter()
+        .enumerate()
+        .map(|(idx, arg)| {
+            if !is_owned_type(&arg.kind) || arg.literal.is_some() {
+                return Ok(arg);
+            }
+            if use_counts.get(idx).copied().unwrap_or_default() <= 1 {
+                ctx.owned_values.remove(&arg.name);
+                return Ok(arg);
+            }
+            let name = format!("__{owner}_arg_clone_{idx}");
+            let op = match &arg.kind {
+                SigKind::Sig(signature) => AirOp::CloneClosure(AirCloneClosure {
+                    src: arg.name,
+                    dst: name.clone(),
+                    remaining: signature.kinds(),
+                }),
+                SigKind::Str | SigKind::Bytes => AirOp::CloneDescriptor(AirCloneDescriptor {
+                    src: arg.name,
+                    dst: name.clone(),
+                }),
+                _ => unreachable!("only owned arguments may be cloned"),
+            };
+            statements.push(AirStmt::op(op));
+            Ok(AirArg {
+                name,
+                kind: arg.kind,
+                literal: None,
+            })
+        })
+        .collect()
+}
+
 fn lower_new_closure(
     closure: &hir::Closure,
     ctx: &mut AirLowerContext,
 ) -> Result<Vec<AirStmt>, Error> {
     ctx.count_remaining_use(&closure.of);
-    for arg in &closure.args {
-        ctx.count_remaining_use(arg);
-    }
+    let use_counts = closure
+        .args
+        .iter()
+        .map(|arg| ctx.count_remaining_use(arg))
+        .collect::<Vec<_>>();
     let (mut block_items, target, args) = ensure_target(ctx, &closure.args, &closure.of)?;
     ctx.locals.insert(closure.name.clone());
-    mark_target(&mut ctx.unused_params, &target);
-    mark_args(&mut ctx.unused_params, &args);
+    let args = prepare_owned_arguments(ctx, args, &use_counts, &closure.name, &mut block_items)?;
 
     let new_remaining =
         closure_remaining_after_applying(&ctx.closure_remaining, &target, args.len());
@@ -482,12 +659,20 @@ fn lower_new_closure(
             ));
         }
     };
+    if target_sig.builtin.is_some() {
+        for helper in build_closure_helpers(&target_sig) {
+            ctx.push_generated_function(helper);
+        }
+    }
     block_items.push(AirStmt::op(AirOp::NewClosure(AirNewClosure {
         name: closure.name.clone(),
         target: target_sig.clone(),
         args,
     })));
     if let Some(remaining) = new_remaining {
+        let kind = SigKind::Sig(hir::Signature::from_kinds(remaining.clone()));
+        ctx.owned_values.insert(closure.name.clone(), kind.clone());
+        ctx.value_kinds.insert(closure.name.clone(), kind);
         ctx.closure_remaining
             .insert(closure.name.clone(), remaining);
     }
@@ -498,6 +683,12 @@ fn lower_closure_curry(
     closure: &hir::Closure,
     ctx: &mut AirLowerContext,
 ) -> Result<Vec<AirStmt>, Error> {
+    let source_use_count = ctx.count_remaining_use(&closure.of);
+    let arg_use_counts = closure
+        .args
+        .iter()
+        .map(|arg| ctx.count_remaining_use(arg))
+        .collect::<Vec<_>>();
     let existing_remaining = ctx
         .closure_remaining
         .get(&closure.of)
@@ -522,52 +713,22 @@ fn lower_closure_curry(
             literal: literal_for_arg(arg, &ctx.literals),
         });
     }
-    mark_target(
-        &mut ctx.unused_params,
-        &AirExecTarget::Closure {
-            name: closure.of.clone(),
-        },
-    );
-    mark_args(&mut ctx.unused_params, &args);
-
     ctx.locals.insert(closure.name.clone());
-    block_items.push(AirStmt::op(AirOp::CloneClosure(AirCloneClosure {
-        src: closure.of.clone(),
-        dst: closure.name.clone(),
-        remaining: existing_remaining.clone(),
-    })));
-
-    let mut stored_args = Vec::with_capacity(args.len());
-    for (idx, arg) in args.iter().enumerate() {
-        let arg_use_count = ctx.count_remaining_use(&arg.name);
-        let should_clone_arg = matches!(arg.kind, SigKind::Sig(_)) && arg_use_count > 1;
-        if should_clone_arg {
-            let arg_remaining = ctx
-                .closure_remaining
-                .get(&arg.name)
-                .cloned()
-                .ok_or_else(|| {
-                    Error::new(
-                        Code::Internal,
-                        format!("missing closure signature for '{}'", arg.name),
-                        Span::unknown(),
-                    )
-                })?;
-            let clone_name = format!("__{}_arg_clone_{}", closure.name, idx);
-            block_items.push(AirStmt::op(AirOp::CloneClosure(AirCloneClosure {
-                src: arg.name.clone(),
-                dst: clone_name.clone(),
-                remaining: arg_remaining,
-            })));
-            stored_args.push(AirArg {
-                name: clone_name,
-                kind: arg.kind.clone(),
-                literal: None,
-            });
-        } else {
-            stored_args.push(arg.clone());
-        }
+    if source_use_count > 1 {
+        block_items.push(AirStmt::op(AirOp::CloneClosure(AirCloneClosure {
+            src: closure.of.clone(),
+            dst: closure.name.clone(),
+            remaining: existing_remaining.clone(),
+        })));
+    } else {
+        block_items.push(AirStmt::op(AirOp::MoveClosure(AirMoveClosure {
+            src: closure.of.clone(),
+            dst: closure.name.clone(),
+        })));
+        ctx.owned_values.remove(&closure.of);
     }
+    let stored_args =
+        prepare_owned_arguments(ctx, args, &arg_use_counts, &closure.name, &mut block_items)?;
 
     let env_end_binding = format!("__{}_env_end", closure.name);
     block_items.push(AirStmt::op(AirOp::Pin(AirPin {
@@ -599,46 +760,73 @@ fn lower_closure_curry(
 
     ctx.closure_remaining
         .insert(closure.name.clone(), remaining.clone());
+    let kind = SigKind::Sig(hir::Signature::from_kinds(remaining));
+    ctx.owned_values.insert(closure.name.clone(), kind.clone());
+    ctx.value_kinds.insert(closure.name.clone(), kind);
 
     Ok(block_items)
 }
 
 fn lower_exec(exec: &hir::Exec, ctx: &mut AirLowerContext) -> Result<Vec<AirStmt>, Error> {
-    let exec = exec.clone();
-    ctx.count_remaining_use(&exec.of);
-    for arg in &exec.args {
-        ctx.count_remaining_use(arg);
+    if exec.is_comptime {
+        return Err(Error::new(
+            Code::Internal,
+            "compile-time execution reached AIR without being residualized",
+            exec.span,
+        ));
     }
-    let (mut block_items, target, args) = ensure_target(ctx, &exec.args, &exec.of)?;
-    mark_target(&mut ctx.unused_params, &target);
-    mark_args(&mut ctx.unused_params, &args);
+    let exec = exec.clone();
+    let target_use_count = ctx.count_remaining_use(&exec.of);
+    let arg_use_counts = exec
+        .args
+        .iter()
+        .map(|arg| ctx.count_remaining_use(arg))
+        .collect::<Vec<_>>();
+    let (mut block_items, mut target, args) = ensure_target(ctx, &exec.args, &exec.of)?;
+    if let AirExecTarget::Closure { name } = &target {
+        if target_use_count > 1 {
+            let remaining = match value_kind(ctx, name)? {
+                SigKind::Sig(signature) => signature.kinds(),
+                _ => {
+                    return Err(Error::new(
+                        Code::Internal,
+                        format!("expected closure type for '{name}'"),
+                        Span::unknown(),
+                    ));
+                }
+            };
+            let clone_name = format!("__{}_target_clone", exec.of);
+            block_items.push(AirStmt::op(AirOp::CloneClosure(AirCloneClosure {
+                src: name.clone(),
+                dst: clone_name.clone(),
+                remaining,
+            })));
+            target = AirExecTarget::Closure { name: clone_name };
+        } else {
+            ctx.owned_values.remove(name);
+        }
+    }
+    let args = prepare_owned_arguments(ctx, args, &arg_use_counts, &exec.of, &mut block_items)?;
 
     if let AirExecTarget::Function(sig) = &target {
         if let Some(builtin) = sig.builtin {
-            if builtin.is_call() {
-                let builtin_items = lower_builtin_call(sig, builtin, args, &mut ctx.unused_params)?;
-                block_items.extend(builtin_items);
-                return Ok(block_items);
-            }
-            if is_inline_builtin(builtin) {
-                for continuation in &sig.params {
-                    if matches!(continuation.kind, SigKind::Sig(_)) {
-                        mark_target(
-                            &mut ctx.unused_params,
-                            &AirExecTarget::Closure {
-                                name: continuation.name.clone(),
-                            },
-                        );
-                    }
+            match builtin.air_route() {
+                builtins::AirRoute::Call => {
+                    block_items.extend(take_drop_statements(&mut ctx.owned_values));
+                    let builtin_items = lower_builtin_call(builtin, args)?;
+                    block_items.extend(builtin_items);
+                    return Ok(block_items);
                 }
-                block_items.extend(take_release_statements(&mut ctx.unused_params));
-                block_items.extend(build_builtin_statements(sig, builtin, args));
-                return Ok(block_items);
+                _ => {
+                    block_items.extend(take_drop_statements(&mut ctx.owned_values));
+                    block_items.extend(build_builtin_statements(sig, builtin, args));
+                    return Ok(block_items);
+                }
             }
         }
     }
 
-    block_items.extend(take_release_statements(&mut ctx.unused_params));
+    block_items.extend(take_drop_statements(&mut ctx.owned_values));
     match target {
         AirExecTarget::Function(sig) => {
             block_items.push(AirStmt::op(AirOp::JumpArgs(AirJumpArgs {
@@ -657,29 +845,10 @@ fn lower_exec(exec: &hir::Exec, ctx: &mut AirLowerContext) -> Result<Vec<AirStmt
 }
 
 fn lower_builtin_call(
-    sig: &FunctionSig,
     builtin: builtins::Builtin,
     args: Vec<AirArg>,
-    unused_params: &mut HashSet<String>,
 ) -> Result<Vec<AirStmt>, Error> {
-    let mut stmts = Vec::new();
-
-    // Continuation is always the last param + last arg
-    if let (Some(param), Some(arg)) = (sig.params.last(), args.last()) {
-        if matches!(param.kind, SigKind::Sig(_)) {
-            mark_target(
-                unused_params,
-                &AirExecTarget::Closure {
-                    name: arg.name.clone(),
-                },
-            );
-        }
-    }
-
-    stmts.extend(take_release_statements(unused_params));
-    stmts.push(AirStmt::op(call_op(builtin, args)));
-
-    Ok(stmts)
+    Ok(vec![AirStmt::op(call_op(builtin, args))])
 }
 
 // TODO: Simplify this.
@@ -715,68 +884,57 @@ fn extract_closure_sig_info(
     target: &AirExecTarget,
     args: &[String],
     literals: &HashMap<String, Lit>,
-    value_kinds: &HashMap<String, SigKind>,
+    closure_remaining: &HashMap<String, Vec<SigKind>>,
 ) -> Vec<AirArg> {
-    if let Some(params) = target_signature(target) {
-        return consume_signature_for_args(params, args, literals, value_kinds);
+    match target {
+        AirExecTarget::Function(sig) => {
+            return consume_signature_for_args(&sig.params, args, literals);
+        }
+        AirExecTarget::Closure { name } => {
+            if let Some(kinds) = closure_remaining.get(name) {
+                return consume_kinds_for_args(kinds, args, literals);
+            }
+        }
     }
-    let fallback_args = args
-        .iter()
+    args.iter()
         .map(|arg| AirArg {
             name: arg.clone(),
             kind: SigKind::Int,
             literal: literal_for_arg(arg, literals),
         })
-        .collect();
-    fallback_args
-}
-
-fn target_signature(target: &AirExecTarget) -> Option<&[SigItem]> {
-    match target {
-        AirExecTarget::Function(sig) => Some(&sig.params),
-        AirExecTarget::Closure { .. } => None,
-    }
+        .collect()
 }
 
 fn consume_signature_for_args(
     params: &[SigItem],
     args: &[String],
     literals: &HashMap<String, Lit>,
-    value_kinds: &HashMap<String, SigKind>,
+) -> Vec<AirArg> {
+    let kinds = params
+        .iter()
+        .map(|param| param.kind.clone())
+        .collect::<Vec<_>>();
+    consume_kinds_for_args(&kinds, args, literals)
+}
+
+fn consume_kinds_for_args(
+    kinds: &[SigKind],
+    args: &[String],
+    literals: &HashMap<String, Lit>,
 ) -> Vec<AirArg> {
     let mut consumed = 0;
     let mut sig_index = 0;
-    let total = params.len();
+    let total = kinds.len();
     let mut air_args = Vec::with_capacity(args.len());
     while consumed < args.len() && sig_index < total {
-        match &params[sig_index].kind {
-            SigKind::Variadic => {
-                let remaining_args = args.len() - consumed;
-                let final_items = total.saturating_sub(sig_index + 1);
-                let variadic_count = remaining_args.saturating_sub(final_items);
-                for _ in 0..variadic_count {
-                    air_args.push(AirArg {
-                        name: args[consumed].clone(),
-                        kind: value_kinds
-                            .get(&args[consumed])
-                            .cloned()
-                            .unwrap_or(SigKind::Int),
-                        literal: literal_for_arg(&args[consumed], literals),
-                    });
-                    consumed += 1;
-                }
-                sig_index += 1;
-            }
-            ty => {
-                air_args.push(AirArg {
-                    name: args[consumed].clone(),
-                    kind: ty.clone(),
-                    literal: literal_for_arg(&args[consumed], literals),
-                });
-                consumed += 1;
-                sig_index += 1;
-            }
-        }
+        let ty = &kinds[sig_index];
+        air_args.push(AirArg {
+            name: args[consumed].clone(),
+            kind: ty.clone(),
+            literal: literal_for_arg(&args[consumed], literals),
+        });
+        consumed += 1;
+        sig_index += 1;
     }
 
     while consumed < args.len() {
@@ -836,14 +994,7 @@ fn build_unwrapper_function(
         .collect::<Vec<_>>();
 
     if let Some(builtin) = target_sig.builtin {
-        if builtin.is_call() || is_inline_builtin(builtin) {
-            items.extend(build_builtin_statements(&target_sig, builtin, builtin_args));
-        } else {
-            items.push(AirStmt::op(AirOp::JumpArgs(AirJumpArgs {
-                target: target_sig.clone(),
-                args: builtin_args,
-            })));
-        }
+        items.extend(build_builtin_statements(&target_sig, builtin, builtin_args));
     } else {
         items.push(AirStmt::op(AirOp::JumpArgs(AirJumpArgs {
             target: target_sig.clone(),
@@ -887,7 +1038,7 @@ fn build_deep_release_helper(function: &AirFunction) -> Option<AirFunction> {
         .iter()
         .enumerate()
         .filter_map(|(idx, param)| {
-            if !is_reference_type(&param.kind) {
+            if !is_owned_type(&param.kind) {
                 return None;
             }
             let offset_from_end = env_word_count.saturating_sub(offsets[idx]);
@@ -922,9 +1073,7 @@ fn build_deep_release_helper(function: &AirFunction) -> Option<AirFunction> {
                 offset: *offset,
                 kind: kind.clone(),
             })));
-            items.push(AirStmt::op(AirOp::CallPtr(AirCallPtr {
-                target: AirCallPtrTarget::Binding(location),
-            })));
+            items.push(drop_owned_value(location, kind));
             items.push(AirStmt::Label(AirLabel { name: skip_label }));
         }
     }
@@ -970,7 +1119,7 @@ fn build_deep_copy_helper(function: &AirFunction) -> Option<AirFunction> {
         .iter()
         .enumerate()
         .filter_map(|(idx, param)| {
-            if !is_reference_type(&param.kind) {
+            if !is_owned_type(&param.kind) {
                 return None;
             }
             let env_offset_from_start = offsets[idx];
@@ -1059,8 +1208,8 @@ fn word_count_from_kind(kind: &SigKind) -> usize {
     }
 }
 
-fn is_reference_type(ty: &SigKind) -> bool {
-    matches!(ty, SigKind::Sig(_))
+fn is_owned_type(ty: &SigKind) -> bool {
+    matches!(ty, SigKind::Sig(_) | SigKind::Str | SigKind::Bytes)
 }
 
 fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
@@ -1081,9 +1230,25 @@ fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
                 target: continuation_target,
             })
         }
+        builtins::Builtin::AddUInt => {
+            let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
+            AirOp::AddUInt(AirAdd {
+                input_a,
+                input_b,
+                target: continuation_target,
+            })
+        }
         builtins::Builtin::AddF64 => {
             let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
             AirOp::AddF64(AirAddF64 {
+                input_a,
+                input_b,
+                target: continuation_target,
+            })
+        }
+        builtins::Builtin::SubF64 => {
+            let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
+            AirOp::SubF64(AirSubF64 {
                 input_a,
                 input_b,
                 target: continuation_target,
@@ -1101,6 +1266,14 @@ fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
         builtins::Builtin::Sub => {
             let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
             AirOp::Sub(AirSub {
+                input_a,
+                input_b,
+                target: continuation_target,
+            })
+        }
+        builtins::Builtin::SubUInt => {
+            let (input_a, input_b) = binary_input_args(builtin.name(), inputs);
+            AirOp::SubUInt(AirSub {
                 input_a,
                 input_b,
                 target: continuation_target,
@@ -1183,6 +1356,11 @@ fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
                 target: continuation_target,
             })
         }
+        builtins::Builtin::Native(function) => AirOp::NativeCall(AirNativeCall {
+            function,
+            inputs,
+            target: continuation_target,
+        }),
         builtins::Builtin::ConvertFixed { from, to } => {
             let input = inputs
                 .into_iter()
@@ -1195,7 +1373,129 @@ fn instruction_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
                 to,
             })
         }
+        builtins::Builtin::RuneFromU32 => {
+            let invalid_target = args
+                .get(arg_len - 2)
+                .expect("rune_from_u32 requires an invalid continuation")
+                .name
+                .clone();
+            let input = args
+                .first()
+                .cloned()
+                .expect("rune_from_u32 requires one input");
+            AirOp::RuneFromU32(AirRuneFromU32 {
+                input,
+                invalid_target,
+                ok_target: continuation_target,
+            })
+        }
+        builtins::Builtin::U32FromRune => {
+            let input = inputs
+                .into_iter()
+                .next()
+                .expect("u32_from_rune requires one input");
+            AirOp::U32FromRune(AirU32FromRune {
+                input,
+                target: continuation_target,
+            })
+        }
+        builtins::Builtin::StrRuneLen => {
+            let value = inputs
+                .into_iter()
+                .next()
+                .expect("str_rune_len requires a string");
+            AirOp::StrRuneLen(AirStrRuneLen {
+                value,
+                target: continuation_target,
+            })
+        }
+        builtins::Builtin::StrRuneNth => {
+            let empty_target = args
+                .get(arg_len - 2)
+                .expect("str_rune_nth requires an empty continuation")
+                .name
+                .clone();
+            let mut inputs = args[..arg_len - 2].iter().cloned();
+            let value = inputs.next().expect("str_rune_nth requires a string");
+            let idx = inputs.next().expect("str_rune_nth requires an index");
+            AirOp::StrRuneNth(AirStrRuneNth {
+                value,
+                idx,
+                empty_target,
+                one_target: continuation_target,
+            })
+        }
+        builtins::Builtin::StrFromUtf8 => {
+            let invalid_target = args
+                .get(arg_len - 2)
+                .expect("str_from_utf8 requires an invalid continuation")
+                .name
+                .clone();
+            let value = args.first().cloned().expect("str_from_utf8 requires bytes");
+            AirOp::StrFromUtf8(AirStrFromUtf8 {
+                value,
+                invalid_target,
+                ok_target: continuation_target,
+            })
+        }
+        builtins::Builtin::BytesLen => {
+            let value = inputs.into_iter().next().expect("bytes_len requires bytes");
+            AirOp::BytesLen(AirBytesLen {
+                value,
+                target: continuation_target,
+            })
+        }
+        builtins::Builtin::BytesNth => {
+            let empty_target = args
+                .get(arg_len - 2)
+                .expect("bytes_nth requires an empty continuation")
+                .name
+                .clone();
+            let mut inputs = args[..arg_len - 2].iter().cloned();
+            let value = inputs.next().expect("bytes_nth requires bytes");
+            let idx = inputs.next().expect("bytes_nth requires an index");
+            AirOp::BytesNth(AirBytesNth {
+                value,
+                idx,
+                empty_target,
+                one_target: continuation_target,
+            })
+        }
+        builtins::Builtin::BytesFromStr => {
+            let value = inputs
+                .into_iter()
+                .next()
+                .expect("bytes_from_str requires a string");
+            AirOp::BytesFromStr(AirBytesFromStr {
+                value,
+                target: continuation_target,
+            })
+        }
+        builtins::Builtin::U8FromInt => {
+            let invalid_target = args
+                .get(arg_len - 2)
+                .expect("u8_from_int requires an invalid continuation")
+                .name
+                .clone();
+            let value = args
+                .first()
+                .cloned()
+                .expect("u8_from_int requires an integer");
+            AirOp::IntToU8(AirIntToU8 {
+                value,
+                invalid_target,
+                ok_target: continuation_target,
+            })
+        }
         builtins::Builtin::EqInt => AirOp::JumpEqInt(AirJumpEq {
+            args: inputs,
+            target: continuation_target,
+        }),
+        builtins::Builtin::EqUInt => AirOp::JumpEqUInt(AirJumpEq {
+            args: inputs,
+            target: continuation_target,
+        }),
+        builtins::Builtin::EqBits(_) => AirOp::JumpEqBits(AirJumpEq {
             args: inputs,
             target: continuation_target,
         }),
@@ -1249,29 +1549,40 @@ fn call_op(builtin: builtins::Builtin, args: Vec<AirArg>) -> AirOp {
         .collect::<Vec<_>>();
 
     match builtin {
-        builtins::Builtin::Sprintf => AirOp::Sprintf(AirSprintf {
-            args: call_args,
-            arg_kinds,
-            target: continuation_target,
-        }),
         builtins::Builtin::Write => AirOp::Write(AirWrite {
             args: call_args,
             arg_kinds,
             target: continuation_target,
         }),
-        builtins::Builtin::ReadFile => {
+        builtins::Builtin::FileRead => {
             let err_target = call_args
                 .last()
-                .expect("readfile requires an error continuation")
+                .expect("file_read requires an error continuation")
                 .name
                 .clone();
             let path = call_args
                 .first()
                 .cloned()
-                .expect("readfile requires a path argument");
-            AirOp::ReadFile(AirReadFile {
+                .expect("file_read requires a path argument");
+            AirOp::FileRead(AirFileRead {
                 path,
                 err_target,
+                ok_target: continuation_target,
+            })
+        }
+        builtins::Builtin::BytesBuild => {
+            let invalid_target = call_args
+                .last()
+                .expect("bytes_build requires an invalid continuation")
+                .name
+                .clone();
+            let source = call_args
+                .first()
+                .cloned()
+                .expect("bytes_build requires a source");
+            AirOp::BytesBuild(AirBytesBuild {
+                source,
+                invalid_target,
                 ok_target: continuation_target,
             })
         }
@@ -1301,6 +1612,22 @@ fn build_conditional_builtin_bridge(
             args: inputs,
             target: true_label.clone(),
         }),
+        builtins::Builtin::EqUInt => AirOp::JumpEqUInt(AirJumpEq {
+            args: inputs,
+            target: true_label.clone(),
+        }),
+        builtins::Builtin::EqBits(_) => AirOp::JumpEqBits(AirJumpEq {
+            args: inputs,
+            target: true_label.clone(),
+        }),
+        builtins::Builtin::LtUInt => {
+            let (left, right) = binary_operands(builtin.name(), inputs);
+            AirOp::JumpLtUInt(AirJumpLt {
+                left,
+                right,
+                target: true_label.clone(),
+            })
+        }
         builtins::Builtin::Lt => {
             let (left, right) = binary_operands(builtin.name(), inputs);
             AirOp::JumpLt(AirJumpLt {
@@ -1325,9 +1652,7 @@ fn build_conditional_builtin_bridge(
         AirStmt::Label(AirLabel {
             name: false_label.clone(),
         }),
-        AirStmt::op(AirOp::ReleaseHeap(AirReleaseHeap {
-            name: true_cont.name.clone(),
-        })),
+        drop_owned_value(true_cont.name.clone(), &true_cont.kind),
         AirStmt::op(AirOp::JumpClosure(AirJumpClosure {
             env_end: false_cont.name.clone(),
             args: Vec::new(),
@@ -1335,9 +1660,7 @@ fn build_conditional_builtin_bridge(
         AirStmt::Label(AirLabel {
             name: true_label.clone(),
         }),
-        AirStmt::op(AirOp::ReleaseHeap(AirReleaseHeap {
-            name: false_cont.name.clone(),
-        })),
+        drop_owned_value(false_cont.name.clone(), &false_cont.kind),
         AirStmt::op(AirOp::JumpClosure(AirJumpClosure {
             env_end: true_cont.name.clone(),
             args: Vec::new(),
@@ -1350,39 +1673,18 @@ fn build_builtin_statements(
     builtin: builtins::Builtin,
     args: Vec<AirArg>,
 ) -> Vec<AirStmt> {
-    if builtin.is_conditional() {
-        return build_conditional_builtin_bridge(sig, builtin, args);
+    match builtin.air_route() {
+        builtins::AirRoute::Instruction => vec![AirStmt::op(instruction_op(builtin, args))],
+        builtins::AirRoute::Conditional => build_conditional_builtin_bridge(sig, builtin, args),
+        builtins::AirRoute::Call => vec![AirStmt::op(call_op(builtin, args))],
+        builtins::AirRoute::RuntimeFallback => {
+            let continuation = args
+                .last()
+                .expect("compile-error builtin requires a runtime continuation");
+            vec![AirStmt::op(AirOp::JumpClosure(AirJumpClosure {
+                env_end: continuation.name.clone(),
+                args: Vec::new(),
+            }))]
+        }
     }
-
-    if builtin.is_instruction() {
-        return vec![AirStmt::op(instruction_op(builtin, args))];
-    }
-
-    if builtin.is_libc_call() {
-        return vec![AirStmt::op(call_op(builtin, args))];
-    }
-
-    vec![AirStmt::op(AirOp::SysExit(AirSysExit { args }))]
-}
-
-fn is_inline_builtin(builtin: builtins::Builtin) -> bool {
-    matches!(
-        builtin,
-        builtins::Builtin::Add
-            | builtins::Builtin::Sub
-            | builtins::Builtin::Mul
-            | builtins::Builtin::Div
-            | builtins::Builtin::AddF64
-            | builtins::Builtin::MulF64
-            | builtins::Builtin::DivF64
-            | builtins::Builtin::AddBits(_)
-            | builtins::Builtin::SubBits(_)
-            | builtins::Builtin::MulBits(_)
-            | builtins::Builtin::DivBits { .. }
-            | builtins::Builtin::ConvertFixed { .. }
-            | builtins::Builtin::EqInt
-            | builtins::Builtin::EqStr
-            | builtins::Builtin::Lt
-            | builtins::Builtin::Gt
-    )
 }

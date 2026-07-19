@@ -1,0 +1,14 @@
+fmt: /std/fmt
+str: @str
+
+print_name: (name: str, ok: ()) {
+    fmt.new(
+        "% %",
+        @compile_error("missing format argument", @exit(1)),
+        fmt.str(name) fmt.end, @write(ok: ok)
+    )
+}
+
+main: () {
+    print_name("Alice", @exit(0))
+}

@@ -1,0 +1,4 @@
+[hir] expected str!, found str
+tests/failing/2-comptime-calc-runtime-name/main.af:11
+        calc.var(name, value) calc.end,
+                 ^^^^

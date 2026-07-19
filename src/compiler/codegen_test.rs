@@ -17,11 +17,11 @@ fn assert_codegen_snapshot(actual: &str, expected: &str, snapshot_name: &str, me
 #[test]
 #[ignore]
 fn codegen_test() {
-    let source = include_bytes!("codegen_test.rgo");
+    let source = include_bytes!("codegen_test.af");
     let cursor = Cursor::new(&source[..]);
     let mut output = Vec::new();
 
-    compile(cursor, "main", &mut output).expect("codegen should accept codegen_test.rgo");
+    compile(cursor, "main", &mut output).expect("codegen should accept codegen_test.af");
 
     let asm = String::from_utf8(output).expect("assembly should be UTF-8");
     let expected = include_str!("codegen_test.expected.asm");
@@ -30,18 +30,18 @@ fn codegen_test() {
         &asm,
         expected,
         "codegen_test",
-        "codegen should lower the formatted-output sample program",
+        "codegen should lower the arithmetic/output sample program",
     );
 }
 
 #[test]
 #[ignore]
 fn codegen_curry_test() {
-    let source = include_bytes!("codegen_curry_test.rgo");
+    let source = include_bytes!("codegen_curry_test.af");
     let cursor = Cursor::new(&source[..]);
     let mut output = Vec::new();
 
-    compile(cursor, "main", &mut output).expect("codegen should accept codegen_curry_test.rgo");
+    compile(cursor, "main", &mut output).expect("codegen should accept codegen_curry_test.af");
 
     let asm = String::from_utf8(output).expect("assembly should be UTF-8");
     let expected = include_str!("codegen_curry_test.expected.asm");

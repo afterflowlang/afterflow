@@ -1,0 +1,14 @@
+str: @str
+bytes: @bytes
+
+unexpected: (str) {
+    @exit(1)
+}
+
+main: () {
+    @file_read("bin/2-file-read-invalid-utf8.o", @exit(1), (contents: bytes) {
+        @str_from_utf8(contents, () {
+            @write("invalid\n", @exit(0))
+        }, unexpected)
+    })
+}

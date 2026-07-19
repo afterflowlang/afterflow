@@ -1,0 +1,9 @@
+int: @int
+
+foo: (cb: (int)) {
+    cb(42)
+}
+
+main: () {
+    foo(@exit)
+}

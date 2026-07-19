@@ -1,9 +1,0 @@
-stdout: /stdout
-
-str: @str
-int: @int
-
-x: 42
-main: () {
-    stdout.printf("Hello %d!", 42, @exit(0))
-}

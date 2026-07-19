@@ -1,0 +1,21 @@
+fmt: /std/fmt
+calc: /std/math/calc
+
+print_result: (result: @f64, ok: ()) {
+    fmt.new(
+        "result: %\n",
+        @compile_error("invalid format", @exit(1)),
+        fmt.f64(result) fmt.end,
+        @write(ok: ok)
+    )
+}
+
+handle_error: @compile_error("invalid calculation", @exit(1))
+main: () {
+    calc.new("hypot(width, height) + sin(pi / 2) ^ 2", handle_error,
+        calc.var("width", 3.0)
+        calc.var("height", 4.0)
+        calc.end,
+        print_result(ok: @exit(0))
+    )
+}

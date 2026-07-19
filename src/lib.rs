@@ -82,13 +82,10 @@ mod tests {
     #[test]
     fn compile_simple_program() {
         let source = r#"
-str: @str
 int: @int
 
 print_int: (value: int) {
-    @sprintf("%d", value, (res: str){
-        @write(res, @exit(0))
-    })
+    @write("5", @exit(0))
 }
 
 add_five: (ok:(int)) {
@@ -146,8 +143,8 @@ main: () {
             .expect("compiler produced asm");
         let asm = String::from_utf8(output).expect("valid utf8");
         assert!(asm.contains("global puts"));
-        assert!(asm.contains("extern write"));
-        assert!(asm.contains("extern exit"));
+        assert!(!asm.contains("extern write"));
+        assert!(!asm.contains("extern exit"));
         assert!(!asm.contains("extern puts"));
     }
 
@@ -162,7 +159,7 @@ main: () {
         compile(Cursor::new(source.as_bytes()), "main", &mut output)
             .expect("direct builtins compile");
         let asm = String::from_utf8(output).expect("valid utf8");
-        assert!(asm.contains("extern write"));
+        assert!(asm.contains("mov rax, 1 ; write syscall"));
     }
 
     #[test]

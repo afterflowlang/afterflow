@@ -1,0 +1,23 @@
+str: @str
+uint: @uint
+rune: @rune
+u32: @u32
+
+unexpected: (rune) {
+    @exit(1)
+}
+
+inspect: (l: uint, nth: (idx: uint, empty: (), one: (rune))) {
+    (value: rune) = nth(2, @exit(1))
+    (scalar: u32) = @u32_from_rune(value)
+    nth(3, () {
+        @write("3 128512\n", @exit(0))
+    }, unexpected)
+}
+
+value: "Aé😀"
+run: value(inspect)
+
+main: () {
+    run
+}

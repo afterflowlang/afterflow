@@ -1,0 +1,4 @@
+[hir] expected (((f64))), found (f64)!
+tests/failing/1-curried_arg_signature_mismatch/main.af:12
+    consume(print(ok: @exit(0)))
+            ^^^^^

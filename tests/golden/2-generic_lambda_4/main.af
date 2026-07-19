@@ -1,0 +1,14 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+receiver: <T>(T)
+foo: <T>(x: T, ok:receiver<T>){
+    ok(x)
+}
+bar: (x: int){
+    fmt.new("%", @exit(1), fmt.int(x) fmt.end, @write(ok: @exit(0)))
+}
+main: () {
+    foo(42, bar)
+}

@@ -1,0 +1,5 @@
+write: @write
+
+emit: (ok: ()) {
+    write("this builtin must be replaced", ok)
+}

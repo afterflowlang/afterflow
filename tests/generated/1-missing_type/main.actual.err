@@ -1,4 +1,4 @@
 [hir] type `x` is not defined
-tests/failing/1-missing_type/main.rgo:5
+tests/failing/1-missing_type/main.af:5
 start: (){ omega(omega, start) }
                  ^^^^^

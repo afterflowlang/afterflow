@@ -1,0 +1,38 @@
+int: @int
+bar: (ok:()){
+    _0: "bar,"
+    @write(_0, ok)
+}
+baz: (ok:()){
+    _1: "baz,"
+    @write(_1, ok)
+}
+_7_foo: (foo:(int, ())!, done:(), next: int){
+    _8: "foo,"
+    _9_foo: foo(next, done)
+    _10_baz: baz(_9_foo)
+    _11_bar: bar(_10_baz)
+    @write(_8, _11_bar)
+}
+
+_4_foo: (remaining: int, foo:(int, ())!, done:()){
+    _5: 1
+    _12_foo: _7_foo(foo, done)
+    @sub(remaining, _5, _12_foo)
+}
+
+foo: (remaining: int, done:()){
+    _2: 0
+    _13_foo: _4_foo(remaining, foo, done)
+    @eq_int(remaining, _2, done, _13_foo)
+}
+_16_main: (){
+    _17: 0
+    @exit(_17)
+}
+
+main: (){
+    _14: 3
+    foo(_14, _16_main)
+}
+main()

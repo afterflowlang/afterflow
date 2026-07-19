@@ -14,7 +14,8 @@ impl Project {
             .duration_since(UNIX_EPOCH)
             .expect("clock is after epoch")
             .as_nanos();
-        let path = std::env::temp_dir().join(format!("rgo-{name}-{}-{nonce}", std::process::id()));
+        let path =
+            std::env::temp_dir().join(format!("afterflow-{name}-{}-{nonce}", std::process::id()));
         fs::create_dir_all(&path).expect("project directory is created");
         Self { path }
     }
@@ -41,10 +42,35 @@ impl Drop for Project {
 }
 
 #[test]
+fn compiles_the_complete_std_math_surface() {
+    let entry =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/std_math_surface/main.af");
+    let mut output = Vec::new();
+    compile_path(&entry, "main", &mut output).expect("the complete std math surface compiles");
+    let assembly = String::from_utf8(output).expect("assembly is UTF-8");
+    let native_symbols = assembly
+        .lines()
+        .filter(|line| line.starts_with("extern freestanding_math_"))
+        .count();
+    assert_eq!(native_symbols, 37);
+}
+
+#[test]
+fn compiles_checked_in_test_source_fixture() {
+    let entry =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/test_sources/main_test.af");
+    let mut output = Vec::new();
+    compile_path(&entry, "main", &mut output).expect("the checked-in test source fixture compiles");
+    let assembly = String::from_utf8(output).expect("assembly is UTF-8");
+    assert!(!assembly.contains("write syscall"));
+    assert!(assembly.contains("global emit"));
+}
+
+#[test]
 fn compiles_all_files_in_entry_and_imported_folders() {
     let project = Project::new("folder-import");
     let main = project.write(
-        "main.rgo",
+        "main.af",
         r#"lib: /lib
 
 main: () {
@@ -53,21 +79,21 @@ main: () {
 "#,
     );
     let other = project.write(
-        "anything.rgo",
+        "anything.af",
         r#"unused: () {
     @exit(1)
 }
 "#,
     );
     project.write(
-        "lib/a.rgo",
+        "lib/a.af",
         r#"run: (ok: done) {
     helper(ok)
 }
 "#,
     );
     project.write(
-        "lib/z.rgo",
+        "lib/z.af",
         r#"done: ()
 
 helper: (ok: done) {
@@ -86,8 +112,8 @@ helper: (ok: done) {
 #[test]
 fn rejects_duplicate_labels_across_files() {
     let project = Project::new("duplicate-label");
-    let entry = project.write("one.rgo", "main: () {\n    @exit(0)\n}\n");
-    project.write("two.rgo", "main: () {\n    @exit(1)\n}\n");
+    let entry = project.write("one.af", "main: () {\n    @exit(0)\n}\n");
+    project.write("two.af", "main: () {\n    @exit(1)\n}\n");
 
     let error = project
         .compile(&entry)
@@ -98,8 +124,8 @@ fn rejects_duplicate_labels_across_files() {
 #[test]
 fn rejects_importing_the_root_package() {
     let project = Project::new("import-cycle");
-    let entry = project.write("main.rgo", "lib: /lib\n\nmain: () {\n    lib.run()\n}\n");
-    project.write("lib/lib.rgo", "root: /\n\nrun: () {\n    @exit(0)\n}\n");
+    let entry = project.write("main.af", "lib: /lib\n\nmain: () {\n    lib.run()\n}\n");
+    project.write("lib/lib.af", "root: /\n\nrun: () {\n    @exit(0)\n}\n");
 
     let error = project
         .compile(&entry)
@@ -113,11 +139,54 @@ fn rejects_importing_the_root_package() {
 }
 
 #[test]
+fn private_file_declarations_remain_visible_inside_their_folder() {
+    let project = Project::new("private-file-sibling-access");
+    let entry = project.write("main.af", "lib: /lib\n\nmain: () {\n    lib.run()\n}\n");
+    project.write("lib/main.af", "run: () {\n    helper()\n}\n");
+    project.write("lib/_helper.af", "helper: () {\n    @exit(0)\n}\n");
+
+    project
+        .compile(&entry)
+        .expect("public declarations can use private sibling declarations");
+}
+
+#[test]
+fn rejects_imported_access_to_private_file_declarations() {
+    let project = Project::new("private-file-import-access");
+    let entry = project.write("main.af", "lib: /lib\n\nmain: () {\n    lib.helper()\n}\n");
+    project.write("lib/main.af", "public: 1\n");
+    project.write("lib/_helper.af", "helper: () {\n    @exit(0)\n}\n");
+
+    let error = project
+        .compile(&entry)
+        .expect_err("private declaration access through an import is rejected");
+    assert!(
+        error
+            .to_string()
+            .contains("folder '/lib' has no label 'helper'"),
+        "{error}"
+    );
+}
+
+#[test]
+fn rejects_private_file_declarations_as_compilation_targets() {
+    let project = Project::new("private-file-target");
+    let entry = project.write("_main.af", "main: () {\n    @exit(0)\n}\n");
+
+    let error = project
+        .compile(&entry)
+        .expect_err("private declaration cannot be selected as a target");
+    assert!(error
+        .to_string()
+        .contains("could not resolve target 'main'"));
+}
+
+#[test]
 fn rejects_source_import_cycles() {
     let project = Project::new("import-cycle");
-    let entry = project.write("main.rgo", "a: /a\n\nmain: () {\n    a.run()\n}\n");
-    project.write("a/main.rgo", "b: /b\n\nrun: () {\n    b.run()\n}\n");
-    project.write("b/main.rgo", "a: /a\n\nrun: () {\n    a.run()\n}\n");
+    let entry = project.write("main.af", "a: /a\n\nmain: () {\n    a.run()\n}\n");
+    project.write("a/main.af", "b: /b\n\nrun: () {\n    b.run()\n}\n");
+    project.write("b/main.af", "a: /a\n\nrun: () {\n    a.run()\n}\n");
 
     let error = project
         .compile(&entry)
@@ -129,7 +198,7 @@ fn rejects_source_import_cycles() {
 fn preserves_declaration_before_use_within_each_file() {
     let project = Project::new("declaration-order");
     let entry = project.write(
-        "main.rgo",
+        "main.af",
         r#"main: () {
     later()
 }
@@ -152,7 +221,7 @@ later: () {
 fn preserves_declaration_before_use_for_source_packages() {
     let project = Project::new("source-import-order");
     let entry = project.write(
-        "main.rgo",
+        "main.af",
         r#"main: () {
     lib.run(@exit(0))
 }
@@ -160,7 +229,7 @@ fn preserves_declaration_before_use_for_source_packages() {
 lib: /lib
 "#,
     );
-    project.write("lib/main.rgo", "run: (ok: ()) {\n    ok()\n}\n");
+    project.write("lib/main.af", "run: (ok: ()) {\n    ok()\n}\n");
 
     let error = project
         .compile(&entry)
@@ -173,22 +242,136 @@ lib: /lib
 #[test]
 fn reports_errors_from_the_originating_source_file() {
     let project = Project::new("source-diagnostic");
-    let entry = project.write("main.rgo", "lib: /lib\n\nmain: () {\n    lib.run()\n}\n");
-    project.write("lib/main.rgo", "run: () {\n    missing()\n}\n");
+    let entry = project.write("main.af", "lib: /lib\n\nmain: () {\n    lib.run()\n}\n");
+    project.write("lib/main.af", "run: () {\n    missing()\n}\n");
 
     let error = project
         .compile(&entry)
         .expect_err("undefined imported label is rejected");
     assert!(error
         .to_string()
-        .contains("lib/main.rgo:2\n    missing()\n    ^^^^^^^"));
+        .contains("lib/main.af:2\n    missing()\n    ^^^^^^^"));
+}
+
+#[test]
+fn normal_compilation_ignores_test_sources() {
+    let project = Project::new("ignore-test-sources");
+    let entry = project.write("main.af", "main: () {\n    @exit(0)\n}\n");
+    project.write("broken_test.af", "this is not valid afterflow\n");
+
+    project
+        .compile(&entry)
+        .expect("test sources do not participate in normal compilation");
+}
+
+#[test]
+fn test_sources_can_use_regular_sibling_declarations() {
+    let project = Project::new("test-regular-sibling");
+    project.write("run.af", "run: () {\n    @exit(0)\n}\n");
+    let entry = project.write("main_test.af", "main: () {\n    run()\n}\n");
+
+    project
+        .compile(&entry)
+        .expect("test sources can use regular sibling declarations");
+}
+
+#[test]
+fn test_sources_can_import_regular_package_declarations() {
+    let project = Project::new("test-import");
+    let entry = project.write(
+        "main_test.af",
+        "lib: /lib\n\nmain: () {\n    lib.run()\n}\n",
+    );
+    project.write("lib/run.af", "run: () {\n    @exit(0)\n}\n");
+    project.write("lib/broken_test.af", "this is not valid afterflow\n");
+
+    project
+        .compile(&entry)
+        .expect("imports expose regular declarations and ignore dependency tests");
+}
+
+#[test]
+fn regular_sources_cannot_use_test_declarations() {
+    let project = Project::new("regular-cannot-see-test");
+    project.write("run.af", "run: () {\n    helper()\n}\n");
+    let entry = project.write(
+        "main_test.af",
+        "helper: () {\n    @exit(0)\n}\n\nmain: () {\n    run()\n}\n",
+    );
+
+    let error = project
+        .compile(&entry)
+        .expect_err("regular sources cannot use declarations from test sources");
+    assert!(
+        error
+            .to_string()
+            .contains("`helper` is only available to _test.af sources"),
+        "{error}"
+    );
+}
+
+#[test]
+fn test_entry_sources_can_override_callable_builtins() {
+    let project = Project::new("test-builtin-override");
+    project.write(
+        "run.af",
+        "write: @write\n\nrun: () {\n    @write(\"not written\", @exit(0))\n}\n\nrun_alias: () {\n    write(\"also not written\", @exit(0))\n}\n",
+    );
+    let entry = project.write(
+        "main_test.af",
+        "discard: (message: @str, ok: ()) {\n    ok()\n}\n\n@write: discard\n\nmain: () {\n    run()\n}\n",
+    );
+
+    let assembly = project
+        .compile(&entry)
+        .expect("the selected test entry can replace a builtin with a function alias");
+    assert!(!assembly.contains("write syscall"));
+}
+
+#[test]
+fn regular_sources_cannot_override_builtins() {
+    let project = Project::new("regular-builtin-override");
+    let entry = project.write(
+        "main.af",
+        "discard: (message: @str, ok: ()) {\n    ok()\n}\n\n@write: discard\n\nmain: () {\n    @exit(0)\n}\n",
+    );
+
+    let error = project
+        .compile(&entry)
+        .expect_err("regular entry sources cannot override builtins");
+    assert!(
+        error
+            .to_string()
+            .contains("builtin overrides are only allowed in the selected _test.af entry source"),
+        "{error}"
+    );
+}
+
+#[test]
+fn only_the_selected_test_entry_can_override_builtins() {
+    let project = Project::new("non-entry-builtin-override");
+    project.write(
+        "other_test.af",
+        "discard: (message: @str, ok: ()) {\n    ok()\n}\n\n@write: discard\n",
+    );
+    let entry = project.write("main_test.af", "main: () {\n    @exit(0)\n}\n");
+
+    let error = project
+        .compile(&entry)
+        .expect_err("non-entry test sources cannot override builtins");
+    assert!(
+        error
+            .to_string()
+            .contains("builtin overrides are only allowed in the selected _test.af entry source"),
+        "{error}"
+    );
 }
 
 #[test]
 fn rejects_access_through_a_nested_source_folder() {
     let project = Project::new("nested-folder-access");
     let entry = project.write(
-        "main.rgo",
+        "main.af",
         r#"lib: /lib
 
 main: () {
@@ -196,9 +379,9 @@ main: () {
 }
 "#,
     );
-    project.write("lib/lib.rgo", "marker: 1\n");
+    project.write("lib/lib.af", "marker: 1\n");
     project.write(
-        "lib/strings/strings.rgo",
+        "lib/strings/strings.af",
         r#"upper: () {
     @exit(0)
 }
@@ -217,7 +400,7 @@ main: () {
 fn source_packages_can_use_an_explicit_alias() {
     let project = Project::new("file-import");
     let entry = project.write(
-        "main.rgo",
+        "main.af",
         r#"strings: /lib/strings
 
 main: () {
@@ -226,7 +409,7 @@ main: () {
 "#,
     );
     project.write(
-        "lib/strings/main.rgo",
+        "lib/strings/main.af",
         r#"upper: () {
     @exit(0)
 }
@@ -242,10 +425,10 @@ main: () {
 fn source_packages_can_use_std_as_an_alias() {
     let project = Project::new("std-source-namespace");
     let entry = project.write(
-        "main.rgo",
+        "main.af",
         "std: /std\n\nmain: () {\n    std.run(@exit(0))\n}\n",
     );
-    project.write("std/main.rgo", "run: (ok: ()) {\n    ok()\n}\n");
+    project.write("std/main.af", "run: (ok: ()) {\n    ok()\n}\n");
 
     project
         .compile(&entry)
@@ -256,7 +439,7 @@ fn source_packages_can_use_std_as_an_alias() {
 fn imports_paths_with_spaces_and_hyphens_until_semicolon() {
     let project = Project::new("path-syntax");
     let entry = project.write(
-        "main.rgo",
+        "main.af",
         r#"something: /some path/to-some/something;
 
 main: () {
@@ -265,7 +448,7 @@ main: () {
 "#,
     );
     project.write(
-        "some path/to-some/something/main.rgo",
+        "some path/to-some/something/main.af",
         r#"run: (ok: ()) {
     ok()
 }

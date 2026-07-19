@@ -1,4 +1,4 @@
 [hir] expected T, found str!
-tests/failing/2-generic_lambda_exec_mismatch/main.rgo:11
+tests/failing/2-generic_lambda_exec_mismatch/main.af:11
     foo(1, "bad", done)
            ^^^^^

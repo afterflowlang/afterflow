@@ -1,4 +1,4 @@
 [hir] `printf` is not defined
-tests/failing/1-forgot_func_import/main.rgo:4
+tests/failing/1-forgot_func_import/main.af:4
     printf("Number: %d\n", n, @exit(0)) // Error: forgot to import printf
     ^^^^^^

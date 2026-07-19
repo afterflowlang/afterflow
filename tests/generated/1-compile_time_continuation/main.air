@@ -1,0 +1,100 @@
+_3_main():
+    @exit($_4: int = 1)
+
+
+_3_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_3_main)
+
+
+_3_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_3_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_12_main():
+    @exit($_13: int = 0)
+
+
+_12_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_12_main)
+
+
+_12_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_12_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_9_main($_8_main: ()):
+    $_12_main = @newclosure<>(_12_main)
+    @dropclosure($_8_main)
+    @write($_10: str = "callable!\n", $_12_main)
+
+
+_9_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $_8_main = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_9_main, $_8_main: ())
+
+
+_9_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    $__num_remaining = @field($__env_end, 5)
+    @gt(_9_main_release_skip_0, $__num_remaining, 0)
+    $_9_main_release_field_0 = @field($__env_end, -1)
+    @dropclosure($_9_main_release_field_0)
+_9_main_release_skip_0:
+    @release($__env_end)
+    @return()
+
+
+_9_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    $num_remaining = @field($__env_end, 5)
+    @gt(_9_main_deepcopy_skip_0, $num_remaining, 0)
+    @deepcopy($_9_main_deepcopy_field_0, $__env_end, -1)
+_9_main_deepcopy_skip_0:
+    @return()
+
+
+main():
+    $_3_main = @newclosure<>(_3_main)
+    @jumpargs(_9_main, $_3_main: ())
+
+
+main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(main)
+
+
+main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_start():
+    @jumpargs(main)
+

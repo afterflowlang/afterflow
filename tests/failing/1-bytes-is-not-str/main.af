@@ -1,0 +1,12 @@
+str: @str
+bytes: @bytes
+
+consume: (str) {
+    @exit(0)
+}
+
+main: () {
+    @file_read("unused", @exit(1), (value: bytes) {
+        consume(value)
+    })
+}

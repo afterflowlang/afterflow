@@ -1,0 +1,9 @@
+rune: @rune
+
+accept: (value: rune) {
+    @exit(0)
+}
+
+main: () {
+    accept(55296)
+}

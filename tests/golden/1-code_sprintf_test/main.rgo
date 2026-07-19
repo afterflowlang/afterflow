@@ -1,8 +1,0 @@
-str: @str
-int: @int
-
-main: () {
-    @sprintf("result: %d", 3, (s:str){
-        @write(s, @exit(0))
-    })
-}

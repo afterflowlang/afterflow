@@ -6,14 +6,14 @@ use super::parser::Parser;
 #[test]
 #[ignore] // TODO: unignore
 fn parser_test() {
-    let source = include_bytes!("parser_test.rgo");
+    let source = include_bytes!("parser_test.af");
     let cursor = Cursor::new(&source[..]);
     let lexer = Lexer::new(cursor);
     let mut parser = Parser::new(lexer);
     let mut items = Vec::new();
     while let Some(item) = parser
         .next_block_item()
-        .expect("parser should accept parser_test.rgo")
+        .expect("parser should accept parser_test.af")
     {
         items.push(item);
     }
@@ -69,7 +69,6 @@ fn parser_test() {
                             column: 7,
                             offset: 84,
                         },
-                        is_variadic: false,
                     },
                 ],
                 span: Span {
@@ -157,7 +156,6 @@ fn parser_test() {
                             column: 7,
                             offset: 144,
                         },
-                        is_variadic: false,
                     },
                 ],
                 span: Span {
@@ -235,7 +233,6 @@ fn parser_test() {
                             column: 7,
                             offset: 187,
                         },
-                        is_variadic: false,
                     },
                     NameAndType {
                         name: "name1",
@@ -245,7 +242,6 @@ fn parser_test() {
                             column: 19,
                             offset: 199,
                         },
-                        is_variadic: false,
                     },
                     NameAndType {
                         name: "name2",
@@ -255,7 +251,6 @@ fn parser_test() {
                             column: 31,
                             offset: 211,
                         },
-                        is_variadic: false,
                     },
                 ],
                 span: Span {

@@ -1,0 +1,12 @@
+str: @str
+
+receiver: <T>(T)
+foo: <T>(x: T, ok:receiver<T>){
+    ok(x)
+}
+bar: (x: str){
+    @write(x, @exit(0))
+}
+main: () {
+    foo(42, bar)
+}

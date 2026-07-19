@@ -1,27 +1,4 @@
 [
-    Import {
-        label: "stdout",
-        path: "/stdout",
-        span: ,
-    },
-    IdentDef {
-        name: "str",
-        ident: Ident {
-            name: "@str",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
-    IdentDef {
-        name: "int",
-        ident: Ident {
-            name: "@int",
-            args: [],
-            span: ,
-        },
-        span: ,
-    },
     IdentDef {
         name: "byte",
         ident: Ident {
@@ -67,26 +44,15 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "stdout.printf",
+                            name: "@write",
                             args: [
                                 Arg {
                                     name: None,
                                     term: Lit(
                                         Literal {
                                             value: Str(
-                                                "byte %d\n",
+                                                "byte 255\n",
                                             ),
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "value",
-                                            args: [],
                                             span: ,
                                         },
                                     ),

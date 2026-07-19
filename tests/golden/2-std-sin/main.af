@@ -1,0 +1,9 @@
+math: /std/math
+
+main: () {
+    math.sin(1.0, (value: @f64) {
+        math.sin(value, (result: @f64) {
+            @write("sin ok\n", @exit(0))
+        })
+    })
+}

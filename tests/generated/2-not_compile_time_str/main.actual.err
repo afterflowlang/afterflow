@@ -1,4 +1,4 @@
 [hir] expected str!, found str
-tests/failing/2-not_compile_time_str/main.rgo:11
+tests/failing/2-not_compile_time_str/main.af:7
     bar(fmt)
         ^^^

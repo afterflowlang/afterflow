@@ -1,7 +1,7 @@
 [
     Import {
-        label: "stdout",
-        path: "/stdout",
+        label: "fmt",
+        path: "/std/fmt",
         span: ,
     },
     IdentDef {
@@ -289,14 +289,14 @@
                 items: [
                     Ident(
                         Ident {
-                            name: "stdout.printf",
+                            name: "fmt.new",
                             args: [
                                 Arg {
                                     name: None,
                                     term: Lit(
                                         Literal {
                                             value: Str(
-                                                "a1: %d, a11: %d, a21: %d\n",
+                                                "a1: %, a11: %, a21: %\n",
                                             ),
                                             span: ,
                                         },
@@ -307,8 +307,21 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "a1",
-                                            args: [],
+                                            name: "@exit",
+                                            args: [
+                                                Arg {
+                                                    name: None,
+                                                    term: Lit(
+                                                        Literal {
+                                                            value: Int(
+                                                                1,
+                                                            ),
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
                                             span: ,
                                         },
                                     ),
@@ -318,8 +331,77 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "a11",
-                                            args: [],
+                                            name: "fmt.int",
+                                            args: [
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "a1",
+                                                            args: [],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                                Arg {
+                                                    name: None,
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "fmt.int",
+                                                            args: [
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Ident(
+                                                                        Ident {
+                                                                            name: "a11",
+                                                                            args: [],
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Ident(
+                                                                        Ident {
+                                                                            name: "fmt.int",
+                                                                            args: [
+                                                                                Arg {
+                                                                                    name: None,
+                                                                                    term: Ident(
+                                                                                        Ident {
+                                                                                            name: "a21",
+                                                                                            args: [],
+                                                                                            span: ,
+                                                                                        },
+                                                                                    ),
+                                                                                    span: ,
+                                                                                },
+                                                                                Arg {
+                                                                                    name: None,
+                                                                                    term: Ident(
+                                                                                        Ident {
+                                                                                            name: "fmt.end",
+                                                                                            args: [],
+                                                                                            span: ,
+                                                                                        },
+                                                                                    ),
+                                                                                    span: ,
+                                                                                },
+                                                                            ],
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                            ],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
                                             span: ,
                                         },
                                     ),
@@ -329,19 +411,22 @@
                                     name: None,
                                     term: Ident(
                                         Ident {
-                                            name: "a21",
-                                            args: [],
-                                            span: ,
-                                        },
-                                    ),
-                                    span: ,
-                                },
-                                Arg {
-                                    name: None,
-                                    term: Ident(
-                                        Ident {
-                                            name: "ok",
-                                            args: [],
+                                            name: "@write",
+                                            args: [
+                                                Arg {
+                                                    name: Some(
+                                                        "ok",
+                                                    ),
+                                                    term: Ident(
+                                                        Ident {
+                                                            name: "ok",
+                                                            args: [],
+                                                            span: ,
+                                                        },
+                                                    ),
+                                                    span: ,
+                                                },
+                                            ],
                                             span: ,
                                         },
                                     ),

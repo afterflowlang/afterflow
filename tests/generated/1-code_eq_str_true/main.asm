@@ -7,7 +7,8 @@ _6_main:
     mov rbp, rsp ; establish new frame base
     ; load exit code
     mov rdi, 0 ; operand literal
-    call exit ; call libc exit to flush buffers
+    mov rax, 60 ; exit syscall
+    syscall
 global release_heap_ptr
 release_heap_ptr:
     push rbp ; save caller frame
@@ -57,6 +58,17 @@ _6_main_deepcopy:
     leave
     ret
 
+global release_descriptor_ptr
+release_descriptor_ptr:
+    mov rax, [rdi+16] ; load owned mapping base
+    test rax, rax ; static descriptors have no owner
+    jz release_descriptor_ptr_done
+    mov rsi, [rdi+24] ; mapping size
+    mov rdi, rax ; mapping base
+    mov rax, 11 ; munmap syscall
+    syscall
+release_descriptor_ptr_done:
+    ret
 global _3_main
 _3_main:
     push rbp ; save executor frame pointer
@@ -91,7 +103,12 @@ _3_main:
     mov rsi, [rdi] ; string data pointer
     mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
-    call write ; invoke libc write
+    mov rax, 1 ; write syscall
+    syscall
+    push r12 ; preserve current environment
+    lea rdi, [rel _4] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
     mov r12, [rbp-8] ; load continuation env_end pointer
     mov rax, [r12+0] ; load continuation entry point
     mov rdi, r12 ; pass env_end pointer to continuation
@@ -136,7 +153,8 @@ _14_main:
     mov rbp, rsp ; establish new frame base
     ; load exit code
     mov rdi, 0 ; operand literal
-    call exit ; call libc exit to flush buffers
+    mov rax, 60 ; exit syscall
+    syscall
 global _14_main_unwrapper
 _14_main_unwrapper:
     push rbp ; save executor frame pointer
@@ -204,7 +222,12 @@ _11_main:
     mov rsi, [rdi] ; string data pointer
     mov rdx, [rdi+8] ; string byte length
     mov rdi, 1 ; stdout fd
-    call write ; invoke libc write
+    mov rax, 1 ; write syscall
+    syscall
+    push r12 ; preserve current environment
+    lea rdi, [rel _12] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
     mov r12, [rbp-8] ; load continuation env_end pointer
     mov rax, [r12+0] ; load continuation entry point
     mov rdi, r12 ; pass env_end pointer to continuation
@@ -300,31 +323,55 @@ main:
     mov r11, [rbx] ; load second string data pointer
     mov rcx, [rax+8] ; load first string byte length
     cmp rcx, [rbx+8] ; compare string byte lengths
-    jne main_eqs_false_0 ; lengths differ
+    jne main_eqs_false_1 ; lengths differ
     test rcx, rcx ; empty strings match
-    je eq_str__3_main_true_0_0
-main_eqs_loop_1:
+    je main_eqs_equal_0
+main_eqs_loop_2:
     mov al, byte [r10]
     mov dl, byte [r11]
     cmp al, dl
-    jne main_eqs_false_0 ; bytes differ
+    jne main_eqs_false_1 ; bytes differ
     inc r10
     inc r11
     dec rcx
-    jne main_eqs_loop_1
+    jne main_eqs_loop_2
+    jmp main_eqs_equal_0
+main_eqs_equal_0:
+    push r12 ; preserve current environment
+    lea rdi, [rel _0] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
+    push r12 ; preserve current environment
+    lea rdi, [rel _1] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
     jmp eq_str__3_main_true_0_0
-main_eqs_false_0:
+main_eqs_false_1:
+    push r12 ; preserve current environment
+    lea rdi, [rel _0] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
+    push r12 ; preserve current environment
+    lea rdi, [rel _1] ; point to string literal
+    call release_descriptor_ptr ; release owned descriptor
+    pop r12 ; restore current environment
 eq_str__11_main_false_0_0:
-    mov rdi, [rbp-8] ; load _3_main closure env_end pointer
-    call release_heap_ptr ; release _3_main closure environment
+    push r12 ; preserve current environment
+    mov rdi, [rbp-8] ; load operand
+    mov rax, [rdi+8] ; load closure release helper
+    call rax ; recursively release closure
+    pop r12 ; restore current environment
     mov rbx, [rbp-16] ; load _11_main closure env_end pointer
     mov rdi, rbx ; pass env_end pointer to closure
     mov rax, [rdi+0] ; load closure unwrapper entry point
     leave ; unwind before jumping
     jmp rax ; tail call into closure
 eq_str__3_main_true_0_0:
-    mov rdi, [rbp-16] ; load _11_main closure env_end pointer
-    call release_heap_ptr ; release _11_main closure environment
+    push r12 ; preserve current environment
+    mov rdi, [rbp-16] ; load operand
+    mov rax, [rdi+8] ; load closure release helper
+    call rax ; recursively release closure
+    pop r12 ; restore current environment
     mov rbx, [rbp-8] ; load _3_main closure env_end pointer
     mov rdi, rbx ; pass env_end pointer to closure
     mov rax, [rdi+0] ; load closure unwrapper entry point
@@ -369,22 +416,20 @@ _start:
     mov rbp, rsp ; establish new frame base
     leave ; unwind before named jump
     jmp main
-extern exit
-extern write
 section .rodata
 _4:
-    dq _4_data, 4 ; string data pointer and byte length
+    dq _4_data, 4, 0, 0 ; data, byte length, heap base, heap size
 _4_data:
     db "true", 0
 _12:
-    dq _12_data, 5 ; string data pointer and byte length
+    dq _12_data, 5, 0, 0 ; data, byte length, heap base, heap size
 _12_data:
     db "false", 0
 _0:
-    dq _0_data, 3 ; string data pointer and byte length
+    dq _0_data, 3, 0, 0 ; data, byte length, heap base, heap size
 _0_data:
     db "aaa", 0
 _1:
-    dq _1_data, 3 ; string data pointer and byte length
+    dq _1_data, 3, 0, 0 ; data, byte length, heap base, heap size
 _1_data:
     db "aaa", 0

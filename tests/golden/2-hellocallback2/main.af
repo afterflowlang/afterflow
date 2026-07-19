@@ -1,0 +1,13 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+foo: (f:(str, ()), ok:()){
+	f("42", ok)
+}
+print: (n:str, ok:()){
+	fmt.new("The winning number is %\n", @exit(1), fmt.str(n) fmt.end, @write(ok: ok))
+}
+main: () {
+    foo(print, @exit(0))
+}

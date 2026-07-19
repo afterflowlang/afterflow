@@ -1,0 +1,91 @@
+_12_main():
+    @exit($_13: int = 0)
+
+
+_12_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(_12_main)
+
+
+_12_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_12_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_9_main($_8_main: f64):
+    $_12_main = @newclosure<>(_12_main)
+    @write($_10: str = "f64!\n", $_12_main)
+
+
+_9_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $_8_main = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_9_main, $_8_main: f64)
+
+
+_9_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_9_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_4_main($value: f64):
+    $_9_main = @newclosure<f64>(_9_main)
+    @add_f64($value: f64, $_5: f64 = 0, $_9_main)
+
+
+_4_main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    $value = @field($__env_end, -1)
+    @release($__env_end)
+    @jumpargs(_4_main, $value: f64)
+
+
+_4_main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+_4_main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+main():
+    @jumpargs(_4_main, $__comptime_0: f64 = 1.5)
+
+
+main_unwrapper($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @jumpargs(main)
+
+
+main_deep_release($env_end: int):
+    $__env_end = @pin($env_end)
+    @release($__env_end)
+    @return()
+
+
+main_deepcopy($env_end: int):
+    $__env_end = @pin($env_end)
+    @return()
+
+
+_start():
+    @jumpargs(main)
+

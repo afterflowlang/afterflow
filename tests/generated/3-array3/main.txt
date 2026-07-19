@@ -1,7 +1,7 @@
 [
     Import {
-        label: "stdout",
-        path: "/stdout",
+        label: "fmt",
+        path: "/std/fmt",
         span: ,
     },
     IdentDef {
@@ -640,221 +640,399 @@
                                             },
                                             body: Block {
                                                 items: [
-                                                    ScopeCapture {
-                                                        params: Signature {
-                                                            items: [],
-                                                            span: ,
-                                                            generics: {},
-                                                        },
-                                                        continuation: Block {
-                                                            items: [
-                                                                Ident(
-                                                                    Ident {
-                                                                        name: "nth",
-                                                                        args: [
-                                                                            Arg {
-                                                                                name: None,
-                                                                                term: Lit(
-                                                                                    Literal {
-                                                                                        value: Int(
-                                                                                            1,
-                                                                                        ),
-                                                                                        span: ,
-                                                                                    },
-                                                                                ),
-                                                                                span: ,
-                                                                            },
-                                                                            Arg {
-                                                                                name: None,
-                                                                                term: Lambda(
-                                                                                    Lambda {
-                                                                                        params: Signature {
-                                                                                            items: [
-                                                                                                SigItem {
-                                                                                                    name: "s",
-                                                                                                    kind: Ident(
-                                                                                                        SigIdent {
-                                                                                                            name: "str",
+                                                    Ident(
+                                                        Ident {
+                                                            name: "fmt.new",
+                                                            args: [
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Lit(
+                                                                        Literal {
+                                                                            value: Str(
+                                                                                "array has % elements\n",
+                                                                            ),
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Ident(
+                                                                        Ident {
+                                                                            name: "@exit",
+                                                                            args: [
+                                                                                Arg {
+                                                                                    name: None,
+                                                                                    term: Lit(
+                                                                                        Literal {
+                                                                                            value: Int(
+                                                                                                1,
+                                                                                            ),
+                                                                                            span: ,
+                                                                                        },
+                                                                                    ),
+                                                                                    span: ,
+                                                                                },
+                                                                            ],
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Ident(
+                                                                        Ident {
+                                                                            name: "fmt.int",
+                                                                            args: [
+                                                                                Arg {
+                                                                                    name: None,
+                                                                                    term: Ident(
+                                                                                        Ident {
+                                                                                            name: "len",
+                                                                                            args: [],
+                                                                                            span: ,
+                                                                                        },
+                                                                                    ),
+                                                                                    span: ,
+                                                                                },
+                                                                                Arg {
+                                                                                    name: None,
+                                                                                    term: Ident(
+                                                                                        Ident {
+                                                                                            name: "fmt.end",
+                                                                                            args: [],
+                                                                                            span: ,
+                                                                                        },
+                                                                                    ),
+                                                                                    span: ,
+                                                                                },
+                                                                            ],
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
+                                                                Arg {
+                                                                    name: None,
+                                                                    term: Ident(
+                                                                        Ident {
+                                                                            name: "@write",
+                                                                            args: [
+                                                                                Arg {
+                                                                                    name: Some(
+                                                                                        "ok",
+                                                                                    ),
+                                                                                    term: Lambda(
+                                                                                        Lambda {
+                                                                                            params: Signature {
+                                                                                                items: [],
+                                                                                                span: ,
+                                                                                                generics: {},
+                                                                                            },
+                                                                                            body: Block {
+                                                                                                items: [
+                                                                                                    Ident(
+                                                                                                        Ident {
+                                                                                                            name: "nth",
+                                                                                                            args: [
+                                                                                                                Arg {
+                                                                                                                    name: None,
+                                                                                                                    term: Lit(
+                                                                                                                        Literal {
+                                                                                                                            value: Int(
+                                                                                                                                1,
+                                                                                                                            ),
+                                                                                                                            span: ,
+                                                                                                                        },
+                                                                                                                    ),
+                                                                                                                    span: ,
+                                                                                                                },
+                                                                                                                Arg {
+                                                                                                                    name: None,
+                                                                                                                    term: Lambda(
+                                                                                                                        Lambda {
+                                                                                                                            params: Signature {
+                                                                                                                                items: [
+                                                                                                                                    SigItem {
+                                                                                                                                        name: "s",
+                                                                                                                                        kind: Ident(
+                                                                                                                                            SigIdent {
+                                                                                                                                                name: "str",
+                                                                                                                                                span: ,
+                                                                                                                                            },
+                                                                                                                                        ),
+                                                                                                                                        is_comptime: false,
+                                                                                                                                        span: ,
+                                                                                                                                    },
+                                                                                                                                ],
+                                                                                                                                span: ,
+                                                                                                                                generics: {},
+                                                                                                                            },
+                                                                                                                            body: Block {
+                                                                                                                                items: [
+                                                                                                                                    Ident(
+                                                                                                                                        Ident {
+                                                                                                                                            name: "fmt.new",
+                                                                                                                                            args: [
+                                                                                                                                                Arg {
+                                                                                                                                                    name: None,
+                                                                                                                                                    term: Lit(
+                                                                                                                                                        Literal {
+                                                                                                                                                            value: Str(
+                                                                                                                                                                "element at index 1 is %\n",
+                                                                                                                                                            ),
+                                                                                                                                                            span: ,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                    span: ,
+                                                                                                                                                },
+                                                                                                                                                Arg {
+                                                                                                                                                    name: None,
+                                                                                                                                                    term: Ident(
+                                                                                                                                                        Ident {
+                                                                                                                                                            name: "@exit",
+                                                                                                                                                            args: [
+                                                                                                                                                                Arg {
+                                                                                                                                                                    name: None,
+                                                                                                                                                                    term: Lit(
+                                                                                                                                                                        Literal {
+                                                                                                                                                                            value: Int(
+                                                                                                                                                                                1,
+                                                                                                                                                                            ),
+                                                                                                                                                                            span: ,
+                                                                                                                                                                        },
+                                                                                                                                                                    ),
+                                                                                                                                                                    span: ,
+                                                                                                                                                                },
+                                                                                                                                                            ],
+                                                                                                                                                            span: ,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                    span: ,
+                                                                                                                                                },
+                                                                                                                                                Arg {
+                                                                                                                                                    name: None,
+                                                                                                                                                    term: Ident(
+                                                                                                                                                        Ident {
+                                                                                                                                                            name: "fmt.str",
+                                                                                                                                                            args: [
+                                                                                                                                                                Arg {
+                                                                                                                                                                    name: None,
+                                                                                                                                                                    term: Ident(
+                                                                                                                                                                        Ident {
+                                                                                                                                                                            name: "s",
+                                                                                                                                                                            args: [],
+                                                                                                                                                                            span: ,
+                                                                                                                                                                        },
+                                                                                                                                                                    ),
+                                                                                                                                                                    span: ,
+                                                                                                                                                                },
+                                                                                                                                                                Arg {
+                                                                                                                                                                    name: None,
+                                                                                                                                                                    term: Ident(
+                                                                                                                                                                        Ident {
+                                                                                                                                                                            name: "fmt.end",
+                                                                                                                                                                            args: [],
+                                                                                                                                                                            span: ,
+                                                                                                                                                                        },
+                                                                                                                                                                    ),
+                                                                                                                                                                    span: ,
+                                                                                                                                                                },
+                                                                                                                                                            ],
+                                                                                                                                                            span: ,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                    span: ,
+                                                                                                                                                },
+                                                                                                                                                Arg {
+                                                                                                                                                    name: None,
+                                                                                                                                                    term: Ident(
+                                                                                                                                                        Ident {
+                                                                                                                                                            name: "@write",
+                                                                                                                                                            args: [
+                                                                                                                                                                Arg {
+                                                                                                                                                                    name: Some(
+                                                                                                                                                                        "ok",
+                                                                                                                                                                    ),
+                                                                                                                                                                    term: Ident(
+                                                                                                                                                                        Ident {
+                                                                                                                                                                            name: "@exit",
+                                                                                                                                                                            args: [
+                                                                                                                                                                                Arg {
+                                                                                                                                                                                    name: None,
+                                                                                                                                                                                    term: Lit(
+                                                                                                                                                                                        Literal {
+                                                                                                                                                                                            value: Int(
+                                                                                                                                                                                                0,
+                                                                                                                                                                                            ),
+                                                                                                                                                                                            span: ,
+                                                                                                                                                                                        },
+                                                                                                                                                                                    ),
+                                                                                                                                                                                    span: ,
+                                                                                                                                                                                },
+                                                                                                                                                                            ],
+                                                                                                                                                                            span: ,
+                                                                                                                                                                        },
+                                                                                                                                                                    ),
+                                                                                                                                                                    span: ,
+                                                                                                                                                                },
+                                                                                                                                                            ],
+                                                                                                                                                            span: ,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                    span: ,
+                                                                                                                                                },
+                                                                                                                                            ],
+                                                                                                                                            span: ,
+                                                                                                                                        },
+                                                                                                                                    ),
+                                                                                                                                ],
+                                                                                                                                span: ,
+                                                                                                                            },
+                                                                                                                            args: [],
+                                                                                                                            span: ,
+                                                                                                                        },
+                                                                                                                    ),
+                                                                                                                    span: ,
+                                                                                                                },
+                                                                                                                Arg {
+                                                                                                                    name: None,
+                                                                                                                    term: Lambda(
+                                                                                                                        Lambda {
+                                                                                                                            params: Signature {
+                                                                                                                                items: [],
+                                                                                                                                span: ,
+                                                                                                                                generics: {},
+                                                                                                                            },
+                                                                                                                            body: Block {
+                                                                                                                                items: [
+                                                                                                                                    Ident(
+                                                                                                                                        Ident {
+                                                                                                                                            name: "fmt.new",
+                                                                                                                                            args: [
+                                                                                                                                                Arg {
+                                                                                                                                                    name: None,
+                                                                                                                                                    term: Lit(
+                                                                                                                                                        Literal {
+                                                                                                                                                            value: Str(
+                                                                                                                                                                "index out of bounds\n",
+                                                                                                                                                            ),
+                                                                                                                                                            span: ,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                    span: ,
+                                                                                                                                                },
+                                                                                                                                                Arg {
+                                                                                                                                                    name: None,
+                                                                                                                                                    term: Ident(
+                                                                                                                                                        Ident {
+                                                                                                                                                            name: "@exit",
+                                                                                                                                                            args: [
+                                                                                                                                                                Arg {
+                                                                                                                                                                    name: None,
+                                                                                                                                                                    term: Lit(
+                                                                                                                                                                        Literal {
+                                                                                                                                                                            value: Int(
+                                                                                                                                                                                1,
+                                                                                                                                                                            ),
+                                                                                                                                                                            span: ,
+                                                                                                                                                                        },
+                                                                                                                                                                    ),
+                                                                                                                                                                    span: ,
+                                                                                                                                                                },
+                                                                                                                                                            ],
+                                                                                                                                                            span: ,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                    span: ,
+                                                                                                                                                },
+                                                                                                                                                Arg {
+                                                                                                                                                    name: None,
+                                                                                                                                                    term: Ident(
+                                                                                                                                                        Ident {
+                                                                                                                                                            name: "fmt.end",
+                                                                                                                                                            args: [],
+                                                                                                                                                            span: ,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                    span: ,
+                                                                                                                                                },
+                                                                                                                                                Arg {
+                                                                                                                                                    name: None,
+                                                                                                                                                    term: Ident(
+                                                                                                                                                        Ident {
+                                                                                                                                                            name: "@write",
+                                                                                                                                                            args: [
+                                                                                                                                                                Arg {
+                                                                                                                                                                    name: Some(
+                                                                                                                                                                        "ok",
+                                                                                                                                                                    ),
+                                                                                                                                                                    term: Ident(
+                                                                                                                                                                        Ident {
+                                                                                                                                                                            name: "@exit",
+                                                                                                                                                                            args: [
+                                                                                                                                                                                Arg {
+                                                                                                                                                                                    name: None,
+                                                                                                                                                                                    term: Lit(
+                                                                                                                                                                                        Literal {
+                                                                                                                                                                                            value: Int(
+                                                                                                                                                                                                0,
+                                                                                                                                                                                            ),
+                                                                                                                                                                                            span: ,
+                                                                                                                                                                                        },
+                                                                                                                                                                                    ),
+                                                                                                                                                                                    span: ,
+                                                                                                                                                                                },
+                                                                                                                                                                            ],
+                                                                                                                                                                            span: ,
+                                                                                                                                                                        },
+                                                                                                                                                                    ),
+                                                                                                                                                                    span: ,
+                                                                                                                                                                },
+                                                                                                                                                            ],
+                                                                                                                                                            span: ,
+                                                                                                                                                        },
+                                                                                                                                                    ),
+                                                                                                                                                    span: ,
+                                                                                                                                                },
+                                                                                                                                            ],
+                                                                                                                                            span: ,
+                                                                                                                                        },
+                                                                                                                                    ),
+                                                                                                                                ],
+                                                                                                                                span: ,
+                                                                                                                            },
+                                                                                                                            args: [],
+                                                                                                                            span: ,
+                                                                                                                        },
+                                                                                                                    ),
+                                                                                                                    span: ,
+                                                                                                                },
+                                                                                                            ],
                                                                                                             span: ,
                                                                                                         },
                                                                                                     ),
-                                                                                                    is_comptime: false,
-                                                                                                    span: ,
-                                                                                                },
-                                                                                            ],
-                                                                                            span: ,
-                                                                                            generics: {},
-                                                                                        },
-                                                                                        body: Block {
-                                                                                            items: [
-                                                                                                Ident(
-                                                                                                    Ident {
-                                                                                                        name: "stdout.printf",
-                                                                                                        args: [
-                                                                                                            Arg {
-                                                                                                                name: None,
-                                                                                                                term: Lit(
-                                                                                                                    Literal {
-                                                                                                                        value: Str(
-                                                                                                                            "element at index 1 is %s\n",
-                                                                                                                        ),
-                                                                                                                        span: ,
-                                                                                                                    },
-                                                                                                                ),
-                                                                                                                span: ,
-                                                                                                            },
-                                                                                                            Arg {
-                                                                                                                name: None,
-                                                                                                                term: Ident(
-                                                                                                                    Ident {
-                                                                                                                        name: "s",
-                                                                                                                        args: [],
-                                                                                                                        span: ,
-                                                                                                                    },
-                                                                                                                ),
-                                                                                                                span: ,
-                                                                                                            },
-                                                                                                            Arg {
-                                                                                                                name: None,
-                                                                                                                term: Ident(
-                                                                                                                    Ident {
-                                                                                                                        name: "@exit",
-                                                                                                                        args: [
-                                                                                                                            Arg {
-                                                                                                                                name: None,
-                                                                                                                                term: Lit(
-                                                                                                                                    Literal {
-                                                                                                                                        value: Int(
-                                                                                                                                            0,
-                                                                                                                                        ),
-                                                                                                                                        span: ,
-                                                                                                                                    },
-                                                                                                                                ),
-                                                                                                                                span: ,
-                                                                                                                            },
-                                                                                                                        ],
-                                                                                                                        span: ,
-                                                                                                                    },
-                                                                                                                ),
-                                                                                                                span: ,
-                                                                                                            },
-                                                                                                        ],
-                                                                                                        span: ,
-                                                                                                    },
-                                                                                                ),
-                                                                                            ],
+                                                                                                ],
+                                                                                                span: ,
+                                                                                            },
+                                                                                            args: [],
                                                                                             span: ,
                                                                                         },
-                                                                                        args: [],
-                                                                                        span: ,
-                                                                                    },
-                                                                                ),
-                                                                                span: ,
-                                                                            },
-                                                                            Arg {
-                                                                                name: None,
-                                                                                term: Lambda(
-                                                                                    Lambda {
-                                                                                        params: Signature {
-                                                                                            items: [],
-                                                                                            span: ,
-                                                                                            generics: {},
-                                                                                        },
-                                                                                        body: Block {
-                                                                                            items: [
-                                                                                                Ident(
-                                                                                                    Ident {
-                                                                                                        name: "stdout.printf",
-                                                                                                        args: [
-                                                                                                            Arg {
-                                                                                                                name: None,
-                                                                                                                term: Lit(
-                                                                                                                    Literal {
-                                                                                                                        value: Str(
-                                                                                                                            "index out of bounds\n",
-                                                                                                                        ),
-                                                                                                                        span: ,
-                                                                                                                    },
-                                                                                                                ),
-                                                                                                                span: ,
-                                                                                                            },
-                                                                                                            Arg {
-                                                                                                                name: None,
-                                                                                                                term: Ident(
-                                                                                                                    Ident {
-                                                                                                                        name: "@exit",
-                                                                                                                        args: [
-                                                                                                                            Arg {
-                                                                                                                                name: None,
-                                                                                                                                term: Lit(
-                                                                                                                                    Literal {
-                                                                                                                                        value: Int(
-                                                                                                                                            0,
-                                                                                                                                        ),
-                                                                                                                                        span: ,
-                                                                                                                                    },
-                                                                                                                                ),
-                                                                                                                                span: ,
-                                                                                                                            },
-                                                                                                                        ],
-                                                                                                                        span: ,
-                                                                                                                    },
-                                                                                                                ),
-                                                                                                                span: ,
-                                                                                                            },
-                                                                                                        ],
-                                                                                                        span: ,
-                                                                                                    },
-                                                                                                ),
-                                                                                            ],
-                                                                                            span: ,
-                                                                                        },
-                                                                                        args: [],
-                                                                                        span: ,
-                                                                                    },
-                                                                                ),
-                                                                                span: ,
-                                                                            },
-                                                                        ],
-                                                                        span: ,
-                                                                    },
-                                                                ),
+                                                                                    ),
+                                                                                    span: ,
+                                                                                },
+                                                                            ],
+                                                                            span: ,
+                                                                        },
+                                                                    ),
+                                                                    span: ,
+                                                                },
                                                             ],
                                                             span: ,
                                                         },
-                                                        term: Ident(
-                                                            Ident {
-                                                                name: "stdout.printf",
-                                                                args: [
-                                                                    Arg {
-                                                                        name: None,
-                                                                        term: Lit(
-                                                                            Literal {
-                                                                                value: Str(
-                                                                                    "array has %d elements\n",
-                                                                                ),
-                                                                                span: ,
-                                                                            },
-                                                                        ),
-                                                                        span: ,
-                                                                    },
-                                                                    Arg {
-                                                                        name: None,
-                                                                        term: Ident(
-                                                                            Ident {
-                                                                                name: "len",
-                                                                                args: [],
-                                                                                span: ,
-                                                                            },
-                                                                        ),
-                                                                        span: ,
-                                                                    },
-                                                                ],
-                                                                span: ,
-                                                            },
-                                                        ),
-                                                        span: ,
-                                                    },
+                                                    ),
                                                 ],
                                                 span: ,
                                             },

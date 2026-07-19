@@ -1,0 +1,12 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+error: (msg: str) {
+    fmt.new("Error: %\n", @exit(1), fmt.str(msg) fmt.end, @write(ok: @exit(1)))
+}
+main: () {
+    @div(10, 5, error("division by zero"), (result: int){
+        fmt.new("result: %\n", @exit(1), fmt.int(result) fmt.end, @write(ok: @exit(0)))
+    })
+}

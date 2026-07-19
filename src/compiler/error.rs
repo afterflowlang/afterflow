@@ -11,6 +11,7 @@ pub enum Code {
     Lex,
     Parse,
     HIR,
+    Comptime,
     Resolve,
     Codegen,
     Internal,
@@ -23,6 +24,7 @@ impl Display for Code {
             Code::Lex => "lex",
             Code::Parse => "parse",
             Code::HIR => "hir",
+            Code::Comptime => "comptime",
             Code::Resolve => "resolve",
             Code::Codegen => "codegen",
             Code::Internal => "internal",
@@ -207,7 +209,7 @@ mod tests {
     fn displays_source_line_and_token_highlight() {
         let error = Error::new(Code::HIR, "invalid argument", Span::new(2, 9, 14)).with_source(
             Source::new(
-                PathBuf::from("src/main.rgo"),
+                PathBuf::from("src/main.af"),
                 "main: () {\n    foo(\"bad\")\n}\n".to_string(),
                 1,
             ),
@@ -215,7 +217,7 @@ mod tests {
 
         assert_eq!(
             error.to_string(),
-            "[hir] invalid argument\nsrc/main.rgo:2\n    foo(\"bad\")\n        ^^^^^"
+            "[hir] invalid argument\nsrc/main.af:2\n    foo(\"bad\")\n        ^^^^^"
         );
         assert!(format!("{}", error.display(true)).contains("\x1b[31m^^^^^\x1b[0m"));
     }

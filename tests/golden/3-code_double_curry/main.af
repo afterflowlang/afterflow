@@ -1,0 +1,16 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+foo: (ok:(str)){
+    ok("charlie")
+}
+baz: (ok:(str, str)){
+    foo(ok("bob"))
+}
+bar: (name0: str, name1: str, name2: str){
+    fmt.new("hello %, % and %\n", @exit(1), fmt.str(name0) fmt.str(name1) fmt.str(name2) fmt.end, @write(ok: @exit(0)))
+}
+main: () {
+    baz(bar("alice"))
+}

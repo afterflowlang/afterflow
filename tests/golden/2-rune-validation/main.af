@@ -1,0 +1,30 @@
+str: @str
+rune: @rune
+u32: @u32
+
+print: (label: str!, value: u32, ok: ()) {
+    @write(label, () {
+        @write(" valid\n", ok)
+    })
+}
+
+literal_roundtrip: (value: rune!, ok: (u32)) {
+    @u32_from_rune(value, ok)
+}
+
+unexpected: (value: rune) {
+    (scalar: u32) = @u32_from_rune(value)
+    print("unexpected", scalar, @exit(1))
+}
+
+main: () {
+    (literal: u32) = literal_roundtrip(128512)
+    print("literal", literal)
+    @rune_from_u32(128512, @exit(1), (value: rune) {
+        (roundtrip: u32) = @u32_from_rune(value)
+        print("runtime", roundtrip)
+        @rune_from_u32(55296, () {
+            @rune_from_u32(1114112, @exit(0), unexpected)
+        }, unexpected)
+    })
+}

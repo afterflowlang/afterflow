@@ -1,0 +1,25 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+list: ((int, list), ())
+nil: (next:(int, list), end: ()){
+    end()
+}
+cons: (head:int, tail:list, next:(int, list), end: ()){
+    next(head, tail)
+}
+iterate: (handler:(int, ()), arr:list, end:()){
+    arr((head:int, tail:list){
+        next_iterate: iterate(handler, tail, end)
+        handler(head, next_iterate)
+    }, end)
+}
+mylist: cons(1, cons(2, cons(3, cons(4, nil))))
+handler: (n: int, ok: ()){
+    fmt.new("%, ", @exit(1), fmt.int(n) fmt.end, @write(ok: ok))
+}
+end: () {fmt.new("end\n", @exit(1), fmt.end, @write(ok: @exit(0)))}
+main: () {
+    iterate(handler, mylist, end)
+}

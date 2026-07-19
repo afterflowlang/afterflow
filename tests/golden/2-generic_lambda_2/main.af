@@ -1,0 +1,15 @@
+fmt: /std/fmt
+str: @str
+int: @int
+
+foo: <T, U>(x:T, y:U, ok:(T, U)){
+    ok(x, y)
+}
+
+done: (a:int, b:str){
+    fmt.new("a=% b=%\n", @exit(1), fmt.int(a) fmt.str(b) fmt.end, @write(ok: @exit(0)))
+}
+
+main: () {
+    foo(41, "hi", done)
+}

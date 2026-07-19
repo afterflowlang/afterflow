@@ -1,0 +1,198 @@
+__rgo_7374642f6d617468__to_degrees: (radians: f64, ok:(f64)){
+    _43: 57.29577951308232
+    @mul_f64(radians, _43, ok)
+}
+__rgo_7374642f6d617468__to_radians: (degrees: f64, ok:(f64)){
+    _45: 0.017453292519943295
+    @mul_f64(degrees, _45, ok)
+}
+__rgo_7374642f6d617468__exp: (value: f64, ok:(f64)){
+    @exp_f64(value, ok)
+}
+__rgo_7374642f6d617468__exp2: (value: f64, ok:(f64)){
+    @exp2_f64(value, ok)
+}
+__rgo_7374642f6d617468__exp_m1: (value: f64, ok:(f64)){
+    @expm1_f64(value, ok)
+}
+__rgo_7374642f6d617468__abs: (value: f64, ok:(f64)){
+    @fabs_f64(value, ok)
+}
+__rgo_7374642f6d617468__copy_sign: (magnitude: f64, sign: f64, ok:(f64)){
+    @copysign_f64(magnitude, sign, ok)
+}
+__rgo_7374642f6d617468__dim: (a: f64, b: f64, ok:(f64)){
+    @fdim_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__max_f64: (a: f64, b: f64, ok:(f64)){
+    @fmax_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__min_f64: (a: f64, b: f64, ok:(f64)){
+    @fmin_f64(a, b, ok)
+}
+__rgo_7374642f6d617468__mod: (dividend: f64, divisor: f64, ok:(f64)){
+    @fmod_f64(dividend, divisor, ok)
+}
+__rgo_7374642f6d617468__remainder: (dividend: f64, divisor: f64, ok:(f64)){
+    @remainder_f64(dividend, divisor, ok)
+}
+__rgo_7374642f6d617468__next_after: (value: f64, toward: f64, ok:(f64)){
+    @nextafter_f64(value, toward, ok)
+}
+__rgo_7374642f6d617468__ldexp: (value: f64, exponent: i32, ok:(f64)){
+    @ldexp_f64_i32(value, exponent, ok)
+}
+__rgo_7374642f6d617468__sinh: (value: f64, ok:(f64)){
+    @sinh_f64(value, ok)
+}
+__rgo_7374642f6d617468__cosh: (value: f64, ok:(f64)){
+    @cosh_f64(value, ok)
+}
+__rgo_7374642f6d617468__tanh: (value: f64, ok:(f64)){
+    @tanh_f64(value, ok)
+}
+__rgo_7374642f6d617468__asinh: (value: f64, ok:(f64)){
+    @asinh_f64(value, ok)
+}
+__rgo_7374642f6d617468__acosh: (value: f64, ok:(f64)){
+    @acosh_f64(value, ok)
+}
+__rgo_7374642f6d617468__atanh: (value: f64, ok:(f64)){
+    @atanh_f64(value, ok)
+}
+__rgo_7374642f6d617468__ln: (value: f64, ok:(f64)){
+    @log_f64(value, ok)
+}
+_69___rgo_7374642f6d617468__log: (value_logarithm: f64, ok:(f64), base_logarithm: f64){
+    @div_f64(value_logarithm, base_logarithm, ok)
+}
+
+_67___rgo_7374642f6d617468__log: (base: f64, ok:(f64), value_logarithm: f64){
+    _70___rgo_7374642f6d617468__log: _69___rgo_7374642f6d617468__log(value_logarithm, ok)
+    @log_f64(base, _70___rgo_7374642f6d617468__log)
+}
+
+__rgo_7374642f6d617468__log: (value: f64, base: f64, ok:(f64)){
+    _71___rgo_7374642f6d617468__log: _67___rgo_7374642f6d617468__log(base, ok)
+    @log_f64(value, _71___rgo_7374642f6d617468__log)
+}
+__rgo_7374642f6d617468__log2: (value: f64, ok:(f64)){
+    @log2_f64(value, ok)
+}
+__rgo_7374642f6d617468__log10: (value: f64, ok:(f64)){
+    @log10_f64(value, ok)
+}
+__rgo_7374642f6d617468__ln_1p: (value: f64, ok:(f64)){
+    @log1p_f64(value, ok)
+}
+_77___rgo_7374642f6d617468__min: (ok:(int), a: int){
+    ok(a)
+}
+
+_80___rgo_7374642f6d617468__min: (ok:(int), b: int){
+    ok(b)
+}
+
+__rgo_7374642f6d617468__min: (a: int, b: int, ok:(int)){
+    _78___rgo_7374642f6d617468__min: _77___rgo_7374642f6d617468__min(ok, a)
+    _81___rgo_7374642f6d617468__min: _80___rgo_7374642f6d617468__min(ok, b)
+    @lt(a, b, _78___rgo_7374642f6d617468__min, _81___rgo_7374642f6d617468__min)
+}
+_84___rgo_7374642f6d617468__max: (ok:(int), b: int){
+    ok(b)
+}
+
+_87___rgo_7374642f6d617468__max: (ok:(int), a: int){
+    ok(a)
+}
+
+__rgo_7374642f6d617468__max: (a: int, b: int, ok:(int)){
+    _85___rgo_7374642f6d617468__max: _84___rgo_7374642f6d617468__max(ok, b)
+    _88___rgo_7374642f6d617468__max: _87___rgo_7374642f6d617468__max(ok, a)
+    @lt(a, b, _85___rgo_7374642f6d617468__max, _88___rgo_7374642f6d617468__max)
+}
+__rgo_7374642f6d617468__pow: (base: f64, exponent: f64, ok:(f64)){
+    @pow_f64(base, exponent, ok)
+}
+__rgo_7374642f6d617468__sqrt: (value: f64, ok:(f64)){
+    @sqrt_f64(value, ok)
+}
+__rgo_7374642f6d617468__cbrt: (value: f64, ok:(f64)){
+    @cbrt_f64(value, ok)
+}
+__rgo_7374642f6d617468__hypot: (x: f64, y: f64, ok:(f64)){
+    @hypot_f64(x, y, ok)
+}
+__rgo_7374642f6d617468__ceil: (value: f64, ok:(f64)){
+    @ceil_f64(value, ok)
+}
+__rgo_7374642f6d617468__floor: (value: f64, ok:(f64)){
+    @floor_f64(value, ok)
+}
+__rgo_7374642f6d617468__round: (value: f64, ok:(f64)){
+    @round_f64(value, ok)
+}
+__rgo_7374642f6d617468__trunc: (value: f64, ok:(f64)){
+    @trunc_f64(value, ok)
+}
+__rgo_7374642f6d617468__sin: (radians: f64, ok:(f64)){
+    @sin_f64(radians, ok)
+}
+__rgo_7374642f6d617468__cos: (radians: f64, ok:(f64)){
+    @cos_f64(radians, ok)
+}
+__rgo_7374642f6d617468__tan: (radians: f64, ok:(f64)){
+    @tan_f64(radians, ok)
+}
+__rgo_7374642f6d617468__asin: (value: f64, ok:(f64)){
+    @asin_f64(value, ok)
+}
+__rgo_7374642f6d617468__acos: (value: f64, ok:(f64)){
+    @acos_f64(value, ok)
+}
+__rgo_7374642f6d617468__atan: (value: f64, ok:(f64)){
+    @atan_f64(value, ok)
+}
+__rgo_7374642f6d617468__atan2: (y: f64, x: f64, ok:(f64)){
+    @atan2_f64(y, x, ok)
+}
+_124_main: (){
+    _125: 0
+    @exit(_125)
+}
+
+_121_main: (natural_logarithm: f64){
+    _122: "math functions ok\n"
+    @write(_122, _124_main)
+}
+
+_119_main: (logarithm: f64){
+    __rgo_7374642f6d617468__ln(logarithm, _121_main)
+}
+
+_116_main: (power: f64){
+    _117: 2
+    __rgo_7374642f6d617468__log(power, _117, _119_main)
+}
+
+_113_main: (scaled: f64){
+    _114: 2
+    __rgo_7374642f6d617468__pow(_114, scaled, _116_main)
+}
+
+_109_main: (root: f64){
+    _110: 0.5
+    _111: 4
+    __rgo_7374642f6d617468__ldexp(_110, _111, _113_main)
+}
+
+_106_main: (cosine: f64){
+    _107: 9
+    __rgo_7374642f6d617468__sqrt(_107, _109_main)
+}
+
+main: (){
+    _104: 0
+    __rgo_7374642f6d617468__cos(_104, _106_main)
+}
+main()

@@ -1,0 +1,59 @@
+str: @str
+bytes: @bytes
+uint: @uint
+u8: @u8
+
+nth: (base: u8, idx: uint, empty: (), one: (u8)) {
+    @eq_uint(idx, 0, one(base), () {
+        @eq_uint(idx, 1, one(66), () {
+            @eq_uint(idx, 2, one(67), empty)
+        })
+    })
+}
+
+source: (base: u8, inspect: (uint, (uint, (), (u8)))) {
+    inspect(3, nth(base))
+}
+
+empty_nth: (uint, empty: (), (u8)) {
+    empty()
+}
+
+empty_source: (inspect: (uint, (uint, (), (u8)))) {
+    inspect(0, empty_nth)
+}
+
+invalid_source: (inspect: (uint, (uint, (), (u8)))) {
+    inspect(1, empty_nth)
+}
+
+unexpected_bytes: (bytes) {
+    @exit(1)
+}
+
+empty_inspect: (ok: (), l: uint, (uint, (), (u8))) {
+    @eq_uint(l, 0, ok, @exit(1))
+}
+
+test_empty: (ok: ()) {
+    @bytes_build(empty_source, @exit(1), (value: bytes) {
+        value(empty_inspect(ok))
+    })
+}
+
+test_invalid: (ok: ()) {
+    @bytes_build(invalid_source, ok, unexpected_bytes)
+}
+
+main: () {
+    test_empty(() {
+        test_invalid(() {
+            labelled: source(65)
+            @bytes_build(labelled, @exit(1), (value: bytes) {
+                @str_from_utf8(value, @exit(1), (text: str) {
+                    @write(text, @exit(0))
+                })
+            })
+        })
+    })
+}

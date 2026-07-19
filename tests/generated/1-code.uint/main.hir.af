@@ -1,0 +1,15 @@
+uint: @uint
+print_uint: (value: uint!, ok:()){
+    _0: "uint 42\n"
+    @write(_0, ok)
+}
+_3_main: (){
+    _4: 0
+    @exit(_4)
+}
+
+main: (){
+    _1: 42
+    print_uint(_1, _3_main)
+}
+main()
