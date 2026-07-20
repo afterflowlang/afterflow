@@ -217,8 +217,9 @@ chain:
 
 ### Compile-time execution
 
-Compile-time execution is declared by parameter slots. A `!` after a parameter
-type means that the argument is consumed by the compile-time interpreter:
+Compile-time execution is declared and triggered exclusively by parameter
+slots in a callable signature. A `!` after a parameter type means that the
+argument is consumed by the compile-time interpreter:
 
 ```af
 build: (value: @int!, run: (@int)) {
@@ -230,9 +231,11 @@ main: () {
 }
 ```
 
-There is no call-level bang. When an executable target is rooted in a function
-with at least one marked parameter, the compiler interprets that transfer. A
-partial application retains the staging property of its root function:
+The signature is the only staging trigger. There is no call-level bang and no
+other way to initiate staging. When an executable target is rooted in a
+function with at least one marked parameter, the compiler interprets that
+transfer. A partial application retains the staging property of its root
+function:
 
 ```af
 q: build(2)
@@ -249,9 +252,10 @@ inspects before reaching a runtime continuation. This makes the signature the
 binding-time contract instead of letting call-site constants silently change
 the function's behavior.
 
-Unmarked callable parameters of a function with marked parameters define its
-runtime boundaries. The interpreter follows validation and other pure work,
-then residualizes the transfer leading into such a continuation:
+Each remaining continuation parameter without `!` in a staged signature is a
+staging boundary. The interpreter follows validation and other pure work, then
+residualizes the transfer leading into that continuation for ordinary runtime
+execution:
 
 ```af
 new: (
@@ -500,8 +504,8 @@ The primitive type rules are:
 
 The availability bang belongs to the parameter slot, not to the value's
 runtime meaning. Only a compile-time-available string satisfies a `str!` slot.
-This marker does not start staged execution. Only a value-level executable
-application such as `foo!(...)` does that.
+A callable signature containing a marked slot stages when a value rooted in
+that signature is executed. Applications never carry a staging marker.
 
 `str` and `bytes` are distinct value types. `bytes` permits any byte sequence,
 while every `str` promises valid UTF-8. String literals and Unicode escapes are
@@ -1033,8 +1037,10 @@ Afterflow uses a repeated punctuation pattern:
 - `@name` addresses compiler-provided builtins; `name: /path/to/name` binds a
   compile-time source namespace.
 - `name.member` accesses an imported source member.
-- `foo!(...)` marks a value-level executable application for compile-time HIR
-  execution; `type!` marks compile-time availability on a parameter slot.
+- `!` marks compile-time consumption on a callable signature's parameter slot.
+  A signature with such a slot is staged when executed, and a remaining
+  continuation slot without `!` is its staging boundary. There is no
+  call-level staging form.
 
 Types are not allowed as arguments in `()` because type arguments can often be
 inferred and would clash with value argument counts. Type arguments use `<>`

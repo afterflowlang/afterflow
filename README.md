@@ -54,7 +54,7 @@ elimination.
 - **Punctuation-driven syntax**: A minimal surface language that stays readable while keeping the parser and backend fast.
 - **No keywords**: There are no built-ins like `let`, `fn`, `if`, or `struct`, every semantic construct arises from punctuation and continuation form.
 - **First-class functions**: Every value is passed explicitly, closures are automatically curried and lowered to environment structures.
-- **Signature-owned staged execution**: `!` parameters are consumed by the typed HIR interpreter, while unmarked continuation parameters define where ordinary runtime execution resumes.
+- **Signature-owned staged execution**: A signature containing `!` parameters is the sole staging trigger. Those parameters are consumed by the typed HIR interpreter, while each remaining continuation without `!` is the staging boundary where ordinary runtime execution resumes. Applications have no staging marker.
 - **Unicode-aware frontend**: UTF-8 literals and identifiers work as expected while the grammar stays ASCII-friendly.
 - **Direct compile-to-assembly backend**: Deterministic performance, tiny runtime footprint, full control over calling conventions and memory layout.
 
@@ -162,15 +162,16 @@ When application appears as a standalone action in a block .e.g `foo(end)`
 it is compiled as a tail jump to `foo`. Control transfers directly to `foo`
 and never returns to the current location.
 
-Compile-time execution is owned by the callable's signature. Executing a
-function with at least one `!` parameter enters the HIR interpreter. There is
-no call-level bang. Marked arguments remain available to that interpreter,
+Compile-time execution is owned exclusively by the callable's signature.
+Executing a function with at least one `!` parameter enters the HIR
+interpreter. There is no call-level bang or any other staging mechanism.
+Marked arguments remain available to that interpreter,
 including known recursive closure structure such as a formatter argument
 chain. Unmarked data is opaque to the interpreter even when the caller supplied
-a literal, while an unmarked callable parameter is the residual boundary: the
-compiler emits the transfer leading into that continuation for normal runtime
-execution. Any input that staged code must inspect before that boundary must
-therefore be marked `!`.
+a literal, while each remaining continuation parameter without `!` is the
+staging boundary: the compiler emits the transfer leading into that
+continuation for normal runtime execution. Any input that staged code must
+inspect before that boundary must therefore be marked `!`.
 
 Partial application preserves this property. A labelled closure rooted in a
 function with marked parameters is staged when it is eventually executed:
