@@ -4,6 +4,7 @@ pub mod ast;
 pub mod builtins;
 pub mod error;
 pub mod format_hir;
+pub mod formatter;
 pub mod hir;
 pub mod hir_ast;
 pub mod hir_context;

@@ -6,15 +6,17 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use afterflow_frontend::builtins::{self, BuiltinSpec};
+use afterflow_frontend::formatter::format_source;
 use afterflow_frontend::hir;
 use language_server_protocol::types::request::Request as _;
 use language_server_protocol::types::{
     self, request, CompletionItem, CompletionItemKind, CompletionOptions, CompletionParams,
-    CompletionResponse, Diagnostic, DiagnosticSeverity, DocumentSymbol, DocumentSymbolParams,
-    DocumentSymbolResponse, GotoDefinitionParams, GotoDefinitionResponse, Hover, HoverContents,
-    HoverParams, InitializeParams, InitializeResult, Location, MarkupContent, MarkupKind,
-    NumberOrString, OneOf, PositionEncodingKind, PublishDiagnosticsParams, ServerCapabilities,
-    ServerInfo, SymbolKind, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+    CompletionResponse, Diagnostic, DiagnosticSeverity, DocumentFormattingParams, DocumentSymbol,
+    DocumentSymbolParams, DocumentSymbolResponse, GotoDefinitionParams, GotoDefinitionResponse,
+    Hover, HoverContents, HoverParams, InitializeParams, InitializeResult, Location, MarkupContent,
+    MarkupKind, NumberOrString, OneOf, PositionEncodingKind, PublishDiagnosticsParams,
+    ServerCapabilities, ServerInfo, SymbolKind, TextDocumentSyncCapability, TextDocumentSyncKind,
+    TextEdit, Url,
 };
 use language_server_protocol::{
     from_value, to_value, Connection, ErrorCode, Message, Notification, Request, Response,
@@ -96,6 +98,7 @@ fn server_capabilities() -> ServerCapabilities {
         completion_provider: Some(CompletionOptions::default()),
         definition_provider: Some(OneOf::Left(true)),
         document_symbol_provider: Some(OneOf::Left(true)),
+        document_formatting_provider: Some(OneOf::Left(true)),
         ..ServerCapabilities::default()
     }
 }
@@ -156,6 +159,10 @@ impl Server {
                     .and_then(|params| {
                         to_value(self.session.snapshot.completion(params)).map_err(Error::new)
                     }),
+                request::Formatting::METHOD => self
+                    .parse::<DocumentFormattingParams>(request.params)
+                    .and_then(|params| self.session.snapshot.formatting(params))
+                    .and_then(|edits| to_value(edits).map_err(Error::new)),
                 VIRTUAL_DOCUMENT_REQUEST => self
                     .parse::<HashMap<String, String>>(request.params)
                     .and_then(|params| {
@@ -421,6 +428,17 @@ impl Snapshot {
         }
         items.sort_by(|a, b| a.label.cmp(&b.label));
         Some(CompletionResponse::Array(items))
+    }
+
+    fn formatting(&self, params: DocumentFormattingParams) -> Result<Option<Vec<TextEdit>>, Error> {
+        let Some(document) = self.document(&params.text_document.uri) else {
+            return Ok(None);
+        };
+        let formatted = format_source(document.text()).map_err(Error::new)?;
+        if formatted == document.text() {
+            return Ok(Some(Vec::new()));
+        }
+        Ok(Some(vec![TextEdit::new(document.full_range(), formatted)]))
     }
 
     fn resolve<'a>(
@@ -1024,5 +1042,25 @@ mod tests {
         let content: Option<String> =
             from_value(response.result.expect("request result")).expect("string result");
         assert!(content.expect("known builtin").starts_with("@write: ("));
+    }
+
+    #[test]
+    fn formats_documents_with_the_frontend_formatter() {
+        let uri = Url::parse("file:///workspace/main.af").expect("valid URI");
+        let snapshot = snapshot(&[(uri.as_str(), "main:(){ @exit(0) }\n")]);
+        let edits = snapshot
+            .formatting(DocumentFormattingParams {
+                text_document: types::TextDocumentIdentifier::new(uri),
+                options: types::FormattingOptions {
+                    tab_size: 2,
+                    insert_spaces: false,
+                    ..types::FormattingOptions::default()
+                },
+                work_done_progress_params: Default::default(),
+            })
+            .expect("formatting succeeds")
+            .expect("document exists");
+        assert_eq!(edits.len(), 1);
+        assert_eq!(edits[0].new_text, "main: () {\n\t@exit(0)\n}\n");
     }
 }

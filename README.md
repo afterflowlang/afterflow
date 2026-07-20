@@ -18,6 +18,22 @@ Editor-independent language tooling lives in
 [language-server](./language-server/README.md). Run it over standard input and
 output with `cargo run -p afterflow-ls`.
 
+## Formatting
+
+Afterflow has one canonical source style implemented by the shared frontend.
+Format standard input, print a file, rewrite files, or check formatting with:
+
+```sh
+cargo run -p afterflow-fmt < main.af
+cargo run -p afterflow-fmt -- main.af
+cargo run -p afterflow-fmt -- --write main.af
+cargo run -p afterflow-fmt -- --check main.af
+```
+
+The language server exposes the same formatter over LSP. The Afterflow VS Code
+extension uses it for **Format Document** and for save-time formatting when
+`editor.formatOnSave` is enabled.
+
 ## compile-direct purpose
 
 compile-direct is intentionally unoptimized. It is a *what you write is what you get*

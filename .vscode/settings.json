@@ -9,13 +9,20 @@
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer"
   },
+  "[afterflow]": {
+    "editor.defaultFormatter": "afterflowlang.afterflow-vscode",
+    "editor.formatOnSave": true,
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
+  },
   "rust-analyzer.diagnostics.disabled": [
     "non_snake_case"
   ],
   "editor.fontSize": 14,
   "files.associations": {
     "*.proto": "proto3",
-    "*.af": "c",
+    "*.af": "afterflow",
     "*.example": "c"
   },
   // NASM extension settings

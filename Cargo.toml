@@ -2,6 +2,7 @@
 members = [
     "frontend",
     "compile-direct",
+    "formatter",
     "kit/format",
     "kit/lsp",
     "kit/math",
@@ -11,6 +12,7 @@ members = [
 default-members = [
     "frontend",
     "compile-direct",
+    "formatter",
     "kit/format",
     "kit/lsp",
     "kit/math",

@@ -35,9 +35,15 @@ impl Document {
         self.version
     }
 
-    #[cfg(test)]
     pub(crate) fn text(&self) -> &str {
         &self.text
+    }
+
+    pub(crate) fn full_range(&self) -> Range {
+        Range::new(
+            Position::new(0, 0),
+            self.offset_to_position(self.text.len()),
+        )
     }
 
     pub(crate) fn analysis(&self) -> &Analysis {

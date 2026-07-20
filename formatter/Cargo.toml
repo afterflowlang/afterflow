@@ -1,0 +1,9 @@
+[package]
+name = "afterflow-fmt"
+version = "0.1.0"
+edition = "2021"
+description = "Canonical source formatter for Afterflow"
+license = "Apache-2.0"
+
+[dependencies]
+afterflow-frontend = { path = "../frontend" }
