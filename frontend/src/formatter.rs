@@ -6,7 +6,7 @@
 use std::fmt::Write as _;
 use std::io::Cursor;
 
-use crate::ast::{Arg, BlockItem, Lambda, Lit, SigKind, Signature, Term};
+use crate::ast::{Arg, BlockItem, Ident, Lambda, Lit, SigKind, Signature, Term};
 use crate::error::Error;
 use crate::lexer::Lexer;
 use crate::parser::Parser;
@@ -142,6 +142,10 @@ impl Formatter {
             return inline;
         }
 
+        if let Some(output) = self.comptime_string_dsl(name, args, depth, prefix_width, &rendered) {
+            return output;
+        }
+
         let padding = INDENT.repeat(depth + 1);
         let closing = INDENT.repeat(depth);
         let mut output = format!("{name}(\n");
@@ -162,6 +166,63 @@ impl Formatter {
         output.push_str(&closing);
         output.push(')');
         output
+    }
+
+    fn comptime_string_dsl(
+        &mut self,
+        name: &str,
+        args: &[Arg],
+        depth: usize,
+        prefix_width: usize,
+        rendered_args: &[String],
+    ) -> Option<String> {
+        let first = args.first()?;
+        if first.name.is_some()
+            || !matches!(&first.term, Term::Lit(value) if matches!(value.value, Lit::Str(_)))
+        {
+            return None;
+        }
+
+        let chain = dsl_chain(&args.get(1)?.term)?;
+        let first_line = format!("{name}({},", rendered_args.first()?);
+        if first_line.contains('\n')
+            || depth * INDENT_WIDTH + prefix_width + first_line.chars().count() > MAX_WIDTH
+        {
+            return None;
+        }
+
+        let padding = INDENT.repeat(depth + 1);
+        let closing = INDENT.repeat(depth);
+        let mut output = first_line;
+        output.push('\n');
+
+        for (index, ident) in chain.iter().enumerate() {
+            let chain_args = if index + 1 == chain.len() {
+                ident.args.as_slice()
+            } else {
+                &ident.args[..ident.args.len() - 1]
+            };
+            let line = self.ident(&ident.name, chain_args, depth + 1, 0);
+            output.push_str(&padding);
+            output.push_str(&line);
+            if index + 1 == chain.len() && args.len() > 2 {
+                output.push(',');
+            }
+            output.push('\n');
+        }
+
+        for (index, arg) in rendered_args.iter().enumerate().skip(2) {
+            output.push_str(&padding);
+            output.push_str(arg);
+            if index + 1 < rendered_args.len() {
+                output.push(',');
+            }
+            output.push('\n');
+        }
+
+        output.push_str(&closing);
+        output.push(')');
+        Some(output)
     }
 
     fn arg(&mut self, arg: &Arg, depth: usize) -> String {
@@ -248,6 +309,29 @@ impl Formatter {
             self.output.push_str(line);
             self.output.push('\n');
         }
+    }
+}
+
+fn dsl_chain(term: &Term) -> Option<Vec<&Ident>> {
+    let mut ident = match term {
+        Term::Ident(ident) => ident,
+        _ => return None,
+    };
+    let mut chain = Vec::new();
+
+    loop {
+        chain.push(ident);
+        if ident.args.is_empty() {
+            return (chain.len() > 1).then_some(chain);
+        }
+        let tail = ident.args.last()?;
+        if tail.name.is_some() {
+            return None;
+        }
+        let Term::Ident(next) = &tail.term else {
+            return None;
+        };
+        ident = next;
     }
 }
 
@@ -354,7 +438,10 @@ fn comments(source: &str) -> Vec<Comment> {
                 }
                 comments.push(Comment {
                     offset: start,
-                    text: source[start..index].to_string(),
+                    text: source
+                        .get(start..index)
+                        .expect("comment boundaries must be valid UTF-8")
+                        .to_string(),
                 });
             }
             (None, b'/') if bytes.get(index + 1) == Some(&b'*') => {
@@ -367,7 +454,10 @@ fn comments(source: &str) -> Vec<Comment> {
                 index = (index + 2).min(bytes.len());
                 comments.push(Comment {
                     offset: start,
-                    text: source[start..index].to_string(),
+                    text: source
+                        .get(start..index)
+                        .expect("comment boundaries must be valid UTF-8")
+                        .to_string(),
                 });
             }
             // The frontend treats a non-comment slash as a source path and
@@ -452,6 +542,31 @@ main: () {
             assert!(!line.starts_with(' '), "line starts with spaces: {line:?}");
         }
         assert!(!formatted.contains("         calc.end"));
+        assert_eq!(format_source(&formatted).unwrap(), formatted);
+    }
+
+    #[test]
+    fn keeps_comptime_string_dsl_chains_vertical() {
+        let source = r#"main: () {
+	(result: @f64) = calc.new(
+		"hypot(width, height) + sin(pi / 2) ^ 2",
+		calc.var("width", 3.0, calc.var("height", 4.0, calc.end))
+	)
+	@exit(0)
+}
+"#;
+        let expected = r#"main: () {
+	(result: @f64) = calc.new("hypot(width, height) + sin(pi / 2) ^ 2",
+		calc.var("width", 3.0)
+		calc.var("height", 4.0)
+		calc.end
+	)
+	@exit(0)
+}
+"#;
+
+        let formatted = format_source(source).unwrap();
+        assert_eq!(formatted, expected);
         assert_eq!(format_source(&formatted).unwrap(), formatted);
     }
 }
