@@ -5,6 +5,8 @@ implementation for Afterflow. It communicates over standard input and output.
 An editor extension owns the process lifetime and associates `.af` documents
 with the server.
 
+The Afterflow language server is implemented in Rust.
+
 ## Run
 
 Run a development build from the repository root:
@@ -52,8 +54,9 @@ importing packages.
 
 The first LSP workspace folder is the source-import root. The deprecated
 `rootUri` initialization field is accepted as a fallback for older clients. For
-example, `/std/fmt` maps to `<workspace>/std/fmt`. Open the folder that actually
-contains imported paths. Opening a narrower folder limits cross-package
+example, `/std/fmt` maps to `<workspace>/std/fmt`, or to the bundled standard
+library at `<workspace>/lib/std/fmt` when no workspace package exists there.
+Open the folder that actually contains imported paths. Opening a narrower folder limits cross-package
 navigation. Without a workspace folder or `rootUri`, the server indexes only
 documents opened by the client and cannot discover sibling or imported files.
 

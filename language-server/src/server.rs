@@ -377,7 +377,13 @@ impl Snapshot {
         let document = self.document(&text_params.text_document.uri)?;
         let offset = document.position_to_offset(text_params.position)?;
         if let Some(definition) = document.analysis().definition_at(offset) {
+            if definition.kind == DefinitionKind::Namespace {
+                return self.import_locations(definition);
+            }
             return Some(source_definition_location(document, definition));
+        }
+        if let Some(import) = document.analysis().import_at(offset) {
+            return self.import_locations(import);
         }
         let (name, _, scope) = document.analysis().reference_at(offset)?;
         if let Some((target_document, definition)) = self.resolve(document, name, scope, offset) {
@@ -462,13 +468,8 @@ impl Snapshot {
         import: &Definition,
         member: &str,
     ) -> Option<(&'a Document, &'a Definition)> {
-        let root = self.root.as_ref()?;
-        let path = import.import_path.as_deref()?.strip_prefix('/')?;
-        let directory = root.join(path);
-        self.documents
-            .values()
-            .map(Arc::as_ref)
-            .filter(|document| file_directory(document.uri()).as_deref() == Some(&directory))
+        self.import_documents(import)
+            .into_iter()
             .filter(|document| !is_private_source(document.uri()))
             .find_map(|document| {
                 document
@@ -477,6 +478,46 @@ impl Snapshot {
                     .find(|definition| definition.name == member)
                     .map(|definition| (document, definition))
             })
+    }
+
+    fn import_locations(&self, import: &Definition) -> Option<GotoDefinitionResponse> {
+        let locations = self
+            .import_documents(import)
+            .into_iter()
+            .map(package_document_location)
+            .collect::<Vec<_>>();
+        (!locations.is_empty()).then_some(GotoDefinitionResponse::Array(locations))
+    }
+
+    fn import_documents<'a>(&'a self, import: &Definition) -> Vec<&'a Document> {
+        let Some(root) = self.root.as_ref() else {
+            return Vec::new();
+        };
+        let Some(path) = import
+            .import_path
+            .as_deref()
+            .and_then(|path| path.strip_prefix('/'))
+        else {
+            return Vec::new();
+        };
+        let direct = root.join(path);
+        let bundled = root.join("lib").join(path);
+        let mut documents = self
+            .documents
+            .values()
+            .map(Arc::as_ref)
+            .filter(|document| file_directory(document.uri()).as_deref() == Some(&direct))
+            .collect::<Vec<_>>();
+        if documents.is_empty() {
+            documents = self
+                .documents
+                .values()
+                .map(Arc::as_ref)
+                .filter(|document| file_directory(document.uri()).as_deref() == Some(&bundled))
+                .collect();
+        }
+        documents.sort_by(|left, right| left.uri().as_str().cmp(right.uri().as_str()));
+        documents
     }
 }
 
@@ -667,6 +708,18 @@ fn source_definition_location(
     ))
 }
 
+fn package_document_location(document: &Document) -> Location {
+    let range = document
+        .analysis()
+        .top_level_definitions()
+        .next()
+        .map(|definition| document.name_range(definition.span, &definition.name))
+        .unwrap_or_else(|| {
+            types::Range::new(types::Position::new(0, 0), types::Position::new(0, 0))
+        });
+    Location::new(document.uri().clone(), range)
+}
+
 fn builtin_location(name: &str) -> Option<Location> {
     let builtin_name = name.strip_prefix('@')?;
     builtins::get_spec(builtin_name)?;
@@ -776,6 +829,69 @@ mod tests {
             .expect("imported definition");
         assert_eq!(definition.name, "new");
         assert_eq!(target.uri().as_str(), "file:///workspace/std/fmt/new.af");
+    }
+
+    #[test]
+    fn shows_hover_details_for_members_of_bundled_source_packages() {
+        let snapshot = snapshot(&[
+            (
+                "file:///workspace/main.af",
+                "fmt: /std/fmt\nmain: () { fmt.new(@exit) }\n",
+            ),
+            (
+                "file:///workspace/lib/std/fmt/new.af",
+                "new: (ok: ()) { ok }\n",
+            ),
+        ]);
+        let uri = Url::parse("file:///workspace/main.af").expect("valid URI");
+        let hover = snapshot
+            .hover(HoverParams {
+                text_document_position_params: types::TextDocumentPositionParams::new(
+                    types::TextDocumentIdentifier::new(uri),
+                    types::Position::new(1, 11),
+                ),
+                work_done_progress_params: Default::default(),
+            })
+            .expect("source member hover");
+        let HoverContents::Markup(markup) = hover.contents else {
+            panic!("expected markdown hover");
+        };
+        assert!(markup.value.contains("new: (ok: ())"));
+    }
+
+    #[test]
+    fn navigates_source_import_paths_to_their_package_files() {
+        let snapshot = snapshot(&[
+            ("file:///workspace/main.af", "calc: /std/math/calc\n"),
+            (
+                "file:///workspace/lib/std/math/calc/args.af",
+                "args: () {}\n",
+            ),
+            ("file:///workspace/lib/std/math/calc/new.af", "new: () {}\n"),
+        ]);
+        let uri = Url::parse("file:///workspace/main.af").expect("valid URI");
+        let response = snapshot
+            .definition(GotoDefinitionParams {
+                text_document_position_params: types::TextDocumentPositionParams::new(
+                    types::TextDocumentIdentifier::new(uri),
+                    types::Position::new(0, 8),
+                ),
+                work_done_progress_params: Default::default(),
+                partial_result_params: Default::default(),
+            })
+            .expect("package locations");
+        let GotoDefinitionResponse::Array(locations) = response else {
+            panic!("expected package locations");
+        };
+        assert_eq!(locations.len(), 2);
+        assert_eq!(
+            locations[0].uri.as_str(),
+            "file:///workspace/lib/std/math/calc/args.af"
+        );
+        assert_eq!(
+            locations[1].uri.as_str(),
+            "file:///workspace/lib/std/math/calc/new.af"
+        );
     }
 
     #[test]

@@ -21,6 +21,7 @@ pub(crate) struct Definition {
     pub(crate) name: String,
     pub(crate) detail: String,
     pub(crate) import_path: Option<String>,
+    import_path_offset: Option<usize>,
     pub(crate) kind: DefinitionKind,
     pub(crate) span: Span,
     scope: usize,
@@ -62,7 +63,7 @@ impl Analysis {
             references: Vec::new(),
             scopes: vec![Scope { parent: None }],
         };
-        index.block_items(&items, 0);
+        index.block_items(&items, 0, text);
         Self {
             definitions: index.definitions,
             references: index.references,
@@ -89,6 +90,16 @@ impl Analysis {
         self.definitions
             .iter()
             .find(|definition| contains_name(definition.span, &definition.name, offset))
+    }
+
+    pub(crate) fn import_at(&self, offset: usize) -> Option<&Definition> {
+        self.definitions.iter().find(|definition| {
+            definition
+                .import_path
+                .as_ref()
+                .zip(definition.import_path_offset)
+                .is_some_and(|(path, start)| start <= offset && offset < start + path.len())
+        })
     }
 
     pub(crate) fn reference_at(&self, offset: usize) -> Option<(&str, Span, usize)> {
@@ -138,19 +149,20 @@ struct Index {
 }
 
 impl Index {
-    fn block_items(&mut self, items: &[ast::BlockItem], scope: usize) {
+    fn block_items(&mut self, items: &[ast::BlockItem], scope: usize, text: &str) {
         for item in items {
-            self.block_item(item, scope);
+            self.block_item(item, scope, text);
         }
     }
 
-    fn block_item(&mut self, item: &ast::BlockItem, scope: usize) {
+    fn block_item(&mut self, item: &ast::BlockItem, scope: usize, text: &str) {
         match item {
             ast::BlockItem::Import { label, path, span } => self.define(
                 label,
                 format!("{label}: {path}"),
                 DefinitionKind::Namespace,
                 Some(path.clone()),
+                source_path_offset(text, *span, label, path),
                 *span,
                 scope,
             ),
@@ -160,6 +172,7 @@ impl Index {
                     name,
                     format!("{name}: {}", format_signature(sig, false)),
                     DefinitionKind::Type,
+                    None,
                     None,
                     *span,
                     scope,
@@ -171,10 +184,11 @@ impl Index {
                     format!("{name}: {}", format_signature(&lambda.params, true)),
                     DefinitionKind::Function,
                     None,
+                    None,
                     *span,
                     scope,
                 );
-                self.lambda(lambda, scope);
+                self.lambda(lambda, scope, text);
             }
             ast::BlockItem::LitDef {
                 name,
@@ -185,43 +199,45 @@ impl Index {
                 format!("{name}: {}", format_literal(literal)),
                 DefinitionKind::Constant,
                 None,
+                None,
                 *span,
                 scope,
             ),
             ast::BlockItem::IdentDef { name, ident, span } => {
-                self.ident(ident, scope);
+                self.ident(ident, scope, text);
                 self.define(
                     name,
                     format!("{name}: {}", format_ident(ident)),
                     DefinitionKind::Alias,
                     None,
+                    None,
                     *span,
                     scope,
                 );
             }
-            ast::BlockItem::Lambda(lambda) => self.lambda(lambda, scope),
-            ast::BlockItem::Ident(ident) => self.ident(ident, scope),
+            ast::BlockItem::Lambda(lambda) => self.lambda(lambda, scope, text),
+            ast::BlockItem::Ident(ident) => self.ident(ident, scope, text),
             ast::BlockItem::ScopeCapture {
                 params,
                 continuation,
                 term,
                 ..
             } => {
-                self.term(term, scope);
+                self.term(term, scope, text);
                 let continuation_scope = self.new_scope(scope);
                 self.signature(params, continuation_scope);
-                self.block_items(&continuation.items, continuation_scope);
+                self.block_items(&continuation.items, continuation_scope, text);
             }
         }
     }
 
-    fn lambda(&mut self, lambda: &ast::Lambda, parent_scope: usize) {
+    fn lambda(&mut self, lambda: &ast::Lambda, parent_scope: usize, text: &str) {
         let scope = self.new_scope(parent_scope);
         self.signature(&lambda.params, scope);
         for argument in &lambda.args {
-            self.term(&argument.term, parent_scope);
+            self.term(&argument.term, parent_scope, text);
         }
-        self.block_items(&lambda.body.items, scope);
+        self.block_items(&lambda.body.items, scope, text);
     }
 
     fn signature(&mut self, signature: &ast::Signature, scope: usize) {
@@ -232,6 +248,7 @@ impl Index {
                     &item.name,
                     format!("{}: {}", item.name, format_sig_kind(&item.kind)),
                     DefinitionKind::Parameter,
+                    None,
                     None,
                     item.span,
                     scope,
@@ -267,22 +284,22 @@ impl Index {
         }
     }
 
-    fn term(&mut self, term: &ast::Term, scope: usize) {
+    fn term(&mut self, term: &ast::Term, scope: usize, text: &str) {
         match term {
             ast::Term::Lit(_) => {}
-            ast::Term::Lambda(lambda) => self.lambda(lambda, scope),
-            ast::Term::Ident(ident) => self.ident(ident, scope),
+            ast::Term::Lambda(lambda) => self.lambda(lambda, scope, text),
+            ast::Term::Ident(ident) => self.ident(ident, scope, text),
         }
     }
 
-    fn ident(&mut self, ident: &ast::Ident, scope: usize) {
+    fn ident(&mut self, ident: &ast::Ident, scope: usize, text: &str) {
         self.references.push(Reference {
             name: ident.name.clone(),
             span: ident.span,
             scope,
         });
         for argument in &ident.args {
-            self.term(&argument.term, scope);
+            self.term(&argument.term, scope, text);
         }
     }
 
@@ -292,6 +309,7 @@ impl Index {
         detail: String,
         kind: DefinitionKind,
         import_path: Option<String>,
+        import_path_offset: Option<usize>,
         span: Span,
         scope: usize,
     ) {
@@ -299,6 +317,7 @@ impl Index {
             name: name.to_string(),
             detail,
             import_path,
+            import_path_offset,
             kind,
             span,
             scope,
@@ -312,6 +331,16 @@ impl Index {
         });
         id
     }
+}
+
+fn source_path_offset(text: &str, span: Span, label: &str, path: &str) -> Option<usize> {
+    let start = span.offset.checked_add(label.len())?;
+    let line_end = text[start..]
+        .find(['\n', '\r'])
+        .map_or(text.len(), |end| start + end);
+    text[start..line_end]
+        .find(path)
+        .map(|offset| start + offset)
 }
 
 fn format_signature(signature: &ast::Signature, has_parameter_names: bool) -> String {
