@@ -35,7 +35,7 @@ workspace so editor integrations do not depend on `afterflow-private`.
 | --- | --- |
 | `textDocument/publishDiagnostics` | Reports the compiler lexer's or parser's first error for an open, changed, saved, or closed document. |
 | `textDocument/hover` | Shows Afterflow declarations, references, signatures, literals, imports, and builtin signatures. |
-| `textDocument/definition` | Navigates within a file, across files in one source package, and through imports such as `fmt: /std/fmt` followed by `fmt.new`. |
+| `textDocument/definition` | Navigates within a file, across files in one source package, through imports such as `fmt: /std/fmt` followed by `fmt.new`, and to generated builtin declarations. |
 | `textDocument/documentSymbol` | Lists top-level functions, signatures, constants, aliases, and source-package imports. |
 | `textDocument/completion` | Suggests indexed declarations from the current document and top-level declarations from sibling files. |
 
@@ -89,6 +89,10 @@ A VS Code extension should:
 4. Pass the opened project folder as an LSP workspace folder.
 5. Let the language client perform the standard `initialize`, `initialized`,
    `shutdown`, and `exit` lifecycle.
+6. Register a text document content provider for the `afterflow-builtin` URI
+   scheme. The provider passes `{ "uri": URI_STRING }` to
+   `afterflow/virtualDocument` and returns the generated source string from the
+   response.
 
 After the protocol loop returns, the server must drop its connection before
 joining the standard-I/O worker threads. Keeping the connection alive retains

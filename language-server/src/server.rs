@@ -6,7 +6,6 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use afterflow_frontend::builtins::{self, BuiltinSpec};
-use afterflow_frontend::format_hir;
 use afterflow_frontend::hir;
 use language_server_protocol::types::request::Request as _;
 use language_server_protocol::types::{
@@ -26,6 +25,8 @@ use crate::analysis::{Definition, DefinitionKind};
 use crate::document::Document;
 
 const SERVER_NAME: &str = "afterflow-ls";
+const BUILTIN_SCHEME: &str = "afterflow-builtin";
+const VIRTUAL_DOCUMENT_REQUEST: &str = "afterflow/virtualDocument";
 
 #[derive(Debug)]
 pub struct Error {
@@ -154,6 +155,14 @@ impl Server {
                     .parse::<CompletionParams>(request.params)
                     .and_then(|params| {
                         to_value(self.session.snapshot.completion(params)).map_err(Error::new)
+                    }),
+                VIRTUAL_DOCUMENT_REQUEST => self
+                    .parse::<HashMap<String, String>>(request.params)
+                    .and_then(|params| {
+                        let uri = params
+                            .get("uri")
+                            .ok_or_else(|| Error::new("missing virtual document URI"))?;
+                        to_value(builtin_source_for_uri(uri)).map_err(Error::new)
                     }),
                 _ => {
                     return Response {
@@ -367,17 +376,14 @@ impl Snapshot {
         let text_params = params.text_document_position_params;
         let document = self.document(&text_params.text_document.uri)?;
         let offset = document.position_to_offset(text_params.position)?;
-        let (target_document, definition) =
-            if let Some(definition) = document.analysis().definition_at(offset) {
-                (document, definition)
-            } else {
-                let (name, _, scope) = document.analysis().reference_at(offset)?;
-                self.resolve(document, name, scope, offset)?
-            };
-        Some(GotoDefinitionResponse::Scalar(Location::new(
-            target_document.uri().clone(),
-            target_document.name_range(definition.span, &definition.name),
-        )))
+        if let Some(definition) = document.analysis().definition_at(offset) {
+            return Some(source_definition_location(document, definition));
+        }
+        let (name, _, scope) = document.analysis().reference_at(offset)?;
+        if let Some((target_document, definition)) = self.resolve(document, name, scope, offset) {
+            return Some(source_definition_location(target_document, definition));
+        }
+        builtin_location(name).map(GotoDefinitionResponse::Scalar)
     }
 
     fn document_symbols(&self, params: DocumentSymbolParams) -> Option<DocumentSymbolResponse> {
@@ -584,11 +590,114 @@ fn push_completion(
 fn builtin_detail(name: &str) -> Option<String> {
     let name = name.strip_prefix('@')?;
     match builtins::get_spec(name)? {
+        BuiltinSpec::Function(signature) => {
+            Some(format!("@{name}: {}", format_builtin_signature(&signature)))
+        }
+        BuiltinSpec::Type(kind) => Some(format!("@{name}: {}", format_builtin_kind(&kind))),
+    }
+}
+
+fn format_builtin_signature(signature: &hir::Signature) -> String {
+    let items = signature
+        .items
+        .iter()
+        .map(|item| {
+            let mut kind = format_builtin_kind(&item.kind);
+            if item.is_comptime {
+                kind.push('!');
+            }
+            if item.name.is_empty() {
+                kind
+            } else if kind.starts_with('(') {
+                format!("{}:{kind}", item.name)
+            } else {
+                format!("{}: {kind}", item.name)
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(", ");
+    format!("({items})")
+}
+
+fn format_builtin_kind(kind: &hir::SigKind) -> String {
+    match kind {
+        hir::SigKind::Byte => "@byte".to_string(),
+        hir::SigKind::Int => "@int".to_string(),
+        hir::SigKind::UInt => "@uint".to_string(),
+        hir::SigKind::Rune => "@rune".to_string(),
+        hir::SigKind::FixedInt(kind) => format!("@{}", kind.name()),
+        hir::SigKind::Bytes => "@bytes".to_string(),
+        hir::SigKind::Str => "@str".to_string(),
+        hir::SigKind::F64 => "@f64".to_string(),
+        hir::SigKind::Sig(signature) => {
+            let items = signature
+                .items
+                .iter()
+                .map(|item| {
+                    let mut kind = format_builtin_kind(&item.kind);
+                    if item.is_comptime {
+                        kind.push('!');
+                    }
+                    kind
+                })
+                .collect::<Vec<_>>()
+                .join(", ");
+            format!("({items})")
+        }
+        hir::SigKind::Ident(ident) => ident.name.clone(),
+        hir::SigKind::GenericInst { name, args } => {
+            let args = args
+                .iter()
+                .map(format_builtin_kind)
+                .collect::<Vec<_>>()
+                .join(", ");
+            format!("{name}<{args}>")
+        }
+        hir::SigKind::Generic(name) => name.clone(),
+    }
+}
+
+fn source_definition_location(
+    document: &Document,
+    definition: &Definition,
+) -> GotoDefinitionResponse {
+    GotoDefinitionResponse::Scalar(Location::new(
+        document.uri().clone(),
+        document.name_range(definition.span, &definition.name),
+    ))
+}
+
+fn builtin_location(name: &str) -> Option<Location> {
+    let builtin_name = name.strip_prefix('@')?;
+    builtins::get_spec(builtin_name)?;
+    let uri = Url::parse(&format!("{BUILTIN_SCHEME}:/{builtin_name}.af")).ok()?;
+    Some(Location::new(
+        uri,
+        types::Range::new(
+            types::Position::new(0, 0),
+            types::Position::new(0, name.encode_utf16().count() as u32),
+        ),
+    ))
+}
+
+fn builtin_source_for_uri(uri: &str) -> Option<String> {
+    let uri = Url::parse(uri).ok()?;
+    if uri.scheme() != BUILTIN_SCHEME || uri.query().is_some() || uri.fragment().is_some() {
+        return None;
+    }
+    let name = uri.path().strip_prefix('/')?.strip_suffix(".af")?;
+    if name.is_empty() || name.contains('/') {
+        return None;
+    }
+    match builtins::get_spec(name)? {
         BuiltinSpec::Function(signature) => Some(format!(
-            "@{name}: {}",
-            format_hir::format_sig_kind(&hir::SigKind::Sig(signature))
+            "@{name}: {} {{\n    // internal\n}}\n",
+            format_builtin_signature(&signature)
         )),
-        BuiltinSpec::Type(kind) => Some(format!("@{name}: {}", format_hir::format_sig_kind(&kind))),
+        BuiltinSpec::Type(kind) => Some(format!(
+            "@{name}: {}\n\n// internal compiler type\n",
+            format_builtin_kind(&kind)
+        )),
     }
 }
 
@@ -696,5 +805,59 @@ mod tests {
     fn exposes_builtin_hover_details() {
         let detail = builtin_detail("@exit").expect("known builtin");
         assert!(detail.starts_with("@exit: ("));
+    }
+
+    #[test]
+    fn resolves_builtin_references_to_virtual_documents() {
+        let snapshot = snapshot(&[(
+            "file:///workspace/main.af",
+            "main: () { @add(1, 2, @exit) }\n",
+        )]);
+        let uri = Url::parse("file:///workspace/main.af").expect("valid URI");
+        let response = snapshot
+            .definition(GotoDefinitionParams {
+                text_document_position_params: types::TextDocumentPositionParams::new(
+                    types::TextDocumentIdentifier::new(uri),
+                    types::Position::new(0, 11),
+                ),
+                work_done_progress_params: Default::default(),
+                partial_result_params: Default::default(),
+            })
+            .expect("builtin definition");
+        let GotoDefinitionResponse::Scalar(location) = response else {
+            panic!("expected one builtin location");
+        };
+        assert_eq!(location.uri.as_str(), "afterflow-builtin:/add.af");
+        assert_eq!(location.range.start, types::Position::new(0, 0));
+        assert_eq!(location.range.end, types::Position::new(0, 4));
+    }
+
+    #[test]
+    fn renders_builtin_virtual_documents_from_the_frontend_registry() {
+        assert_eq!(
+            builtin_source_for_uri("afterflow-builtin:/add.af").as_deref(),
+            Some("@add: (x: @int, y: @int, ok:(@int)) {\n    // internal\n}\n")
+        );
+        assert!(builtin_source_for_uri("afterflow-builtin:/unknown.af").is_none());
+        assert!(builtin_source_for_uri("file:///add.af").is_none());
+    }
+
+    #[test]
+    fn serves_virtual_documents_from_object_request_params() {
+        let server = Server::new(None);
+        let response = server.request(Request {
+            id: 1.into(),
+            method: VIRTUAL_DOCUMENT_REQUEST.to_string(),
+            params: to_value(HashMap::from([(
+                "uri".to_string(),
+                "afterflow-builtin:/write.af".to_string(),
+            )]))
+            .expect("serializable params"),
+        });
+
+        assert!(response.error.is_none());
+        let content: Option<String> =
+            from_value(response.result.expect("request result")).expect("string result");
+        assert!(content.expect("known builtin").starts_with("@write: ("));
     }
 }
