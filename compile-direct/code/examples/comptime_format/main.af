@@ -1,12 +1,10 @@
 fmt: /std/fmt
+
 str: @str
-
 print_name: (name: str, ok: ()) {
-    (message: str) = fmt.new("hello %\n", fmt.str(name) fmt.end)
-    @write(message)
-    ok
+	(message: str) = fmt.new("hello %\n", fmt.str(name, fmt.end))
+	@write(message, ok)
 }
-
 main: () {
-    print_name("Alice!", @exit(0))
+	print_name("Alice!", @exit(0))
 }

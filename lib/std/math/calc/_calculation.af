@@ -1,46 +1,39 @@
 math: /std/math
 
 constant: (value: @f64, ok: (@f64)) {
-    ok(value)
+	ok(value)
 }
-
 add: (a: calculation, b: calculation, ok: (@f64)) {
-    (a_value: @f64) = a
-    (b_value: @f64) = b
-    @add_f64(a_value, b_value, ok)
+	(a_value: @f64) = a
+	(b_value: @f64) = b
+	@add_f64(a_value, b_value, ok)
 }
-
 negate: (value: calculation, ok: (@f64)) {
-    (number: @f64) = value
-    @sub_f64(0.0, number, ok)
+	(number: @f64) = value
+	@sub_f64(0.0, number, ok)
 }
-
 subtract: (a: calculation, b: calculation, ok: (@f64)) {
-    (a_value: @f64) = a
-    (b_value: @f64) = b
-    @sub_f64(a_value, b_value, ok)
+	(a_value: @f64) = a
+	(b_value: @f64) = b
+	@sub_f64(a_value, b_value, ok)
 }
-
 multiply: (a: calculation, b: calculation, ok: (@f64)) {
-    (a_value: @f64) = a
-    (b_value: @f64) = b
-    @mul_f64(a_value, b_value, ok)
+	(a_value: @f64) = a
+	(b_value: @f64) = b
+	@mul_f64(a_value, b_value, ok)
 }
-
 divide: (a: calculation, b: calculation, ok: (@f64)) {
-    (a_value: @f64) = a
-    (b_value: @f64) = b
-    @div_f64(a_value, b_value, ok)
+	(a_value: @f64) = a
+	(b_value: @f64) = b
+	@div_f64(a_value, b_value, ok)
 }
-
 power: (a: calculation, b: calculation, ok: (@f64)) {
-    (a_value: @f64) = a
-    (b_value: @f64) = b
-    math.pow(a_value, b_value, ok)
+	(a_value: @f64) = a
+	(b_value: @f64) = b
+	math.pow(a_value, b_value, ok)
 }
-
 append_digit: (prefix: calculation, digit: @f64, ok: (@f64)) {
-    (prefix_value: @f64) = prefix
-    (shifted: @f64) = @mul_f64(prefix_value, 10.0)
-    @add_f64(shifted, digit, ok)
+	(prefix_value: @f64) = prefix
+	(shifted: @f64) = @mul_f64(prefix_value, 10.0)
+	@add_f64(shifted, digit, ok)
 }

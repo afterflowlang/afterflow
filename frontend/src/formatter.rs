@@ -27,7 +27,7 @@ pub fn format_source(source: &str) -> Result<String, Error> {
     }
 
     let mut formatter = Formatter::new(source);
-    formatter.block_items(&items, 0);
+    formatter.top_level_items(&items);
     formatter.remaining_comments(0);
     while formatter.output.ends_with("\n\n") {
         formatter.output.pop();
@@ -64,6 +64,35 @@ impl Formatter {
             self.comments_before(item.span().offset, depth);
             self.block_item(item, depth);
         }
+    }
+
+    fn top_level_items(&mut self, items: &[BlockItem]) {
+        let import_count = items
+            .iter()
+            .take_while(|item| matches!(item, BlockItem::Import { .. }))
+            .count();
+        let mut imports = items[..import_count].iter().collect::<Vec<_>>();
+        imports.sort_by(|left, right| import_key(left).cmp(&import_key(right)));
+        for item in imports {
+            self.comments_before(item.span().offset, 0);
+            self.block_item(item, 0);
+        }
+
+        let type_count = items[import_count..]
+            .iter()
+            .take_while(|item| matches!(item, BlockItem::SigDef { .. }))
+            .count();
+        let type_end = import_count + type_count;
+
+        if import_count > 0 && import_count < items.len() {
+            self.blank_line();
+        }
+        self.block_items(&items[import_count..type_end], 0);
+
+        if type_count > 0 && type_end < items.len() {
+            self.blank_line();
+        }
+        self.block_items(&items[type_end..], 0);
     }
 
     fn block_item(&mut self, item: &BlockItem, depth: usize) {
@@ -301,6 +330,12 @@ impl Formatter {
         self.output.push('\n');
     }
 
+    fn blank_line(&mut self) {
+        if !self.output.is_empty() && !self.output.ends_with("\n\n") {
+            self.output.push('\n');
+        }
+    }
+
     fn line_multiline(&mut self, depth: usize, value: &str) {
         for (index, line) in value.lines().enumerate() {
             if index == 0 {
@@ -309,6 +344,13 @@ impl Formatter {
             self.output.push_str(line);
             self.output.push('\n');
         }
+    }
+}
+
+fn import_key(item: &BlockItem) -> (&str, &str) {
+    match item {
+        BlockItem::Import { label, path, .. } => (label, path),
+        _ => unreachable!("import_key must only be called for imports"),
     }
 }
 
@@ -515,6 +557,34 @@ mod tests {
             format_source("pkg:/vendor//generated\n").unwrap(),
             "pkg: /vendor//generated\n"
         );
+    }
+
+    #[test]
+    fn sorts_imports_and_separates_top_level_sections() {
+        let source = r#"std: /std
+fmt: /std/fmt
+calc: /std/math/calc
+result: (@f64)
+callback: (@str, ())
+main: () {
+	@exit(0)
+}
+"#;
+        let expected = r#"calc: /std/math/calc
+fmt: /std/fmt
+std: /std
+
+result: (@f64)
+callback: (@str, ())
+
+main: () {
+	@exit(0)
+}
+"#;
+
+        let formatted = format_source(source).unwrap();
+        assert_eq!(formatted, expected);
+        assert_eq!(format_source(&formatted).unwrap(), formatted);
     }
 
     #[test]

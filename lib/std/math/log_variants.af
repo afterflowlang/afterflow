@@ -1,11 +1,9 @@
 log2: (value: @f64, ok: (@f64)) {
-    @log2_f64(value, ok)
+	@log2_f64(value, ok)
 }
-
 log10: (value: @f64, ok: (@f64)) {
-    @log10_f64(value, ok)
+	@log10_f64(value, ok)
 }
-
 ln_1p: (value: @f64, ok: (@f64)) {
-    @log1p_f64(value, ok)
+	@log1p_f64(value, ok)
 }

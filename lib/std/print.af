@@ -1,7 +1,6 @@
 print: (value: @str, ok: ()) {
-    @write(value, ok)
+	@write(value, ok)
 }
-
 println: (value: @str, ok: ()) {
-    @write(value, @write("\n", ok))
+	@write(value, @write("\n", ok))
 }

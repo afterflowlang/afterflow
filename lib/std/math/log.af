@@ -1,5 +1,5 @@
 log: (value: @f64, base: @f64, ok: (@f64)) {
-    (value_logarithm: @f64) = @log_f64(value)
-    (base_logarithm: @f64) = @log_f64(base)
-    @div_f64(value_logarithm, base_logarithm, ok)
+	(value_logarithm: @f64) = @log_f64(value)
+	(base_logarithm: @f64) = @log_f64(base)
+	@div_f64(value_logarithm, base_logarithm, ok)
 }

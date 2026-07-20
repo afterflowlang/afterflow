@@ -1,79 +1,453 @@
 math: /std/math
 
 apply_unary_function: (source_nth: nth, start: @uint, end: @uint, value: calculation, invalid: (), ok: (calculation)) {
-    range_equals_name(source_nth, start, end, "abs", ok(apply_unary_operation(math.abs, value)), () {
-        range_equals_name(source_nth, start, end, "acos", ok(apply_unary_operation(math.acos, value)), () {
-            range_equals_name(source_nth, start, end, "acosh", ok(apply_unary_operation(math.acosh, value)), () {
-                range_equals_name(source_nth, start, end, "asin", ok(apply_unary_operation(math.asin, value)), () {
-                    range_equals_name(source_nth, start, end, "asinh", ok(apply_unary_operation(math.asinh, value)), () {
-                        range_equals_name(source_nth, start, end, "atan", ok(apply_unary_operation(math.atan, value)), () {
-                            range_equals_name(source_nth, start, end, "atanh", ok(apply_unary_operation(math.atanh, value)), () {
-                                range_equals_name(source_nth, start, end, "cbrt", ok(apply_unary_operation(math.cbrt, value)), () {
-                                    range_equals_name(source_nth, start, end, "ceil", ok(apply_unary_operation(math.ceil, value)), () {
-                                        range_equals_name(source_nth, start, end, "cos", ok(apply_unary_operation(math.cos, value)), () {
-                                            range_equals_name(source_nth, start, end, "cosh", ok(apply_unary_operation(math.cosh, value)), () {
-                                                range_equals_name(source_nth, start, end, "deg", ok(apply_unary_operation(math.to_degrees, value)), () {
-                                                    range_equals_name(source_nth, start, end, "exp", ok(apply_unary_operation(math.exp, value)), () {
-                                                        range_equals_name(source_nth, start, end, "exp2", ok(apply_unary_operation(math.exp2, value)), () {
-                                                            range_equals_name(source_nth, start, end, "expm1", ok(apply_unary_operation(math.exp_m1, value)), () {
-                                                                range_equals_name(source_nth, start, end, "floor", ok(apply_unary_operation(math.floor, value)), () {
-                                                                    range_equals_name(source_nth, start, end, "ln", ok(apply_unary_operation(math.ln, value)), () {
-                                                                        range_equals_name(source_nth, start, end, "ln1p", ok(apply_unary_operation(math.ln_1p, value)), () {
-                                                                            range_equals_name(source_nth, start, end, "log", ok(apply_unary_operation(math.log10, value)), () {
-                                                                                range_equals_name(source_nth, start, end, "log10", ok(apply_unary_operation(math.log10, value)), () {
-                                                                                    range_equals_name(source_nth, start, end, "log2", ok(apply_unary_operation(math.log2, value)), () {
-                                                                                        range_equals_name(source_nth, start, end, "rad", ok(apply_unary_operation(math.to_radians, value)), () {
-                                                                                            range_equals_name(source_nth, start, end, "round", ok(apply_unary_operation(math.round, value)), () {
-                                                                                                range_equals_name(source_nth, start, end, "sin", ok(apply_unary_operation(math.sin, value)), () {
-                                                                                                    range_equals_name(source_nth, start, end, "sinh", ok(apply_unary_operation(math.sinh, value)), () {
-                                                                                                        range_equals_name(source_nth, start, end, "sqrt", ok(apply_unary_operation(math.sqrt, value)), () {
-                                                                                                            range_equals_name(source_nth, start, end, "tan", ok(apply_unary_operation(math.tan, value)), () {
-                                                                                                                range_equals_name(source_nth, start, end, "tanh", ok(apply_unary_operation(math.tanh, value)), () {
-                                                                                                                    range_equals_name(source_nth, start, end, "trunc", ok(apply_unary_operation(math.trunc, value)), invalid)
-                                                                                                                })
-                                                                                                            })
-                                                                                                        })
-                                                                                                    })
-                                                                                                })
-                                                                                            })
-                                                                                        })
-                                                                                    })
-                                                                                })
-                                                                            })
-                                                                        })
-                                                                    })
-                                                                })
-                                                            })
-                                                        })
-                                                    })
-                                                })
-                                            })
-                                        })
-                                    })
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    })
+	range_equals_name(
+		source_nth,
+		start,
+		end,
+		"abs",
+		ok(apply_unary_operation(math.abs, value)),
+		() {
+			range_equals_name(
+				source_nth,
+				start,
+				end,
+				"acos",
+				ok(apply_unary_operation(math.acos, value)),
+				() {
+					range_equals_name(
+						source_nth,
+						start,
+						end,
+						"acosh",
+						ok(apply_unary_operation(math.acosh, value)),
+						() {
+							range_equals_name(
+								source_nth,
+								start,
+								end,
+								"asin",
+								ok(apply_unary_operation(math.asin, value)),
+								() {
+									range_equals_name(
+										source_nth,
+										start,
+										end,
+										"asinh",
+										ok(apply_unary_operation(math.asinh, value)),
+										() {
+											range_equals_name(
+												source_nth,
+												start,
+												end,
+												"atan",
+												ok(apply_unary_operation(math.atan, value)),
+												() {
+													range_equals_name(
+														source_nth,
+														start,
+														end,
+														"atanh",
+														ok(apply_unary_operation(math.atanh, value)),
+														() {
+															range_equals_name(
+																source_nth,
+																start,
+																end,
+																"cbrt",
+																ok(
+																	apply_unary_operation(
+																		math.cbrt,
+																		value
+																	)
+																),
+																() {
+																	range_equals_name(
+																		source_nth,
+																		start,
+																		end,
+																		"ceil",
+																		ok(
+																			apply_unary_operation(
+																				math.ceil,
+																				value
+																			)
+																		),
+																		() {
+																			range_equals_name(
+																				source_nth,
+																				start,
+																				end,
+																				"cos",
+																				ok(
+																					apply_unary_operation(
+																						math.cos,
+																						value
+																					)
+																				),
+																				() {
+																					range_equals_name(
+																						source_nth,
+																						start,
+																						end,
+																						"cosh",
+																						ok(
+																							apply_unary_operation(
+																								math.cosh,
+																								value
+																							)
+																						),
+																						() {
+																							range_equals_name(
+																								source_nth,
+																								start,
+																								end,
+																								"deg",
+																								ok(
+																									apply_unary_operation(
+																										math.to_degrees,
+																										value
+																									)
+																								),
+																								() {
+																									range_equals_name(
+																										source_nth,
+																										start,
+																										end,
+																										"exp",
+																										ok(
+																											apply_unary_operation(
+																												math.exp,
+																												value
+																											)
+																										),
+																										() {
+																											range_equals_name(
+																												source_nth,
+																												start,
+																												end,
+																												"exp2",
+																												ok(
+																													apply_unary_operation(
+																														math.exp2,
+																														value
+																													)
+																												),
+																												() {
+																													range_equals_name(
+																														source_nth,
+																														start,
+																														end,
+																														"expm1",
+																														ok(
+																															apply_unary_operation(
+																																math.exp_m1,
+																																value
+																															)
+																														),
+																														() {
+																															range_equals_name(
+																																source_nth,
+																																start,
+																																end,
+																																"floor",
+																																ok(
+																																	apply_unary_operation(
+																																		math.floor,
+																																		value
+																																	)
+																																),
+																																() {
+																																	range_equals_name(
+																																		source_nth,
+																																		start,
+																																		end,
+																																		"ln",
+																																		ok(
+																																			apply_unary_operation(
+																																				math.ln,
+																																				value
+																																			)
+																																		),
+																																		() {
+																																			range_equals_name(
+																																				source_nth,
+																																				start,
+																																				end,
+																																				"ln1p",
+																																				ok(
+																																					apply_unary_operation(
+																																						math.ln_1p,
+																																						value
+																																					)
+																																				),
+																																				() {
+																																					range_equals_name(
+																																						source_nth,
+																																						start,
+																																						end,
+																																						"log",
+																																						ok(
+																																							apply_unary_operation(
+																																								math.log10,
+																																								value
+																																							)
+																																						),
+																																						() {
+																																							range_equals_name(
+																																								source_nth,
+																																								start,
+																																								end,
+																																								"log10",
+																																								ok(
+																																									apply_unary_operation(
+																																										math.log10,
+																																										value
+																																									)
+																																								),
+																																								() {
+																																									range_equals_name(
+																																										source_nth,
+																																										start,
+																																										end,
+																																										"log2",
+																																										ok(
+																																											apply_unary_operation(
+																																												math.log2,
+																																												value
+																																											)
+																																										),
+																																										() {
+																																											range_equals_name(
+																																												source_nth,
+																																												start,
+																																												end,
+																																												"rad",
+																																												ok(
+																																													apply_unary_operation(
+																																														math.to_radians,
+																																														value
+																																													)
+																																												),
+																																												() {
+																																													range_equals_name(
+																																														source_nth,
+																																														start,
+																																														end,
+																																														"round",
+																																														ok(
+																																															apply_unary_operation(
+																																																math.round,
+																																																value
+																																															)
+																																														),
+																																														() {
+																																															range_equals_name(
+																																																source_nth,
+																																																start,
+																																																end,
+																																																"sin",
+																																																ok(
+																																																	apply_unary_operation(
+																																																		math.sin,
+																																																		value
+																																																	)
+																																																),
+																																																() {
+																																																	range_equals_name(
+																																																		source_nth,
+																																																		start,
+																																																		end,
+																																																		"sinh",
+																																																		ok(
+																																																			apply_unary_operation(
+																																																				math.sinh,
+																																																				value
+																																																			)
+																																																		),
+																																																		() {
+																																																			range_equals_name(
+																																																				source_nth,
+																																																				start,
+																																																				end,
+																																																				"sqrt",
+																																																				ok(
+																																																					apply_unary_operation(
+																																																						math.sqrt,
+																																																						value
+																																																					)
+																																																				),
+																																																				() {
+																																																					range_equals_name(
+																																																						source_nth,
+																																																						start,
+																																																						end,
+																																																						"tan",
+																																																						ok(
+																																																							apply_unary_operation(
+																																																								math.tan,
+																																																								value
+																																																							)
+																																																						),
+																																																						() {
+																																																							range_equals_name(
+																																																								source_nth,
+																																																								start,
+																																																								end,
+																																																								"tanh",
+																																																								ok(
+																																																									apply_unary_operation(
+																																																										math.tanh,
+																																																										value
+																																																									)
+																																																								),
+																																																								() {
+																																																									range_equals_name(
+																																																										source_nth,
+																																																										start,
+																																																										end,
+																																																										"trunc",
+																																																										ok(
+																																																											apply_unary_operation(
+																																																												math.trunc,
+																																																												value
+																																																											)
+																																																										),
+																																																										invalid
+																																																									)
+																																																								}
+																																																							)
+																																																						}
+																																																					)
+																																																				}
+																																																			)
+																																																		}
+																																																	)
+																																																}
+																																															)
+																																														}
+																																													)
+																																												}
+																																											)
+																																										}
+																																									)
+																																								}
+																																							)
+																																						}
+																																					)
+																																				}
+																																			)
+																																		}
+																																	)
+																																}
+																															)
+																														}
+																													)
+																												}
+																											)
+																										}
+																									)
+																								}
+																							)
+																						}
+																					)
+																				}
+																			)
+																		}
+																	)
+																}
+															)
+														}
+													)
+												}
+											)
+										}
+									)
+								}
+							)
+						}
+					)
+				}
+			)
+		}
+	)
 }
-
 apply_binary_function: (source_nth: nth, start: @uint, end: @uint, a: calculation, b: calculation, invalid: (), ok: (calculation)) {
-    range_equals_name(source_nth, start, end, "atan2", ok(apply_binary_operation(math.atan2, a, b)), () {
-        range_equals_name(source_nth, start, end, "hypot", ok(apply_binary_operation(math.hypot, a, b)), () {
-            range_equals_name(source_nth, start, end, "log", ok(apply_binary_operation(math.log, a, b)), () {
-                range_equals_name(source_nth, start, end, "max", ok(apply_binary_operation(math.max_f64, a, b)), () {
-                    range_equals_name(source_nth, start, end, "min", ok(apply_binary_operation(math.min_f64, a, b)), () {
-                        range_equals_name(source_nth, start, end, "mod", ok(apply_binary_operation(math.mod, a, b)), () {
-                            range_equals_name(source_nth, start, end, "pow", ok(power(a, b)), () {
-                                range_equals_name(source_nth, start, end, "remainder", ok(apply_binary_operation(math.remainder, a, b)), invalid)
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    })
+	range_equals_name(
+		source_nth,
+		start,
+		end,
+		"atan2",
+		ok(apply_binary_operation(math.atan2, a, b)),
+		() {
+			range_equals_name(
+				source_nth,
+				start,
+				end,
+				"hypot",
+				ok(apply_binary_operation(math.hypot, a, b)),
+				() {
+					range_equals_name(
+						source_nth,
+						start,
+						end,
+						"log",
+						ok(apply_binary_operation(math.log, a, b)),
+						() {
+							range_equals_name(
+								source_nth,
+								start,
+								end,
+								"max",
+								ok(apply_binary_operation(math.max_f64, a, b)),
+								() {
+									range_equals_name(
+										source_nth,
+										start,
+										end,
+										"min",
+										ok(apply_binary_operation(math.min_f64, a, b)),
+										() {
+											range_equals_name(
+												source_nth,
+												start,
+												end,
+												"mod",
+												ok(apply_binary_operation(math.mod, a, b)),
+												() {
+													range_equals_name(
+														source_nth,
+														start,
+														end,
+														"pow",
+														ok(power(a, b)),
+														() {
+															range_equals_name(
+																source_nth,
+																start,
+																end,
+																"remainder",
+																ok(
+																	apply_binary_operation(
+																		math.remainder,
+																		a,
+																		b
+																	)
+																),
+																invalid
+															)
+														}
+													)
+												}
+											)
+										}
+									)
+								}
+							)
+						}
+					)
+				}
+			)
+		}
+	)
 }

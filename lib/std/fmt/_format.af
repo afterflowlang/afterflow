@@ -1,32 +1,70 @@
 parse: (source_l: @uint, source_nth: nth, idx: @uint, output: source, invalid: (), args: arg, ready: (source)) {
-    @lt_uint(idx, source_l, () {
-        (value: @u8) = source_nth(idx, invalid)
-        (value_bits: @b8) = @b8_from_u8(value)
-        (percent_bits: @b8) = @b8_from_u8(37)
-        @eq_b8(value_bits, percent_bits, () {
-            (next_idx: @uint) = @add_uint(idx, 1)
-            @lt_uint(next_idx, source_l, () {
-                (next_value: @u8) = source_nth(next_idx, invalid)
-                (next_bits: @b8) = @b8_from_u8(next_value)
-                @eq_b8(next_bits, percent_bits, () {
-                    (following_idx: @uint) = @add_uint(next_idx, 1)
-                    next_output: concat(output) single(37)
-                    parse(source_l, source_nth, following_idx, next_output, invalid, args, ready)
-                }, () {
-                    args(consume(source_l, source_nth, next_idx, output, invalid, ready))
-                    missing(invalid)
-                })
-            }, () {
-                args(consume(source_l, source_nth, next_idx, output, invalid, ready))
-                missing(invalid)
-            })
-        }, () {
-            (next_idx: @uint) = @add_uint(idx, 1)
-            next_output: concat(output) single(value)
-            parse(source_l, source_nth, next_idx, next_output, invalid, args, ready)
-        })
-    }, () {
-        args(extra(invalid))
-        ready(output)
-    })
+	@lt_uint(
+		idx,
+		source_l,
+		() {
+			(value: @u8) = source_nth(idx, invalid)
+			(value_bits: @b8) = @b8_from_u8(value)
+			(percent_bits: @b8) = @b8_from_u8(37)
+			@eq_b8(
+				value_bits,
+				percent_bits,
+				() {
+					(next_idx: @uint) = @add_uint(idx, 1)
+					@lt_uint(
+						next_idx,
+						source_l,
+						() {
+							(next_value: @u8) = source_nth(next_idx, invalid)
+							(next_bits: @b8) = @b8_from_u8(next_value)
+							@eq_b8(
+								next_bits,
+								percent_bits,
+								() {
+									(following_idx: @uint) = @add_uint(next_idx, 1)
+									next_output: concat(output, single(37))
+									parse(
+										source_l,
+										source_nth,
+										following_idx,
+										next_output,
+										invalid,
+										args,
+										ready
+									)
+								},
+								() {
+									args(
+										consume(
+											source_l,
+											source_nth,
+											next_idx,
+											output,
+											invalid,
+											ready
+										),
+										missing(invalid)
+									)
+								}
+							)
+						},
+						() {
+							args(
+								consume(source_l, source_nth, next_idx, output, invalid, ready),
+								missing(invalid)
+							)
+						}
+					)
+				},
+				() {
+					(next_idx: @uint) = @add_uint(idx, 1)
+					next_output: concat(output, single(value))
+					parse(source_l, source_nth, next_idx, next_output, invalid, args, ready)
+				}
+			)
+		},
+		() {
+			args(extra(invalid), ready(output))
+		}
+	)
 }

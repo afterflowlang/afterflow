@@ -1,10 +1,21 @@
 complete: (value: calculation, args: arg, ready: (calculation)) {
-    args(complete_item(value, ready), complete_done(value, ready))
+	args(complete_item(value, ready), complete_done(value, ready))
 }
-
 calculate: (source_l: @uint, source_nth: nth, args: arg, invalid: (), ready: (calculation)) {
-    validate_args(source_l, source_nth, args, invalid, () {
-        (idx: @uint, value: calculation) = parse_expression(source_l, source_nth, 0, args, invalid)
-        @eq_uint(idx, source_l, complete(value, args, ready), invalid)
-    })
+	validate_args(
+		source_l,
+		source_nth,
+		args,
+		invalid,
+		() {
+			(idx: @uint, value: calculation) = parse_expression(
+				source_l,
+				source_nth,
+				0,
+				args,
+				invalid
+			)
+			@eq_uint(idx, source_l, complete(value, args, ready), invalid)
+		}
+	)
 }

@@ -1,40 +1,42 @@
 empty_nth: (@uint, empty: (), (@u8)) {
-    empty()
+	empty
 }
-
 empty: (inspect_value: inspect) {
-    inspect_value(0, empty_nth)
+	inspect_value(0, empty_nth)
 }
-
 single_nth: (value: @u8, idx: @uint, empty_case: (), one: (@u8)) {
-    @eq_uint(idx, 0, one(value), empty_case)
+	@eq_uint(idx, 0, one(value), empty_case)
 }
-
 single: (value: @u8, inspect_value: inspect) {
-    inspect_value(1, single_nth(value))
+	inspect_value(1, single_nth(value))
 }
-
 raw_nth: (value: @bytes, idx: @uint, empty_case: (), one: (@u8)) {
-    @bytes_nth(value, idx, empty_case, one)
+	@bytes_nth(value, idx, empty_case, one)
 }
-
 from_raw: (value: @bytes, inspect_value: inspect) {
-    (l: @uint) = @bytes_descriptor_len(value)
-    inspect_value(l, raw_nth(value))
+	(l: @uint) = @bytes_descriptor_len(value)
+	inspect_value(l, raw_nth(value))
 }
-
 concat_nth: (l: @uint, a: nth, b: nth, idx: @uint, empty_case: (), one: (@u8)) {
-    @lt_uint(idx, l, a(idx, empty_case, one), () {
-        (b_idx: @uint) = @sub_uint(idx, l)
-        b(b_idx, empty_case, one)
-    })
+	@lt_uint(
+		idx,
+		l,
+		a(idx, empty_case, one),
+		() {
+			(b_idx: @uint) = @sub_uint(idx, l)
+			b(b_idx, empty_case, one)
+		}
+	)
 }
-
 concat: (a: source, b: source, inspect_value: inspect) {
-    a((a_l: @uint, a_nth: nth) {
-        b((b_l: @uint, b_nth: nth) {
-            (l: @uint) = @add_uint(a_l, b_l)
-            inspect_value(l, concat_nth(a_l, a_nth, b_nth))
-        })
-    })
+	a(
+		(a_l: @uint, a_nth: nth) {
+			b(
+				(b_l: @uint, b_nth: nth) {
+					(l: @uint) = @add_uint(a_l, b_l)
+					inspect_value(l, concat_nth(a_l, a_nth, b_nth))
+				}
+			)
+		}
+	)
 }

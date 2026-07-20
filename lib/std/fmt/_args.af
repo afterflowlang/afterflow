@@ -1,11 +1,9 @@
 as_str: (value: @str, str_case: (@str), (@int), (@f64)) {
-    str_case(value)
+	str_case(value)
 }
-
 as_int: (value: @int, (@str), int_case: (@int), (@f64)) {
-    int_case(value)
+	int_case(value)
 }
-
 as_f64: (value: @f64, (@str), (@int), f64_case: (@f64)) {
-    f64_case(value)
+	f64_case(value)
 }

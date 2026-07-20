@@ -1,7 +1,7 @@
 new: (source: @str!, args: arg!, ok: (@f64)) {
-    invalid: @compile_error("invalid calculation", @exit(1))
-    (source_bytes: @bytes) = @bytes_from_str(source)
-    (source_l: @uint) = @bytes_descriptor_len(source_bytes)
-    (value: calculation) = calculate(source_l, raw_nth(source_bytes), args, invalid)
-    value(ok)
+	invalid: @compile_error("invalid calculation", @exit(1))
+	(source_bytes: @bytes) = @bytes_from_str(source)
+	(source_l: @uint) = @bytes_descriptor_len(source_bytes)
+	(value: calculation) = calculate(source_l, raw_nth(source_bytes), args, invalid)
+	value(ok)
 }

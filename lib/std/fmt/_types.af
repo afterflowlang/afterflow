@@ -1,2 +1,2 @@
-format_value: (str_case: (@str), int_case: (@int), f64_case: (@f64))
-arg: (next: (format_value, arg), done_case: ())
+format_value: ((@str), (@int), (@f64))
+arg: ((format_value, arg), ())

@@ -1,19 +1,42 @@
 whitespace: (value: @u8, yes: (), no: ()) {
-    eq_byte(value, 32, yes, () {
-        eq_byte(value, 9, yes, () {
-            eq_byte(value, 10, yes, () {
-                eq_byte(value, 13, yes, no)
-            })
-        })
-    })
+	eq_byte(
+		value,
+		32,
+		yes,
+		() {
+			eq_byte(
+				value,
+				9,
+				yes,
+				() {
+					eq_byte(
+						value,
+						10,
+						yes,
+						() {
+							eq_byte(value, 13, yes, no)
+						}
+					)
+				}
+			)
+		}
+	)
 }
-
 skip_whitespace: (source_l: @uint, source_nth: nth, idx: @uint, ok: (@uint)) {
-    @lt_uint(idx, source_l, () {
-        (value: @u8) = source_nth(idx, ok(idx))
-        whitespace(value, () {
-            (next_idx: @uint) = @add_uint(idx, 1)
-            skip_whitespace(source_l, source_nth, next_idx, ok)
-        }, ok(idx))
-    }, ok(idx))
+	@lt_uint(
+		idx,
+		source_l,
+		() {
+			(value: @u8) = source_nth(idx, ok(idx))
+			whitespace(
+				value,
+				() {
+					(next_idx: @uint) = @add_uint(idx, 1)
+					skip_whitespace(source_l, source_nth, next_idx, ok)
+				},
+				ok(idx)
+			)
+		},
+		ok(idx)
+	)
 }

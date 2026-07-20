@@ -1,15 +1,24 @@
 min: (a: @int, b: @int, ok: (@int)) {
-    @lt(a, b, () {
-        ok(a)
-    }, () {
-        ok(b)
-    })
+	@lt(
+		a,
+		b,
+		() {
+			ok(a)
+		},
+		() {
+			ok(b)
+		}
+	)
 }
-
 max: (a: @int, b: @int, ok: (@int)) {
-    @lt(a, b, () {
-        ok(b)
-    }, () {
-        ok(a)
-    })
+	@lt(
+		a,
+		b,
+		() {
+			ok(b)
+		},
+		() {
+			ok(a)
+		}
+	)
 }

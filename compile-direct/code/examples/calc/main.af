@@ -1,9 +1,11 @@
-fmt: /std/fmt
 calc: /std/math/calc
+fmt: /std/fmt
+
 main: () {
-	(result: @f64) = calc.new(
-		"hypot(width, height) + sin(pi / 2) ^ 2",
-		calc.var("width", 3.0, calc.var("height", 4.0, calc.end))
+	(result: @f64) = calc.new("hypot(width, height) + sin(pi / 2) ^ 2",
+		calc.var("width", 3.0)
+		calc.var("height", 4.0)
+		calc.end
 	)
 	(message: @str) = fmt.new("result: %\n", fmt.f64(result, fmt.end))
 	@write(message, @exit(0))

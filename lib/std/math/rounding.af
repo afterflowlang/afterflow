@@ -1,15 +1,12 @@
 ceil: (value: @f64, ok: (@f64)) {
-    @ceil_f64(value, ok)
+	@ceil_f64(value, ok)
 }
-
 floor: (value: @f64, ok: (@f64)) {
-    @floor_f64(value, ok)
+	@floor_f64(value, ok)
 }
-
 round: (value: @f64, ok: (@f64)) {
-    @round_f64(value, ok)
+	@round_f64(value, ok)
 }
-
 trunc: (value: @f64, ok: (@f64)) {
-    @trunc_f64(value, ok)
+	@trunc_f64(value, ok)
 }

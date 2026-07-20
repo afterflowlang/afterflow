@@ -1,16 +1,15 @@
 fmt: /std/fmt
+
 str: @str
 int: @int
-
 greet: (name: str, count: int, ok: ()) {
-    (message: str) = fmt.new("hello %, you have % messages\n",
-        fmt.str(name)
-        fmt.int(count)
-        fmt.end
-    )
-    @write(message)
-    ok
+	(message: str) = fmt.new("hello %, you have % messages\n",
+		fmt.str(name)
+		fmt.int(count)
+		fmt.end
+	)
+	@write(message, ok)
 }
 main: () {
-    greet("Alice", 3, @exit(0))
+	greet("Alice", 3, @exit(0))
 }

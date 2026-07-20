@@ -1,10 +1,9 @@
 apply_unary_operation: (operation: (@f64, (@f64)), value: calculation, ok: (@f64)) {
-    (number: @f64) = value
-    operation(number, ok)
+	(number: @f64) = value
+	operation(number, ok)
 }
-
 apply_binary_operation: (operation: (@f64, @f64, (@f64)), a: calculation, b: calculation, ok: (@f64)) {
-    (a_value: @f64) = a
-    (b_value: @f64) = b
-    operation(a_value, b_value, ok)
+	(a_value: @f64) = a
+	(b_value: @f64) = b
+	operation(a_value, b_value, ok)
 }

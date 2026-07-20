@@ -1,35 +1,27 @@
 abs: (value: @f64, ok: (@f64)) {
-    @fabs_f64(value, ok)
+	@fabs_f64(value, ok)
 }
-
 copy_sign: (magnitude: @f64, sign: @f64, ok: (@f64)) {
-    @copysign_f64(magnitude, sign, ok)
+	@copysign_f64(magnitude, sign, ok)
 }
-
 dim: (a: @f64, b: @f64, ok: (@f64)) {
-    @fdim_f64(a, b, ok)
+	@fdim_f64(a, b, ok)
 }
-
 max_f64: (a: @f64, b: @f64, ok: (@f64)) {
-    @fmax_f64(a, b, ok)
+	@fmax_f64(a, b, ok)
 }
-
 min_f64: (a: @f64, b: @f64, ok: (@f64)) {
-    @fmin_f64(a, b, ok)
+	@fmin_f64(a, b, ok)
 }
-
 mod: (dividend: @f64, divisor: @f64, ok: (@f64)) {
-    @fmod_f64(dividend, divisor, ok)
+	@fmod_f64(dividend, divisor, ok)
 }
-
 remainder: (dividend: @f64, divisor: @f64, ok: (@f64)) {
-    @remainder_f64(dividend, divisor, ok)
+	@remainder_f64(dividend, divisor, ok)
 }
-
 next_after: (value: @f64, toward: @f64, ok: (@f64)) {
-    @nextafter_f64(value, toward, ok)
+	@nextafter_f64(value, toward, ok)
 }
-
 ldexp: (value: @f64, exponent: @i32, ok: (@f64)) {
-    @ldexp_f64_i32(value, exponent, ok)
+	@ldexp_f64_i32(value, exponent, ok)
 }

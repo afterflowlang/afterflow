@@ -1,47 +1,49 @@
 str_source: (value: @str, inspect_value: inspect) {
-    (value_bytes: @bytes) = @bytes_from_str(value)
-    from_raw(value_bytes, inspect_value)
+	(value_bytes: @bytes) = @bytes_from_str(value)
+	from_raw(value_bytes, inspect_value)
 }
-
 int_source: (value: @int, invalid: (), inspect_value: inspect) {
-    (rendered: source) = from_int(value, invalid)
-    rendered(inspect_value)
+	(rendered: source) = from_int(value, invalid)
+	rendered(inspect_value)
 }
-
 f64_nth: (value: @f64, l: @uint, idx: @uint, empty_case: (), one: (@u8)) {
-    @lt_uint(idx, l, () {
-        (byte: @u8) = @format_f64_nth(value, idx)
-        one(byte)
-    }, empty_case)
+	@lt_uint(
+		idx,
+		l,
+		() {
+			(byte: @u8) = @format_f64_nth(value, idx)
+			one(byte)
+		},
+		empty_case
+	)
 }
-
 f64_source: (value: @f64, inspect_value: inspect) {
-    (l: @uint) = @format_f64_len(value)
-    inspect_value(l, f64_nth(value, l))
+	(l: @uint) = @format_f64_len(value)
+	inspect_value(l, f64_nth(value, l))
 }
-
 consume: (source_l: @uint, source_nth: nth, idx: @uint, output: source, invalid: (), ready: (source), item: format_value, tail: arg) {
-    item((str_value: @str) {
-        next_output: concat(output) str_source(str_value)
-        parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
-    }, (int_value: @int) {
-        next_output: concat(output) int_source(int_value, invalid)
-        parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
-    }, (f64_value: @f64) {
-        next_output: concat(output) f64_source(f64_value)
-        parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
-    })
+	item(
+		(str_value: @str) {
+			next_output: concat(output, str_source(str_value))
+			parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
+		},
+		(int_value: @int) {
+			next_output: concat(output, int_source(int_value, invalid))
+			parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
+		},
+		(f64_value: @f64) {
+			next_output: concat(output, f64_source(f64_value))
+			parse(source_l, source_nth, idx, next_output, invalid, tail, ready)
+		}
+	)
 }
-
 missing: (invalid: ()) {
-    invalid
+	invalid
 }
-
 extra: (invalid: (), format_value, arg) {
-    invalid
+	invalid
 }
-
 finish: (output: source, invalid: (), ok: (@str)) {
-    (value: @bytes) = @bytes_build(output, invalid)
-    @str_from_utf8(value, invalid, ok)
+	(value: @bytes) = @bytes_build(output, invalid)
+	@str_from_utf8(value, invalid, ok)
 }

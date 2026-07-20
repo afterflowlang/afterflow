@@ -1,22 +1,64 @@
 parse_product_tail: (source_l: @uint, source_nth: nth, idx: @uint, args: arg, a: calculation, invalid: (), ok: (@uint, calculation)) {
-    (next_idx: @uint) = skip_whitespace(source_l, source_nth, idx)
-    @lt_uint(next_idx, source_l, () {
-        (operator: @u8) = source_nth(next_idx, invalid)
-        eq_byte(operator, 42, () {
-            (operand_idx: @uint) = @add_uint(next_idx, 1)
-            (following_idx: @uint, b: calculation) = parse_unary(source_l, source_nth, operand_idx, args, invalid)
-            parse_product_tail(source_l, source_nth, following_idx, args, multiply(a, b), invalid, ok)
-        }, () {
-            eq_byte(operator, 47, () {
-                (operand_idx: @uint) = @add_uint(next_idx, 1)
-                (following_idx: @uint, b: calculation) = parse_unary(source_l, source_nth, operand_idx, args, invalid)
-                parse_product_tail(source_l, source_nth, following_idx, args, divide(a, b), invalid, ok)
-            }, ok(next_idx, a))
-        })
-    }, ok(next_idx, a))
+	(next_idx: @uint) = skip_whitespace(source_l, source_nth, idx)
+	@lt_uint(
+		next_idx,
+		source_l,
+		() {
+			(operator: @u8) = source_nth(next_idx, invalid)
+			eq_byte(
+				operator,
+				42,
+				() {
+					(operand_idx: @uint) = @add_uint(next_idx, 1)
+					(following_idx: @uint, b: calculation) = parse_unary(
+						source_l,
+						source_nth,
+						operand_idx,
+						args,
+						invalid
+					)
+					parse_product_tail(
+						source_l,
+						source_nth,
+						following_idx,
+						args,
+						multiply(a, b),
+						invalid,
+						ok
+					)
+				},
+				() {
+					eq_byte(
+						operator,
+						47,
+						() {
+							(operand_idx: @uint) = @add_uint(next_idx, 1)
+							(following_idx: @uint, b: calculation) = parse_unary(
+								source_l,
+								source_nth,
+								operand_idx,
+								args,
+								invalid
+							)
+							parse_product_tail(
+								source_l,
+								source_nth,
+								following_idx,
+								args,
+								divide(a, b),
+								invalid,
+								ok
+							)
+						},
+						ok(next_idx, a)
+					)
+				}
+			)
+		},
+		ok(next_idx, a)
+	)
 }
-
 parse_product: (source_l: @uint, source_nth: nth, idx: @uint, args: arg, invalid: (), ok: (@uint, calculation)) {
-    (next_idx: @uint, value: calculation) = parse_unary(source_l, source_nth, idx, args, invalid)
-    parse_product_tail(source_l, source_nth, next_idx, args, value, invalid, ok)
+	(next_idx: @uint, value: calculation) = parse_unary(source_l, source_nth, idx, args, invalid)
+	parse_product_tail(source_l, source_nth, next_idx, args, value, invalid, ok)
 }

@@ -1,11 +1,9 @@
 sqrt: (value: @f64, ok: (@f64)) {
-    @sqrt_f64(value, ok)
+	@sqrt_f64(value, ok)
 }
-
 cbrt: (value: @f64, ok: (@f64)) {
-    @cbrt_f64(value, ok)
+	@cbrt_f64(value, ok)
 }
-
 hypot: (x: @f64, y: @f64, ok: (@f64)) {
-    @hypot_f64(x, y, ok)
+	@hypot_f64(x, y, ok)
 }

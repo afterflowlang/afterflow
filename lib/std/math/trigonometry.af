@@ -1,23 +1,18 @@
 cos: (radians: @f64, ok: (@f64)) {
-    @cos_f64(radians, ok)
+	@cos_f64(radians, ok)
 }
-
 tan: (radians: @f64, ok: (@f64)) {
-    @tan_f64(radians, ok)
+	@tan_f64(radians, ok)
 }
-
 asin: (value: @f64, ok: (@f64)) {
-    @asin_f64(value, ok)
+	@asin_f64(value, ok)
 }
-
 acos: (value: @f64, ok: (@f64)) {
-    @acos_f64(value, ok)
+	@acos_f64(value, ok)
 }
-
 atan: (value: @f64, ok: (@f64)) {
-    @atan_f64(value, ok)
+	@atan_f64(value, ok)
 }
-
 atan2: (y: @f64, x: @f64, ok: (@f64)) {
-    @atan2_f64(y, x, ok)
+	@atan2_f64(y, x, ok)
 }
