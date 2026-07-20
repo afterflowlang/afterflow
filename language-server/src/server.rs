@@ -378,12 +378,12 @@ impl Snapshot {
         let offset = document.position_to_offset(text_params.position)?;
         if let Some(definition) = document.analysis().definition_at(offset) {
             if definition.kind == DefinitionKind::Namespace {
-                return self.import_locations(definition);
+                return self.import_locations(document, definition);
             }
             return Some(source_definition_location(document, definition));
         }
         if let Some(import) = document.analysis().import_at(offset) {
-            return self.import_locations(import);
+            return self.import_locations(document, import);
         }
         let (name, _, scope) = document.analysis().reference_at(offset)?;
         if let Some((target_document, definition)) = self.resolve(document, name, scope, offset) {
@@ -436,7 +436,7 @@ impl Snapshot {
                 .strip_prefix(first)
                 .and_then(|rest| rest.strip_prefix('.'))
             {
-                return self.resolve_import(definition, member);
+                return self.resolve_import(document, definition, member);
             }
             return Some((document, definition));
         }
@@ -457,7 +457,7 @@ impl Snapshot {
             .strip_prefix(first)
             .and_then(|rest| rest.strip_prefix('.'))
         {
-            self.resolve_import(found.1, member)
+            self.resolve_import(found.0, found.1, member)
         } else {
             Some(found)
         }
@@ -465,10 +465,11 @@ impl Snapshot {
 
     fn resolve_import<'a>(
         &'a self,
+        source: &Document,
         import: &Definition,
         member: &str,
     ) -> Option<(&'a Document, &'a Definition)> {
-        self.import_documents(import)
+        self.import_documents(source, import)
             .into_iter()
             .filter(|document| !is_private_source(document.uri()))
             .find_map(|document| {
@@ -480,19 +481,20 @@ impl Snapshot {
             })
     }
 
-    fn import_locations(&self, import: &Definition) -> Option<GotoDefinitionResponse> {
+    fn import_locations(
+        &self,
+        source: &Document,
+        import: &Definition,
+    ) -> Option<GotoDefinitionResponse> {
         let locations = self
-            .import_documents(import)
+            .import_documents(source, import)
             .into_iter()
             .map(package_document_location)
             .collect::<Vec<_>>();
         (!locations.is_empty()).then_some(GotoDefinitionResponse::Array(locations))
     }
 
-    fn import_documents<'a>(&'a self, import: &Definition) -> Vec<&'a Document> {
-        let Some(root) = self.root.as_ref() else {
-            return Vec::new();
-        };
+    fn import_documents<'a>(&'a self, source: &Document, import: &Definition) -> Vec<&'a Document> {
         let Some(path) = import
             .import_path
             .as_deref()
@@ -500,24 +502,39 @@ impl Snapshot {
         else {
             return Vec::new();
         };
-        let direct = root.join(path);
-        let bundled = root.join("lib").join(path);
-        let mut documents = self
-            .documents
-            .values()
-            .map(Arc::as_ref)
-            .filter(|document| file_directory(document.uri()).as_deref() == Some(&direct))
-            .collect::<Vec<_>>();
-        if documents.is_empty() {
-            documents = self
-                .documents
-                .values()
-                .map(Arc::as_ref)
-                .filter(|document| file_directory(document.uri()).as_deref() == Some(&bundled))
-                .collect();
+
+        let mut roots = Vec::new();
+        if let Some(root) = &self.root {
+            roots.push(root.clone());
         }
-        documents.sort_by(|left, right| left.uri().as_str().cmp(right.uri().as_str()));
-        documents
+        if let Some(directory) = file_directory(source.uri()) {
+            for ancestor in directory.ancestors() {
+                let ancestor = ancestor.to_path_buf();
+                if !roots.contains(&ancestor) {
+                    roots.push(ancestor);
+                }
+            }
+        }
+
+        for root in roots {
+            for directory in [root.join(path), root.join("lib").join(path)] {
+                let mut documents = self
+                    .documents
+                    .values()
+                    .map(Arc::as_ref)
+                    .filter(|document| {
+                        file_directory(document.uri()).as_deref() == Some(&directory)
+                    })
+                    .collect::<Vec<_>>();
+                if documents.is_empty() {
+                    continue;
+                }
+                documents.sort_by(|left, right| left.uri().as_str().cmp(right.uri().as_str()));
+                return documents;
+            }
+        }
+
+        Vec::new()
     }
 }
 
@@ -857,6 +874,38 @@ mod tests {
             panic!("expected markdown hover");
         };
         assert!(markup.value.contains("new: (ok: ())"));
+    }
+
+    #[test]
+    fn resolves_bundled_packages_from_a_nested_repository() {
+        let snapshot = snapshot(&[
+            (
+                "file:///workspace/afterflow/example/main.af",
+                "fmt: /std/fmt\nmain: () { fmt.new(@exit) }\n",
+            ),
+            (
+                "file:///workspace/afterflow/lib/std/fmt/new.af",
+                "new: (ok: ()) { ok }\n",
+            ),
+        ]);
+        let uri = Url::parse("file:///workspace/afterflow/example/main.af").expect("valid URI");
+        let response = snapshot
+            .definition(GotoDefinitionParams {
+                text_document_position_params: types::TextDocumentPositionParams::new(
+                    types::TextDocumentIdentifier::new(uri),
+                    types::Position::new(1, 15),
+                ),
+                work_done_progress_params: Default::default(),
+                partial_result_params: Default::default(),
+            })
+            .expect("nested source definition");
+        let GotoDefinitionResponse::Scalar(location) = response else {
+            panic!("expected one source definition");
+        };
+        assert_eq!(
+            location.uri.as_str(),
+            "file:///workspace/afterflow/lib/std/fmt/new.af"
+        );
     }
 
     #[test]
