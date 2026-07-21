@@ -11,12 +11,12 @@ that remain useful across unrelated programs.
 - `print` writes an `@str` unchanged.
 - `println` writes an `@str` followed by a newline.
 
-Formatting is a domain-specific typed DSL and lives in [`/std/fmt`](fmt/README.md),
+Formatting is a domain-specific typed DSL and lives in [`/std/fmt`](lib-std-fmt.md),
 not in the root package.
 
-Numerical operations live in [`/std/math`](math/README.md). Its unsuffixed
+Numerical operations live in [`/std/math`](lib-std-math.md). Its unsuffixed
 operations use `@int`, the language's default numeric type. Scientific source
-evaluation lives in the focused [`/std/math/calc`](math/calc/README.md)
+evaluation lives in the focused [`/std/math/calc`](lib-std-math-calc.md)
 subpackage.
 
 ## Boundary

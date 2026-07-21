@@ -44,7 +44,7 @@ the ergonomic Afterflow composition `ln(value) / ln(base)`. `ldexp` retains an
 `@i32` exponent because that is the backing function's actual type.
 
 The scientific calculator DSL is a separate subpackage at
-[`/std/math/calc`](calc/README.md). Import it directly when mathematical source
+[`/std/math/calc`](lib-std-math-calc.md). Import it directly when mathematical source
 text and named placeholder bindings should produce an `@f64`.
 
 ## Boundary

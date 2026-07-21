@@ -5,13 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Afterflow",
-            "type": "go",
+            "name": "Debug Rust Tests (WSL)",
+            "type": "lldb",
             "request": "launch",
-            "mode": "debug",
+            "program": "${workspaceFolder}/target/debug/deps/${fileBasenameNoExtension}",
+            "args": [
+                "--nocapture"
+            ],
+            "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/main.go",
-            "args": ["./code/hello.af"]
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "externalConsole": false,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }

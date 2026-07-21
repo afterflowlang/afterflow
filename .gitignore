@@ -2,3 +2,7 @@
 bin/
 Cargo.lock
 target/
+.afterflow-cache/
+musl-1.2.5/
+*.scip
+tests/golden/compiler2/**/actual.txt

@@ -423,9 +423,19 @@ Argument matching flow:
   - reject too many arguments
   - type-check every argument against its matched parameter
 
-Parameter names matter for named application. Function signature compatibility
-is otherwise structural: two function-typed values match by parameter shape and
-types, not by parameter names.
+Named application is static sugar over positional application. A named argument
+selects a slot in the signature visible at the call site, and lowering permutes
+the arguments into positional order. It does not inspect or dispatch on names at
+runtime.
+
+Parameter names therefore belong to a binding's callable interface, but not to
+the identity of its function type. Function signature compatibility is
+structural: two function-typed values match by parameter shape, types, and
+compile-time requirements, not by parameter names. When a function value crosses
+a typed parameter boundary, named calls use the receiving parameter's signature.
+This allows structurally compatible functions with different declaration names
+to remain substitutable. A signature without a source-level name for a slot does
+not offer a name for that slot at that call site.
 
 Builtins can be passed where a function-typed value is expected. The compiler
 treats the builtin as a function value that forwards its parameters to the

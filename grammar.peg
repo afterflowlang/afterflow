@@ -74,7 +74,14 @@ Head
      / QualifiedIdentifier
 
 ArgumentItems
-    <- ContinuationSentence ("," _ ContinuationSentence)*
+    <- Argument ("," _ Argument)*
+
+Argument
+    <- NamedArgument
+     / ContinuationSentence
+
+NamedArgument
+    <- Identifier _ ":" _ ContinuationSentence
 
 ContinuationSentence
     <- Value (__ ContinuationSentence)?
