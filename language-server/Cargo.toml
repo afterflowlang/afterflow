@@ -6,6 +6,9 @@ description = "Language Server Protocol implementation for Afterflow"
 license = "Apache-2.0"
 default-run = "afterflow-ls"
 
+[lints]
+workspace = true
+
 [dependencies]
 afterflow-frontend = { path = "../frontend" }
 language-server-protocol = { path = "../kit/lsp" }

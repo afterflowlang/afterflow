@@ -361,7 +361,7 @@ impl<R: BufRead> Parser<R> {
         let token = self.bump()?;
         match token.kind {
             TokenKind::IntLiteral(value) => Ok(Term::Lit(Literal {
-                value: ast::Lit::Int(value as isize),
+                value: ast::Lit::Int(value),
                 span: token.span,
             })),
             TokenKind::FloatLiteral(value) => Ok(Term::Lit(Literal {

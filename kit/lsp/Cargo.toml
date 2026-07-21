@@ -5,6 +5,9 @@ edition = "2021"
 description = "Synchronous Language Server Protocol transport and interoperable protocol types"
 license = "Apache-2.0"
 
+[lints]
+workspace = true
+
 [dependencies]
 lsp-server = "0.7"
 lsp-types = "0.95"

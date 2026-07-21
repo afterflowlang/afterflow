@@ -51,10 +51,12 @@ impl Document {
     }
 
     pub(crate) fn position_to_offset(&self, position: Position) -> Option<usize> {
-        let start = *self.line_starts.get(position.line as usize)?;
+        let line_index = usize::try_from(position.line).ok()?;
+        let start = *self.line_starts.get(line_index)?;
+        let next_line_index = line_index.checked_add(1)?;
         let raw_end = self
             .line_starts
-            .get(position.line as usize + 1)
+            .get(next_line_index)
             .copied()
             .unwrap_or(self.text.len());
         let end = self.text[..raw_end]
@@ -71,7 +73,8 @@ impl Document {
             if utf16_column == position.character {
                 return Some(start + byte_offset);
             }
-            utf16_column += ch.len_utf16() as u32;
+            let character_width = u32::try_from(ch.len_utf16()).ok()?;
+            utf16_column = utf16_column.checked_add(character_width)?;
             if utf16_column > position.character {
                 return None;
             }
@@ -102,8 +105,12 @@ impl Document {
         let line = self.line_starts.partition_point(|start| *start <= offset) - 1;
         let start = self.line_starts[line];
         let character = self.text[start..offset].encode_utf16().count();
-        Position::new(line as u32, character as u32)
+        Position::new(position_component(line), position_component(character))
     }
+}
+
+pub(crate) fn position_component(value: usize) -> u32 {
+    u32::try_from(value).unwrap_or(u32::MAX)
 }
 
 fn line_starts(text: &str) -> Vec<usize> {
@@ -190,5 +197,10 @@ mod tests {
         assert_eq!(document.position_to_offset(Position::new(0, 3)), Some(3));
         assert_eq!(document.position_to_offset(Position::new(0, 4)), None);
         assert_eq!(document.position_to_offset(Position::new(1, 4)), Some(9));
+    }
+
+    #[test]
+    fn position_components_do_not_wrap() {
+        assert_eq!(position_component(usize::MAX), u32::MAX);
     }
 }

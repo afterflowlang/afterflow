@@ -331,7 +331,7 @@ pub fn lower_function(
 ) -> Result<Vec<AirFunction>, Error> {
     let sig = function_sig_from_hir(func);
     let params = sig.params.clone();
-    symbols.declare_function(sig.clone())?;
+    symbols.declare_function(sig.clone());
 
     let mut ctx = AirLowerContext::new(
         symbols,

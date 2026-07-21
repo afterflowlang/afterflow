@@ -58,10 +58,10 @@ pub fn generate_air_functions(items: &[hir::BlockItem]) -> Result<Vec<air::AirFu
                 }
             }
             hir::BlockItem::SigDef { name, sig } => {
-                symbols.install_type(name.to_string(), air::SigKind::Sig(sig.clone()))?;
+                symbols.install_type(name.clone(), air::SigKind::Sig(sig.clone()));
             }
             hir::BlockItem::FunctionDef(function) => {
-                symbols.declare_function(air::function_sig_from_hir(function))?;
+                symbols.declare_function(air::function_sig_from_hir(function));
                 hir_functions.insert(function.name.clone(), function.clone());
             }
             _ => entry_items.push(item.clone()),

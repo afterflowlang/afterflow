@@ -23,7 +23,7 @@ pub enum TokenKind {
     Ident(String),
     Builtin(String),
     SourcePath(String),
-    IntLiteral(i64),
+    IntLiteral(isize),
     FloatLiteral(f64),
     StringLiteral(String),
     Arrow,

@@ -91,7 +91,7 @@ impl<R: BufRead> Lexer<R> {
                     }
                 }
                 let value = literal
-                    .parse::<i64>()
+                    .parse::<isize>()
                     .map_err(|_| Error::new(Code::Lex, "invalid integer literal", span))?;
                 Token::new(TokenKind::IntLiteral(value), span)
             }

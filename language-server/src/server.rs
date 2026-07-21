@@ -24,7 +24,7 @@ use language_server_protocol::{
 };
 
 use crate::analysis::{Definition, DefinitionKind};
-use crate::document::Document;
+use crate::document::{position_component, Document};
 
 const SERVER_NAME: &str = "afterflow-ls";
 const BUILTIN_SCHEME: &str = "afterflow-builtin";
@@ -763,7 +763,7 @@ fn builtin_location(name: &str) -> Option<Location> {
         uri,
         types::Range::new(
             types::Position::new(0, 0),
-            types::Position::new(0, name.encode_utf16().count() as u32),
+            types::Position::new(0, position_component(name.encode_utf16().count())),
         ),
     ))
 }

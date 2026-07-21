@@ -28,18 +28,16 @@ impl SymbolRegistry {
             .insert(alias.to_string(), builtin_name.to_string());
     }
 
-    pub fn builtin_name_for_alias(&self, alias: &str) -> Option<&String> {
-        self.builtin_imports.get(alias)
+    pub fn builtin_name_for_alias(&self, alias: &str) -> Option<&str> {
+        self.builtin_imports.get(alias).map(String::as_str)
     }
 
-    pub fn declare_function(&mut self, sig: air::FunctionSig) -> Result<(), Error> {
+    pub fn declare_function(&mut self, sig: air::FunctionSig) {
         self.functions.insert(sig.name.clone(), sig);
-        Ok(())
     }
 
-    pub fn install_type(&mut self, name: String, kind: SigKind) -> Result<(), Error> {
-        self.types.insert(name.clone(), kind.clone());
-        Ok(())
+    pub fn install_type(&mut self, name: String, kind: SigKind) {
+        self.types.insert(name, kind);
     }
 
     pub fn get_type_info(&self, name: &str) -> Option<&SigKind> {
@@ -71,7 +69,7 @@ pub fn register_builtin_import(
     })?;
 
     if let builtins::BuiltinSpec::Type(kind) = spec {
-        symbols.install_type(alias.to_string(), kind.clone())?;
+        symbols.install_type(alias.to_string(), kind);
     }
 
     Ok(())
@@ -92,7 +90,8 @@ pub fn register_internal_builtin_import(
         params: signature.items,
         generics: signature.generics,
         builtin: Some(builtin),
-    })
+    });
+    Ok(())
 }
 
 pub fn builtin_function_sig(builtin_name: &str) -> Result<FunctionSig, Error> {

@@ -157,23 +157,23 @@ impl Index {
 
     fn block_item(&mut self, item: &ast::BlockItem, scope: usize, text: &str) {
         match item {
-            ast::BlockItem::Import { label, path, span } => self.define(
-                label,
-                format!("{label}: {path}"),
-                DefinitionKind::Namespace,
-                Some(path.clone()),
-                source_path_offset(text, *span, label, path),
-                *span,
-                scope,
-            ),
+            ast::BlockItem::Import { label, path, span } => {
+                self.definitions.push(Definition {
+                    name: label.clone(),
+                    detail: format!("{label}: {path}"),
+                    import_path: Some(path.clone()),
+                    import_path_offset: source_path_offset(text, *span, label, path),
+                    kind: DefinitionKind::Namespace,
+                    span: *span,
+                    scope,
+                });
+            }
             ast::BlockItem::SigDef { name, sig, span } => {
                 self.signature_references(sig, scope);
                 self.define(
                     name,
                     format!("{name}: {}", format_signature(sig, false)),
                     DefinitionKind::Type,
-                    None,
-                    None,
                     *span,
                     scope,
                 );
@@ -183,8 +183,6 @@ impl Index {
                     name,
                     format!("{name}: {}", format_signature(&lambda.params, true)),
                     DefinitionKind::Function,
-                    None,
-                    None,
                     *span,
                     scope,
                 );
@@ -198,8 +196,6 @@ impl Index {
                 name,
                 format!("{name}: {}", format_literal(literal)),
                 DefinitionKind::Constant,
-                None,
-                None,
                 *span,
                 scope,
             ),
@@ -209,8 +205,6 @@ impl Index {
                     name,
                     format!("{name}: {}", format_ident(ident)),
                     DefinitionKind::Alias,
-                    None,
-                    None,
                     *span,
                     scope,
                 );
@@ -248,8 +242,6 @@ impl Index {
                     &item.name,
                     format!("{}: {}", item.name, format_sig_kind(&item.kind)),
                     DefinitionKind::Parameter,
-                    None,
-                    None,
                     item.span,
                     scope,
                 );
@@ -308,16 +300,14 @@ impl Index {
         name: &str,
         detail: String,
         kind: DefinitionKind,
-        import_path: Option<String>,
-        import_path_offset: Option<usize>,
         span: Span,
         scope: usize,
     ) {
         self.definitions.push(Definition {
             name: name.to_string(),
             detail,
-            import_path,
-            import_path_offset,
+            import_path: None,
+            import_path_offset: None,
             kind,
             span,
             scope,

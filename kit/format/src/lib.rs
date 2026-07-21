@@ -8,20 +8,39 @@ use freestanding_runtime as _;
 const CAPACITY: usize = 64;
 
 #[cfg(not(any(test, debug_assertions)))]
+/// Copies `count` bytes from `source` to `destination`.
+///
+/// # Safety
+///
+/// `source` must be readable and `destination` writable for `count` bytes. The
+/// regions must not overlap, and both pointers must satisfy their allocation's
+/// provenance requirements.
 #[no_mangle]
 pub unsafe extern "C" fn memcpy(destination: *mut u8, source: *const u8, count: usize) -> *mut u8 {
-    for idx in 0..count {
-        let value = core::ptr::read_volatile(source.add(idx));
-        core::ptr::write_volatile(destination.add(idx), value);
+    // SAFETY: The caller provides valid, non-overlapping regions for the full byte count.
+    unsafe {
+        for idx in 0..count {
+            let value = core::ptr::read_volatile(source.add(idx));
+            core::ptr::write_volatile(destination.add(idx), value);
+        }
     }
     destination
 }
 
 #[cfg(not(any(test, debug_assertions)))]
+/// Writes `count` copies of `value` to `destination`.
+///
+/// # Safety
+///
+/// `destination` must be writable for `count` bytes and satisfy its
+/// allocation's provenance requirements.
 #[no_mangle]
 pub unsafe extern "C" fn memset(destination: *mut u8, value: i32, count: usize) -> *mut u8 {
-    for idx in 0..count {
-        core::ptr::write_volatile(destination.add(idx), value as u8);
+    // SAFETY: The caller provides a valid destination region for the full byte count.
+    unsafe {
+        for idx in 0..count {
+            core::ptr::write_volatile(destination.add(idx), value as u8);
+        }
     }
     destination
 }

@@ -114,11 +114,11 @@ fn compile_items<W: Write>(
                     }
                 }
                 hir::BlockItem::SigDef { name, sig } => {
-                    symbols.install_type(name.to_string(), air::SigKind::Sig(sig.clone()))?;
+                    symbols.install_type(name, air::SigKind::Sig(sig));
                 }
                 hir::BlockItem::FunctionDef(function) => {
                     let sig = air::function_sig_from_hir(&function);
-                    symbols.declare_function(sig)?;
+                    symbols.declare_function(sig);
                     hir_functions.insert(function.name.clone(), function);
                 }
                 other => entry_items.push(other),

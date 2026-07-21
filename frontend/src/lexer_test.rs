@@ -177,6 +177,18 @@ fn repeated_dots_are_rejected() {
 }
 
 #[test]
+fn integer_literals_must_fit_the_target_integer_type() {
+    let source = format!("{}0", isize::MAX);
+    let mut lexer = Lexer::new(Cursor::new(source));
+
+    let error = lexer
+        .next_token()
+        .expect_err("out-of-range integer literals should fail");
+    assert_eq!(error.code, Code::Lex);
+    assert_eq!(error.message, "invalid integer literal");
+}
+
+#[test]
 fn source_paths_start_with_slash() {
     let cursor = Cursor::new(b"math: /math\n");
     let mut lexer = Lexer::new(cursor);

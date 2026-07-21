@@ -5,6 +5,9 @@ edition = "2021"
 description = "Freestanding value formatting for statically linked programs"
 license = "Apache-2.0"
 
+[lints]
+workspace = true
+
 [lib]
 crate-type = ["staticlib"]
 
